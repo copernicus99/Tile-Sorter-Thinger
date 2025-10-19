@@ -19,7 +19,9 @@ BLOCK_EXACT_10x10     = int(os.getenv("TS_BLOCK_EXACT_10x10", "0"))
 MAX_INTERNAL_SEAM_FT  = float(os.getenv("TS_MAX_INTERNAL_SEAM_FT", "3"))
 MAX_EDGE_FT           = float(os.getenv("TS_MAX_EDGE_FT", "6"))
 NO_PLUS               = int(os.getenv("TS_NO_PLUS", "1")) != 0
-SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "1"))
+# By default we allow unlimited reuse of the same shape.  Setting a positive
+# integer (via TS_SAME_SHAPE_LIMIT) restores the guard to cap repeats.
+SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "-1"))
 BASE_GRID_AREA_SQFT   = float(os.getenv("TS_BASE_GRID_AREA_SQFT", "1000"))
 
 # ======= Pre-flight sizing / accounting =======
