@@ -36,11 +36,35 @@ def write_coords(placed: List[Placed], Wc: int, Hc: int, base_dir: str) -> str:
     return path
 
 
-def write_layout_view_html(svg: str, legend_html: str, base_dir: str) -> str:
-    """Write the rendered SVG/legend preview to the configured HTML file."""
+def write_layout_view_html(
+    svg: str,
+    legend_html: str,
+    base_dir: str,
+    grid_label: str | None = None,
+) -> str:
+    """Write the rendered SVG/legend preview to the configured HTML file.
+
+    Parameters
+    ----------
+    svg:
+        The rendered SVG markup for the layout preview.
+    legend_html:
+        The HTML list entries for the tile legend.
+    base_dir:
+        Base directory used to resolve the configured output path.
+    grid_label:
+        Optional human readable grid description such as
+        ``"280.0 × 280.0 ft (560 × 560 cells)"``. When provided this will be
+        rendered near the top of the document so the download mirrors the
+        information shown on the results page.
+    """
 
     path = _resolve_output_path(base_dir, CFG.LAYOUT_HTML, "layout_view.html")
     os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    grid_html = (
+        f"<p class='grid-label'>Grid: {grid_label}</p>" if grid_label else ""
+    )
 
     with open(path, "w", encoding="utf-8") as vf:
         vf.write(
@@ -50,6 +74,7 @@ def write_layout_view_html(svg: str, legend_html: str, base_dir: str) -> str:
 <link rel='stylesheet' href='/styles_add_rcgrid.css'></head>
 <body class='container'>
 <h1>Layout View</h1>
+{grid_html}
 <section class='card'><div class='gridwrap'><div class='grid-bg'></div>{svg}</div></section>
 <section class='card'><h3>Legend</h3><ul>{legend_html}</ul></section>
 </body></html>"""

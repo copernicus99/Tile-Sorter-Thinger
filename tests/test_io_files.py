@@ -50,6 +50,24 @@ class WriteOutputsTestCase(unittest.TestCase):
         self.assertIn(svg, contents)
         self.assertIn(legend, contents)
 
+    def test_write_layout_view_html_includes_grid_label(self) -> None:
+        CFG.LAYOUT_HTML = "layout.html"
+
+        svg = "<svg></svg>"
+        legend = "<li>tile</li>"
+        grid_label = "280.0 × 280.0 ft (560 × 560 cells)"
+
+        path = write_layout_view_html(
+            svg, legend, self.tmpdir.name, grid_label=grid_label
+        )
+
+        self.assertTrue(os.path.exists(path))
+
+        with open(path, "r", encoding="utf-8") as fh:
+            contents = fh.read()
+        self.assertIn(grid_label, contents)
+        self.assertIn("class='grid-label'", contents)
+
 
 if __name__ == "__main__":
     unittest.main()
