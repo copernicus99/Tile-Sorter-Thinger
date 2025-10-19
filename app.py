@@ -10,6 +10,9 @@ from flask import Flask, request, render_template, send_from_directory, jsonify
 from solver.orchestrator import solve_orchestrator
 from tiles import parse_demand, fmt_decoded_items
 from config import CFG
+from io_files import write_coords, write_layout_view_html
+from render import render_result
+from models import Placed
 
 from progress import (
     reset as progress_reset,
@@ -158,6 +161,7 @@ def _normalize_result(result: Any) -> Dict[str, Any]:
         ok_flag: Optional[bool] = None
         reason: Optional[str] = None
         payload: Optional[Dict[str, Any]] = None
+        placements: Optional[List[Placed]] = None
         seq = list(result)
         for elem in seq:
             if isinstance(elem, bool) and ok_flag is None:
@@ -166,6 +170,10 @@ def _normalize_result(result: Any) -> Dict[str, Any]:
                 reason = elem
             elif isinstance(elem, dict) and payload is None:
                 payload = elem
+            elif isinstance(elem, (list, tuple)) and placements is None:
+                maybe_list = list(elem)
+                if not maybe_list or all(isinstance(p, Placed) for p in maybe_list):
+                    placements = maybe_list  # type: ignore[assignment]
         if payload is None:
             for elem in seq:
                 if isinstance(elem, (tuple, list)):
@@ -176,6 +184,12 @@ def _normalize_result(result: Any) -> Dict[str, Any]:
                     if payload is not None:
                         break
         out = dict(payload or {})
+        if placements is None and isinstance(out.get("placements"), (list, tuple)):
+            maybe_list = list(out["placements"])  # type: ignore[index]
+            if not maybe_list or all(isinstance(p, Placed) for p in maybe_list):
+                placements = maybe_list  # type: ignore[assignment]
+        if placements is not None:
+            out["placements"] = placements
         if ok_flag is None:
             ok_flag = bool(out.get("svg") or out.get("placed_count") or out.get("placements"))
         out["ok"] = bool(ok_flag)
@@ -341,6 +355,28 @@ def solve():
     set_elapsed(time.time() - t0)
     spinner_stop.set()
 
+    placements_list = list(result.get("placements") or [])
+    svg_markup = result.get("svg", "")
+    coords_name = COORDS_FILENAME
+    layout_name = LAYOUT_FILENAME
+
+    if placements_list:
+        try:
+            svg_markup, legend_html = render_result(placements_list, int(result.get("W") or 0), int(result.get("H") or 0))
+        except Exception:
+            legend_html = ""
+        else:
+            try:
+                coords_path = write_coords(placements_list, int(result.get("W") or 0), int(result.get("H") or 0), BASE_DIR)
+                coords_name = os.path.basename(coords_path) or COORDS_FILENAME
+            except Exception:
+                coords_name = COORDS_FILENAME
+            try:
+                layout_path = write_layout_view_html(svg_markup, legend_html, BASE_DIR)
+                layout_name = os.path.basename(layout_path) or LAYOUT_FILENAME
+            except Exception:
+                layout_name = LAYOUT_FILENAME
+
     LAST_RESULT.update({
         "ok": ok_flag,
         "strategy": strategy_text,
@@ -352,10 +388,10 @@ def solve():
         "placed_count": result.get("placed_count", 0),
         "demand_count": sum(n for _, _, n in bag_list),
         "elapsed_str": _fmt_elapsed(time.time() - t0),
-        "svg": result.get("svg", ""),
+        "svg": svg_markup,
         "demand_items": fmt_decoded_items(decoded),
-        "coords_filename": COORDS_FILENAME,
-        "layout_filename": LAYOUT_FILENAME,
+        "coords_filename": coords_name,
+        "layout_filename": layout_name,
     })
     return render_template("result.html", **LAST_RESULT)
 
