@@ -199,17 +199,25 @@
     const showExtra = api && api.toLowerCase() !== label.toLowerCase();
     S.status.textContent = showExtra ? `${label} (${api})` : label;
 
-    S.strategy.textContent = p.strategy ?? '—';
+    const phaseLabel = (p.phase ?? p.strategy);
+    S.strategy.textContent = (phaseLabel !== undefined && phaseLabel !== null && phaseLabel !== '')
+      ? String(phaseLabel)
+      : '—';
     S.attempt.textContent  = normalize(p.attempt) ?? '—';
 
     // Grid fallback: grid → grid_ft → attempt
     const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? '—';
     S.grid.textContent = gridText;
 
-    S.elapsed.textContent = fmtElapsed(p.overall_elapsed ?? 0);
-    S.phaseTotal.textContent = p.time_limit ? `${p.time_limit}s` : '—';
+    const elapsedSec = p.elapsed ?? p.overall_elapsed ?? 0;
+    S.elapsed.textContent = fmtElapsed(elapsedSec);
 
-    let rawPhase = p.step_pct;
+    const phaseTotal = p.phase_total ?? p.time_limit;
+    S.phaseTotal.textContent = (phaseTotal !== undefined && phaseTotal !== null && phaseTotal !== '')
+      ? String(phaseTotal)
+      : '—';
+
+    let rawPhase = p.percent ?? p.step_pct;
     if (rawPhase == null && p.time_limit) rawPhase = (p.step_elapsed / p.time_limit) * 100;
     const val = Math.max(0, Math.min(100, parseFloat(String(rawPhase || 0).toString().replace('%',''))));
     S.phase.textContent = `${val.toFixed(1)}%`;
