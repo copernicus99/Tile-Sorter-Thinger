@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 import threading
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 # ------------------------------
 # Thread-safe global progress state
@@ -134,11 +134,35 @@ def set_message(msg: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["message"] = "" if msg is None else str(msg)
 
-def set_done() -> None:
+def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None:
+    """Mark the run complete, tolerating legacy arguments.
+
+    Historically ``set_done`` accepted a truthy/falsey positional flag and an
+    optional ``reason`` keyword.  Recent callers in :mod:`app` still pass those
+    arguments, so we accept them here instead of raising ``TypeError``.  The
+    boolean flag controls the final status when provided; otherwise we leave the
+    status unchanged (defaulting to ``"Solved"`` for backwards-compatibility).
+    Any supplied ``reason``/``message`` is surfaced via the ``message`` field.
+    """
+
+    final_status: Optional[str] = None
+    if ok is not None:
+        try:
+            final_status = "Solved" if bool(ok) else "Error"
+        except Exception:
+            final_status = None
+
+    final_message = message if message is not None else reason
+
     with PROGRESS_LOCK:
         _touch_elapsed_locked()
-        PROGRESS["status"] = "Solved"
+        if final_status is not None:
+            PROGRESS["status"] = final_status
+        elif PROGRESS.get("status") in ("", "Idle", None):
+            PROGRESS["status"] = "Solved"
         PROGRESS["percent"] = 100.0
+        if final_message is not None:
+            PROGRESS["message"] = str(final_message)
 
 # ------------------------------
 # Backward-compat shims
