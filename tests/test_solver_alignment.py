@@ -1,0 +1,43 @@
+import pytest
+
+cp_sat = pytest.importorskip("solver.cp_sat")
+orchestrator = pytest.importorskip("solver.orchestrator")
+
+try_pack_exact_cover = cp_sat.try_pack_exact_cover
+_align_up_to_multiple = orchestrator._align_up_to_multiple
+_grid_step_from_bag = orchestrator._grid_step_from_bag
+_square_candidates = orchestrator._square_candidates
+
+
+def test_try_pack_exact_cover_respects_tile_stride():
+    # Require placements at 2-cell increments; coarse stride (10) would fail.
+    multiset = {(2, 2): 8}
+    ok, placed, reason = try_pack_exact_cover(
+        W=8,
+        H=4,
+        multiset=multiset,
+        allow_discard=False,
+        max_seconds=5.0,
+    )
+    assert ok, reason
+    assert len(placed) == 8
+
+
+def test_square_candidates_align_to_tile_gcd():
+    bag_cells = {
+        (30, 30): 6,
+        (30, 10): 6,
+        (30, 6): 6,
+        (30, 4): 6,
+        (10, 4): 6,
+        (4, 4): 6,
+        (2, 4): 6,
+    }
+    step = _grid_step_from_bag(bag_cells)
+    assert step == 2
+    aligned = _align_up_to_multiple(97, step)
+    assert aligned == 98
+    candidates = _square_candidates(64, aligned, descending=False, multiple_of=step)
+    widths = [cb.W for cb in candidates]
+    assert aligned in widths
+    assert all(w % step == 0 for w in widths)

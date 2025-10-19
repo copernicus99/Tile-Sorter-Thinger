@@ -86,17 +86,44 @@ def _bag_ft_to_cells(bag_ft: Dict[Tuple[float, float], int]) -> Dict[Tuple[int, 
     return bag_cells
 
 
-def _square_candidates(min_side: int, max_side: int, *, descending: bool) -> List[CandidateBoard]:
+def _align_up_to_multiple(value: int, step: int) -> int:
+    if step <= 1:
+        return int(value)
+    value_i = int(value)
+    return int(((value_i + step - 1) // step) * step)
+
+
+def _align_down_to_multiple(value: int, step: int) -> int:
+    if step <= 1:
+        return int(value)
+    value_i = int(value)
+    return int((value_i // step) * step)
+
+
+def _grid_step_from_bag(bag_cells: Dict[Tuple[int, int], int]) -> int:
+    step = 0
+    for (w, h) in bag_cells.keys():
+        step = math.gcd(step, int(abs(w)))
+        step = math.gcd(step, int(abs(h)))
+    return max(1, step)
+
+
+def _square_candidates(min_side: int, max_side: int, *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:
     min_side = max(6, int(min_side))
     max_side = max(min_side, int(max_side))
     if descending:
         rng = range(max_side, min_side - 1, -1)
     else:
         rng = range(min_side, max_side + 1)
-    return [CandidateBoard(s, s, f"{_fmt_ft(s)} × {_fmt_ft(s)} ft") for s in rng]
+    out: List[CandidateBoard] = []
+    for s in rng:
+        if multiple_of > 1 and s % multiple_of != 0:
+            continue
+        out.append(CandidateBoard(s, s, f"{_fmt_ft(s)} × {_fmt_ft(s)} ft"))
+    return out
 
 
-def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool) -> List[CandidateBoard]:
+def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:
     out: List[CandidateBoard] = []
     seen = set()
     for w in widths:
@@ -107,6 +134,8 @@ def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, de
             if key in seen:
                 continue
             seen.add(key)
+            if multiple_of > 1 and (w_i % multiple_of != 0 or h_i % multiple_of != 0):
+                continue
             out.append(CandidateBoard(w_i, h_i, f"{_fmt_ft(w_i)} × {_fmt_ft(h_i)} ft"))
     key_fn = lambda cb: (cb.W * cb.H, max(cb.W, cb.H), cb.W)
     return sorted(out, key=key_fn, reverse=descending)
@@ -122,12 +151,18 @@ def _area_sqft(area_cells: int) -> float:
     return float(area_cells) * (CELL ** 2)
 
 
-def _descending_values(start: int, end: int) -> List[int]:
+def _descending_values(start: int, end: int, *, step: int = 1) -> List[int]:
     start_i = int(start)
     end_i = int(end)
     if start_i < end_i:
         start_i, end_i = end_i, start_i
-    return list(range(start_i, end_i - 1, -1)) if start_i >= end_i else [start_i]
+    values: List[int] = []
+    for val in range(start_i, end_i - 1, -1):
+        if step <= 1 or val % step == 0:
+            values.append(val)
+    if not values:
+        values.append(start_i)
+    return values
 
 
 # ---------- CP-SAT isolation ----------
@@ -246,13 +281,16 @@ def solve_orchestrator(*args, **kwargs):
                     "Bad demand: nothing parsed from request", {})
 
         bag_cells = _bag_ft_to_cells(bag_ft)
+        grid_step = _grid_step_from_bag(bag_cells)
         demand_count = sum(bag_cells.values())
         area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
         area_sqft = _area_sqft(area_cells)
 
         base_area_sqft = max(1.0, float(getattr(CFG, "BASE_GRID_AREA_SQFT", 1000.0)))
         base_side_cells = max(6, ft_to_cells(math.sqrt(base_area_sqft)))
+        base_side_cells = _align_up_to_multiple(base_side_cells, grid_step)
         sqrt_cells = _ceil_sqrt_cells(area_cells)
+        sqrt_cells = _align_up_to_multiple(sqrt_cells, grid_step)
 
         set_status("Solving")
         set_phase("S0")
@@ -375,12 +413,23 @@ def solve_orchestrator(*args, **kwargs):
         message_success = "This is the best that can be done."
 
         if area_sqft < base_area_sqft:
-            max_side_small = max(6, base_side_cells - 1)
+            decrement = grid_step if grid_step > 1 else 1
+            max_side_small = max(6, base_side_cells - decrement)
             if max_side_small < sqrt_cells:
                 max_side_small = sqrt_cells
-            max_side_small = max(max_side_small, 6)
-            candidates_A = [cb for cb in _square_candidates(sqrt_cells, max_side_small, descending=True)
-                            if cb.W * cb.H >= area_cells]
+            max_side_small = _align_down_to_multiple(max(max_side_small, 6), grid_step)
+            if max_side_small < sqrt_cells:
+                max_side_small = sqrt_cells
+            candidates_A = [
+                cb
+                for cb in _square_candidates(
+                    sqrt_cells,
+                    max_side_small,
+                    descending=True,
+                    multiple_of=grid_step,
+                )
+                if cb.W * cb.H >= area_cells
+            ]
             res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
                 "A", candidates_A, float(getattr(CFG, "TIME_A", 600.0)), False, prefer_large=True
             )
@@ -395,9 +444,15 @@ def solve_orchestrator(*args, **kwargs):
                 }
             else:
                 min_side_B = max(6, sqrt_cells - 6)
-                widths = _descending_values(max_side_small, min_side_B)
-                heights = _descending_values(max_side_small, min_side_B)
-                candidates_B = _rectangular_candidates(widths, heights, descending=True)[:30]
+                min_side_B = max(6, _align_down_to_multiple(min_side_B, grid_step))
+                widths = _descending_values(max_side_small, min_side_B, step=grid_step)
+                heights = _descending_values(max_side_small, min_side_B, step=grid_step)
+                candidates_B = _rectangular_candidates(
+                    widths,
+                    heights,
+                    descending=True,
+                    multiple_of=grid_step,
+                )[:30]
                 res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
                     "B", candidates_B, float(getattr(CFG, "TIME_B", 600.0)), True, prefer_large=True
                 )
@@ -411,10 +466,17 @@ def solve_orchestrator(*args, **kwargs):
                         "best_used": res_used,
                     }
         else:
-            base_candidate = CandidateBoard(base_side_cells, base_side_cells,
-                                            f"{_fmt_ft(base_side_cells)} × {_fmt_ft(base_side_cells)} ft")
+            base_candidate = CandidateBoard(
+                base_side_cells,
+                base_side_cells,
+                f"{_fmt_ft(base_side_cells)} × {_fmt_ft(base_side_cells)} ft",
+            )
             res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
-                "C", [base_candidate], float(getattr(CFG, "TIME_C", 300.0)), False, prefer_large=False
+                "C",
+                [base_candidate],
+                float(getattr(CFG, "TIME_C", 300.0)),
+                False,
+                prefer_large=False,
             )
             if res_ok and res_board:
                 final_strategy = "C"
@@ -427,7 +489,11 @@ def solve_orchestrator(*args, **kwargs):
                 }
             else:
                 res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
-                    "D", [base_candidate], float(getattr(CFG, "TIME_D", 300.0)), True, prefer_large=True
+                    "D",
+                    [base_candidate],
+                    float(getattr(CFG, "TIME_D", 300.0)),
+                    True,
+                    prefer_large=True,
                 )
                 if res_ok and res_board:
                     final_strategy = "D"
@@ -439,9 +505,19 @@ def solve_orchestrator(*args, **kwargs):
                         "best_used": res_used,
                     }
                 else:
-                    expand_upper = max(base_side_cells + 12, sqrt_cells)
-                    candidates_E = [cb for cb in _square_candidates(base_side_cells + 1, expand_upper, descending=False)
-                                    if cb.W * cb.H >= area_cells][:30]
+                    expand_upper_raw = max(base_side_cells + 12, sqrt_cells)
+                    expand_upper = _align_up_to_multiple(expand_upper_raw, grid_step)
+                    min_expand = base_side_cells + (grid_step if grid_step > 1 else 1)
+                    candidates_E = [
+                        cb
+                        for cb in _square_candidates(
+                            min_expand,
+                            expand_upper,
+                            descending=False,
+                            multiple_of=grid_step,
+                        )
+                        if cb.W * cb.H >= area_cells
+                    ][:30]
                     res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
                         "E", candidates_E, float(getattr(CFG, "TIME_E", 900.0)), False, prefer_large=False
                     )
@@ -455,7 +531,12 @@ def solve_orchestrator(*args, **kwargs):
                             "best_used": res_used,
                         }
                     else:
-                        candidates_F = _square_candidates(base_side_cells + 1, expand_upper, descending=False)[:30]
+                        candidates_F = _square_candidates(
+                            min_expand,
+                            expand_upper,
+                            descending=False,
+                            multiple_of=grid_step,
+                        )[:30]
                         res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
                             "F", candidates_F, float(getattr(CFG, "TIME_F", 900.0)), True, prefer_large=False
                         )

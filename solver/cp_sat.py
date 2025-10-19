@@ -1,3 +1,4 @@
+import math
 from typing import List, Tuple, Dict, Iterable, Union
 from ortools.sat.python import cp_model as _cp
 
@@ -105,6 +106,15 @@ def try_pack_exact_cover(
         return False, [], "Bad demand: nothing parsed from request"
 
     stride = max(1, int(getattr(CFG, "GRID_STRIDE_BASE", 1)))
+    dims = []
+    for r in tiles:
+        dims.append(abs(int(r.w)))
+        dims.append(abs(int(r.h)))
+    if dims:
+        dims_gcd = abs(int(dims[0]))
+        for dim in dims[1:]:
+            dims_gcd = math.gcd(dims_gcd, abs(int(dim)))
+        stride = min(stride, max(1, dims_gcd))
     max_placements = int(getattr(CFG, "MAX_PLACEMENTS", 150000))
 
     # adaptive thinning
