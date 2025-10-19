@@ -306,15 +306,14 @@ def try_pack_exact_cover(
                 total_used_area = sum(used_area_terms)
                 target_pct = float(getattr(CFG, "COVERAGE_GOAL_PCT", 99.5))
                 target_cells = int(round((target_pct / 100.0) * (W * H)))
-                # Make target a “soft” requirement: if infeasible, maximize anyway.
-                # (So we still get a best effort layout.)
+                # We only maximize coverage.  Previously we also added a hard
+                # lower bound which could incorrectly mark layouts infeasible when
+                # geometric parity prevented perfectly covering the grid (e.g. all
+                # even-width tiles on an odd-width board).  Keeping the objective
+                # without the hard constraint lets CP-SAT chase the best coverage
+                # attainable while still returning partial layouts when necessary.
+                _ = (target_pct, target_cells)  # retained for potential diagnostics / parity tweaks
                 m.Maximize(total_used_area)
-                # Try a feasibility solve first with a hard bound; if infeasible within
-                # the timebox, the solver will still return the best it found because
-                # we’re optimizing. (CP-SAT treats the maximize objective as primary.)
-                # We still add the constraint; if it causes proven infeasible the
-                # return code will say so; if not proven, we get the best-so-far.
-                m.Add(total_used_area >= target_cells)
             else:
                 m.Minimize(0)
         else:
