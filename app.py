@@ -359,6 +359,15 @@ def solve():
     svg_markup = result.get("svg", "")
     coords_name = COORDS_FILENAME
     layout_name = LAYOUT_FILENAME
+    grid_label_text = None
+
+    if rW_ft and rH_ft:
+        if rW and rH:
+            grid_label_text = f"{rW_ft:g} × {rH_ft:g} ft ({rW} × {rH} cells)"
+        else:
+            grid_label_text = f"{rW_ft:g} × {rH_ft:g} ft"
+    elif rW and rH:
+        grid_label_text = f"{rW} × {rH} cells"
 
     if placements_list:
         try:
@@ -372,7 +381,9 @@ def solve():
             except Exception:
                 coords_name = COORDS_FILENAME
             try:
-                layout_path = write_layout_view_html(svg_markup, legend_html, BASE_DIR)
+                layout_path = write_layout_view_html(
+                    svg_markup, legend_html, BASE_DIR, grid_label=grid_label_text
+                )
                 layout_name = os.path.basename(layout_path) or LAYOUT_FILENAME
             except Exception:
                 layout_name = LAYOUT_FILENAME
