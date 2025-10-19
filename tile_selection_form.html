@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tile Layout — Select Tiles</title>
+  <link rel="stylesheet" href="styles.css?v=rows_static_1" />
+</head>
+<body>
+  <div class="container">
+    <h1>Tile Layout — <span class="accent">Select Tiles</span></h1>
+    <p class="muted">Enter quantities (0–10). “Total sq ft” is reference-only and is not sent.</p>
+
+    <form class="card table-card" method="post" action="/solve" id="tileForm">
+      <div class="grid-2">
+        <!-- Client total -->
+        <div class="card">
+          <label for="clientTotal" class="lbl">Total sq ft (client-only)</label>
+          <input id="clientTotal" class="input" placeholder="e.g., 100" inputmode="decimal" />
+        </div>
+
+        <!-- Live likelihood -->
+        <div class="card">
+          <div class="lbl-row">
+            <span class="lbl">Live Solve Likelihood</span>
+            <span id="totalBadge" class="badge">Total: 0 ft²</span>
+          </div>
+          <div class="likelihood">
+            <span id="lkBadge" class="chip bad">Low</span>
+            <svg class="bar bar-svg" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+              <rect class="track" x="0" y="0" width="100" height="8"></rect>
+              <rect id="lkBar" class="fill" x="0" y="0" width="0" height="8"></rect>
+            </svg>
+          </div>
+          <ul class="hints">
+            <li>Adjust quantities to see likelihood change.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tiles table (pre-rendered rows) -->
+      <div class="card">
+        <div class="lbl-row">
+          <span class="lbl">Tile size (ft)</span>
+          <span class="lbl rightnum">Quantity (0–10)</span>
+        </div>
+        <table>
+          <thead>
+            <!-- <tr><th>Tile size (ft)</th><th class="rightnum">Quantity (0–10)</th></tr> -->
+          </thead>
+<tbody id="rows">
+  <tr><td>1 × 1</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_1x1"   value="0" data-w="1"   data-h="1"></div>
+    </td></tr>
+  <tr><td>1 × 1.5</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_1x15"  value="0" data-w="1"   data-h="1.5"></div>
+    </td></tr>
+  <tr><td>1 × 2</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_1x2"   value="0" data-w="1"   data-h="2"></div>
+    </td></tr>
+  <tr><td>1.5 × 1.5</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_15x15" value="0" data-w="1.5" data-h="1.5"></div>
+    </td></tr>
+  <tr><td>1.5 × 2</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_15x2"  value="0" data-w="1.5" data-h="2"></div>
+    </td></tr>
+  <tr><td>1.5 × 2.5</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_15x25" value="0" data-w="1.5" data-h="2.5"></div>
+    </td></tr>
+  <tr><td>1.5 × 3</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_15x3"  value="0" data-w="1.5" data-h="3"></div>
+    </td></tr>
+  <tr><td>2 × 2</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_2x2"   value="0" data-w="2"   data-h="2"></div>
+    </td></tr>
+  <tr><td>2 × 2.5</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_2x25"  value="0" data-w="2"   data-h="2.5"></div>
+    </td></tr>
+  <tr><td>2 × 3</td>
+    <td>
+      <div class="row"><input class="field" type="number" min="0" max="10" step="1" name="count_2x3"   value="0" data-w="2"   data-h="3"></div>
+    </td></tr>
+</tbody>
+
+        </table>
+
+        <div class="actions">
+          <button type="button" id="clearBtn" class="btn ghost">Clear</button>
+          <button type="submit" class="btn primary">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Progress overlay -->
+  <div id="runOverlay" class="overlay hidden">
+    <div class="overlay-card" role="dialog" aria-modal="true">
+      <h2>Running solver…</h2>
+      <p class="rc-sub">We’re computing your layout. This dialog will close when results are ready.</p>
+
+      <div class="rc-grid rc-grid-compact">
+        <div class="rc-row-span"><div class="rc-stat"><b>Status</b><span id="rc-status">Solving</span></div></div>
+        <div class="rc-stat"><b>Phase</b><span id="rc-strategy">—</span></div>
+        <div class="rc-stat"><b>Phase total</b><span id="rc-phase-total">—</span></div>
+        <div class="rc-stat"><b>Attempt</b><span id="rc-attempt">—</span></div>
+        <div class="rc-stat"><b>Grid</b><span id="rc-grid">—</span></div>
+        <div class="rc-row-span"><div class="rc-stat"><b>Elapsed</b><span id="rc-elapsed">0s</span></div></div>
+        <div class="rc-row-span rc-divider"></div>
+        <div class="rc-row-span"><div class="rc-stat"><b>Phase</b><span id="rc-phase">—</span></div></div>
+        <div class="rc-row-span">
+          <svg class="rc-bar bar-svg" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+            <rect class="track" x="0" y="0" width="100" height="8"></rect>
+            <rect id="rc-bar-phase" class="fill" x="0" y="0" width="0" height="8"></rect>
+          </svg>
+        </div>
+      </div>
+
+      <div class="rc-actions">
+        <button id="rc-cancel" class="rc-btn">Hide</button>
+        <button id="rc-abort" class="rc-btn danger">Abort</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ===== Totals & likelihood (works on pre-rendered rows) ===== */
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const totalBadge = $('#totalBadge');
+  const lkBadge = $('#lkBadge');
+  const lkBar = $('#lkBar');
+  const clientTotal = $('#clientTotal');
+
+  function fmt(n){ return (Math.round(n*10)/10).toString(); }
+
+  function summarize() {
+    let area=0, count=0, bigs=0;
+    $$('input.field').forEach(inp => {
+      const q = Math.max(0, Math.min(10, parseInt(inp.value || '0', 10)));
+      const w = parseFloat(inp.dataset.w), h = parseFloat(inp.dataset.h);
+      area += q * w * h;
+      count += q;
+      if (Math.max(w,h) >= 2) bigs += q;
+    });
+    return {area, count, bigs};
+  }
+
+  function refresh(){
+    const {area, count, bigs} = summarize();
+    totalBadge.textContent = `Total: ${fmt(area)} ft²`;
+    const base = Math.min(70, Math.round(area*0.8)) + Math.min(30, count*2);
+    const penalty = Math.min(25, bigs*2);
+    const score = Math.max(0, Math.min(100, 20 + base - penalty));
+    lkBar.setAttribute('width', String(score));
+    let label='Low', cls='chip bad';
+    if (score > 70) { label='High'; cls='chip good'; }
+    else if (score > 35) { label='Medium'; cls='chip ok'; }
+    lkBadge.textContent = label; lkBadge.className = cls;
+  }
+
+  $$('input.field').forEach(inp => inp.addEventListener('input', refresh));
+  $('#clearBtn')?.addEventListener('click', ()=>{
+    $$('input.field').forEach(i => i.value='0');
+    if (clientTotal) clientTotal.value='';
+    refresh();
+  });
+
+  refresh();
+})();
+
+/* ===== Overlay submit + polling (uses /progress3) ===== */
+(function(){
+  const form = document.getElementById('tileForm');
+  const ov = document.getElementById('runOverlay');
+  const $ = (id) => document.getElementById(id);
+  const S = {
+    status: $('rc-status'), strategy: $('rc-strategy'), attempt: $('rc-attempt'),
+    grid: $('rc-grid'), elapsed: $('rc-elapsed'),
+    phaseTotal: $('rc-phase-total'), phase: $('rc-phase'), barPhase: $('rc-bar-phase')
+  };
+  function show(){ ov.classList.remove('hidden'); }
+  function hide(){ ov.classList.add('hidden'); }
+  function fmtElapsed(sec){ sec=Math.max(0,Math.floor(sec||0)); const m=Math.floor(sec/60), s=sec%60; return (m?m+'m ':'')+s+'s'; }
+  function normalize(s){ return s ? String(s).replace(/x/g,' × ') : s; }
+
+  function updateCard(p){
+    const label = "Solving";
+    const api = (p.status || "").trim();
+    const showExtra = api && api.toLowerCase() !== label.toLowerCase();
+    S.status.textContent = showExtra ? `${label} (${api})` : label;
+
+    S.strategy.textContent = p.strategy ?? '—';
+    S.attempt.textContent  = normalize(p.attempt) ?? '—';
+
+    // Grid fallback: grid → grid_ft → attempt
+    const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? '—';
+    S.grid.textContent = gridText;
+
+    S.elapsed.textContent = fmtElapsed(p.overall_elapsed ?? 0);
+    S.phaseTotal.textContent = p.time_limit ? `${p.time_limit}s` : '—';
+
+    let rawPhase = p.step_pct;
+    if (rawPhase == null && p.time_limit) rawPhase = (p.step_elapsed / p.time_limit) * 100;
+    const val = Math.max(0, Math.min(100, parseFloat(String(rawPhase || 0).toString().replace('%',''))));
+    S.phase.textContent = `${val.toFixed(1)}%`;
+    S.barPhase.setAttribute('width', String(val));
+  }
+
+  async function poll(){
+    try{
+      const r = await fetch('/progress3', {cache:'no-store'});
+      if(!r.ok) return;
+      const p = await r.json();
+      updateCard(p);
+      if (p.done) {
+        // If backend gave us a URL, go there (safe fallback)
+        if (p.result_url && !window.__navigated) {
+          window.__navigated = true;
+          window.location.href = p.result_url;
+        }
+        clearInterval(window.__pollTimer);
+      }
+    }catch(e){}
+  }
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    show();
+    if (window.__pollTimer) clearInterval(window.__pollTimer);
+    await poll();
+    window.__pollTimer = setInterval(poll, 400);
+    try{
+      const resp = await fetch('/solve', {method:'POST', body:new FormData(form)});
+      const html = await resp.text();
+      // Immediate navigation with the returned page body
+      document.open(); document.write(html); document.close();
+    }catch(err){ S.status.textContent = 'Error'; }
+  });
+
+  document.getElementById('rc-cancel').addEventListener('click', hide);
+  document.getElementById('rc-abort').addEventListener('click', hide);
+})();
+</script>
+</body>
+</html>

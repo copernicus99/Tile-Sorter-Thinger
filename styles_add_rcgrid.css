@@ -1,0 +1,4 @@
+
+/* Ensure the compact layout rows span full width when needed */
+.rc-grid.rc-grid-compact { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rc-grid-compact .rc-row-span { grid-column: 1 / -1; }
