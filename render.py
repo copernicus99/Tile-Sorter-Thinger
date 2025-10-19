@@ -33,7 +33,12 @@ def render_result(placed: List[Placed], Wc: int, Hc: int):
             f'<text x="{x+4}" y="{y+14}" font-size="12" fill="black">{p.rect.name}</text>'
         )
     grid = f'<rect x="1" y="1" width="{svg_w-2}" height="{svg_h-2}" fill="none" stroke="black" stroke-width="2"/>'
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{svg_w}" height="{svg_h}" viewBox="0 0 {svg_w} {svg_h}">{grid}{"".join(rects)}</svg>'
+    svg = (
+        f'<svg class="layout-svg" xmlns="http://www.w3.org/2000/svg" '
+        f'width="{svg_w}" height="{svg_h}" '
+        f'viewBox="0 0 {svg_w} {svg_h}" preserveAspectRatio="xMinYMin meet">'
+        f'{grid}{"".join(rects)}</svg>'
+    )
 
     legend = "".join(f"<li><span class='swatch' style='background:{c}'></span>{n}</li>" for n, c in palette.items())
     return svg, legend

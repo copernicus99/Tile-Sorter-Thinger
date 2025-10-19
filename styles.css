@@ -30,3 +30,6 @@ table{width:100%;border-collapse:separate;border-spacing:0}th,td{padding:12px 14
 .rc-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
 .rc-btn{appearance:none;border:1px solid #3840a6;background:#1b2030;color:#e6e8ec;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
 .rc-btn.danger{border-color:#8a2424;color:#ffb0b0}
+.gridwrap{position:relative;background:#0f141b;border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto;max-height:520px}
+.gridwrap svg{display:block;position:relative;z-index:1;width:100%;height:auto}
+.gridwrap .grid-bg{position:absolute;inset:12px;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.15),rgba(255,255,255,.15) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(90deg,rgba(255,255,255,.15),rgba(255,255,255,.15) 1px,transparent 1px,transparent 28px);pointer-events:none;z-index:0;border-radius:6px}
