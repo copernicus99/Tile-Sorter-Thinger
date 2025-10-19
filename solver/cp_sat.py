@@ -129,204 +129,239 @@ def try_pack_exact_cover(
             f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
         )
 
-    m = _cp.CpModel()
-    n = len(tiles)
+    def _solve_with_limit(limit_value, seconds):
+        m = _cp.CpModel()
+        n = len(tiles)
 
-    # at most once (coverage) / exactly once (strict)
-    p = [[m.NewBoolVar(f"p_{i}_{k}") for k in range(len(options[i]))] for i in range(n)]
-    for i in range(n):
-        if allow_discard:
-            if p[i]:
-                m.Add(sum(p[i]) <= 1)
-        else:
-            if not p[i]:
-                return False, [], "No placements remain for at least one tile (over-thinned)"
-            m.Add(sum(p[i]) == 1)
+        # at most once (coverage) / exactly once (strict)
+        p = [[m.NewBoolVar(f"p_{i}_{k}") for k in range(len(options[i]))] for i in range(n)]
+        for i in range(n):
+            if allow_discard:
+                if p[i]:
+                    m.Add(sum(p[i]) <= 1)
+            else:
+                if not p[i]:
+                    return False, [], "No placements remain for at least one tile (over-thinned)"
+                m.Add(sum(p[i]) == 1)
 
-    # symmetry breaking
-    place_idx = []
-    for i in range(n):
-        idx = m.NewIntVar(0, max(0, len(options[i]) - 1), f"idx_{i}")
-        if options[i]:
-            m.Add(idx == sum(k * p[i][k] for k in range(len(options[i]))))
-        place_idx.append(idx)
+        # symmetry breaking
+        place_idx = []
+        for i in range(n):
+            idx = m.NewIntVar(0, max(0, len(options[i]) - 1), f"idx_{i}")
+            if options[i]:
+                m.Add(idx == sum(k * p[i][k] for k in range(len(options[i]))))
+            place_idx.append(idx)
 
-    by_shape: Dict[tuple, List[int]] = {}
-    for i, t in enumerate(tiles):
-        key = tuple(sorted((t.w, t.h)))
-        by_shape.setdefault(key, []).append(i)
-    for _, idxs in by_shape.items():
-        if len(idxs) >= 2:
-            idxs = sorted(idxs)
-            for a, b in zip(idxs, idxs[1:]):
-                m.Add(place_idx[a] <= place_idx[b])
+        by_shape: Dict[tuple, List[int]] = {}
+        for i, t in enumerate(tiles):
+            key = tuple(sorted((t.w, t.h)))
+            by_shape.setdefault(key, []).append(i)
+        for _, idxs in by_shape.items():
+            if len(idxs) >= 2:
+                idxs = sorted(idxs)
+                for a, b in zip(idxs, idxs[1:]):
+                    m.Add(place_idx[a] <= place_idx[b])
 
-    # --- coverage / non-overlap ---
-    #
-    # In coverage mode we must still prevent overlap, so use ≤ 1 coverage per cell.
-    # In strict mode it’s the usual == 1 exact cover.
-    for x in range(W):
-        for y in range(H):
-            covers = []
-            for i in range(n):
-                for k, (px, py, rot, w, h) in enumerate(options[i]):
-                    if (px <= x < px + w) and (py <= y < py + h):
-                        covers.append(p[i][k])
-            if not covers:
-                if not allow_discard:
-                    return False, [], f"Coverage impossible with stride={stride} (un-coverable cell)"
-                # coverage mode can tolerate uncovered cells
-                continue
-            m.Add(sum(covers) <= (1 if allow_discard else 1))  # ≤1 in both; strictness comes from exactly-once above
-
-    # ---- rule / guard extras ----
-    max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
-    try:
-        max_edge_ft = None if max_edge_ft is None else float(max_edge_ft)
-    except Exception:
-        max_edge_ft = None
-    if max_edge_ft is not None and max_edge_ft <= 0:
-        max_edge_ft = None
-    max_edge_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
-
-    if (max_edge_cells is not None) and (max_edge_cells < max(W, H)):
-        # vertical
-        for x in range(1, W):
-            seam_col = []
+        # --- coverage / non-overlap ---
+        #
+        # In coverage mode we must still prevent overlap, so use ≤ 1 coverage per cell.
+        # In strict mode it’s the usual == 1 exact cover.
+        for x in range(W):
             for y in range(H):
-                s = m.NewBoolVar(f"sv_{x}_{y}")
-                both = []
+                covers = []
                 for i in range(n):
                     for k, (px, py, rot, w, h) in enumerate(options[i]):
-                        if (px <= x - 1 < px + w) and (py <= y < py + h) and (px <= x < px + w):
-                            both.append(p[i][k])
-                if both:
-                    share = m.NewBoolVar(f"share_v_{x}_{y}")
-                    m.AddMaxEquality(share, both)
-                    m.Add(s + share == 1)
-                else:
-                    m.Add(s == 1)
-                seam_col.append(s)
-            L = max_edge_cells
-            for y0 in range(0, H - (L + 1) + 1):
-                m.Add(sum(seam_col[yy] for yy in range(y0, y0 + L + 1)) <= L)
+                        if (px <= x < px + w) and (py <= y < py + h):
+                            covers.append(p[i][k])
+                if not covers:
+                    if not allow_discard:
+                        return False, [], f"Coverage impossible with stride={stride} (un-coverable cell)"
+                    # coverage mode can tolerate uncovered cells
+                    continue
+                m.Add(sum(covers) <= 1)
 
-        # horizontal
-        for y in range(1, H):
-            seam_row = []
-            for x in range(W):
-                s = m.NewBoolVar(f"sh_{x}_{y}")
-                both = []
+        # ---- rule / guard extras ----
+        max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
+        try:
+            max_edge_ft = None if max_edge_ft is None else float(max_edge_ft)
+        except Exception:
+            max_edge_ft = None
+        if max_edge_ft is not None and max_edge_ft <= 0:
+            max_edge_ft = None
+        max_edge_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
+
+        if (max_edge_cells is not None) and (max_edge_cells < max(W, H)):
+            # vertical
+            for x in range(1, W):
+                seam_col = []
+                for y in range(H):
+                    s = m.NewBoolVar(f"sv_{x}_{y}")
+                    both = []
+                    for i in range(n):
+                        for k, (px, py, rot, w, h) in enumerate(options[i]):
+                            if (px <= x - 1 < px + w) and (py <= y < py + h) and (px <= x < px + w):
+                                both.append(p[i][k])
+                    if both:
+                        share = m.NewBoolVar(f"share_v_{x}_{y}")
+                        m.AddMaxEquality(share, both)
+                        m.Add(s + share == 1)
+                    else:
+                        m.Add(s == 1)
+                    seam_col.append(s)
+                L = max_edge_cells
+                for y0 in range(0, H - (L + 1) + 1):
+                    m.Add(sum(seam_col[yy] for yy in range(y0, y0 + L + 1)) <= L)
+
+            # horizontal
+            for y in range(1, H):
+                seam_row = []
+                for x in range(W):
+                    s = m.NewBoolVar(f"sh_{x}_{y}")
+                    both = []
+                    for i in range(n):
+                        for k, (px, py, rot, w, h) in enumerate(options[i]):
+                            if (py <= y - 1 < py + h) and (px <= x < px + w) and (py <= y < py + h):
+                                both.append(p[i][k])
+                    if both:
+                        share = m.NewBoolVar(f"share_h_{x}_{y}")
+                        m.AddMaxEquality(share, both)
+                        m.Add(s + share == 1)
+                    else:
+                        m.Add(s == 1)
+                    seam_row.append(s)
+                L = max_edge_cells
+                for x0 in range(0, W - (L + 1) + 1):
+                    m.Add(sum(seam_row[xx] for xx in range(x0, x0 + L + 1)) <= L)
+
+        if bool(getattr(CFG, "NO_PLUS", False)):
+            for nx in range(1, W):
+                for ny in range(1, H):
+                    corners = []
+                    for i in range(n):
+                        for k, (px, py, rot, w, h) in enumerate(options[i]):
+                            if (px == nx and py == ny) or (px + w == nx and py == ny) or (px == nx and py + h == ny) or (px + w == nx and py + h == ny):
+                                corners.append(p[i][k])
+                    if corners:
+                        m.Add(sum(corners) <= 3)
+
+        if limit_value is not None:
+            try:
+                LMT = int(limit_value)
+            except Exception:
+                LMT = 0
+            if LMT < 0:
+                LMT = -1
+            if LMT >= 0:
                 for i in range(n):
-                    for k, (px, py, rot, w, h) in enumerate(options[i]):
-                        if (py <= y - 1 < py + h) and (px <= x < px + w) and (py <= y < py + h):
-                            both.append(p[i][k])
-                if both:
-                    share = m.NewBoolVar(f"share_h_{x}_{y}")
-                    m.AddMaxEquality(share, both)
-                    m.Add(s + share == 1)
-                else:
-                    m.Add(s == 1)
-                seam_row.append(s)
-            L = max_edge_cells
-            for x0 in range(0, W - (L + 1) + 1):
-                m.Add(sum(seam_row[xx] for xx in range(x0, x0 + L + 1)) <= L)
+                    wi_hi = {(tiles[i].w, tiles[i].h), (tiles[i].h, tiles[i].w)}
+                    same_neighbors = []
+                    for j in range(n):
+                        if j == i:
+                            continue
+                        wj_hj = {(tiles[j].w, tiles[j].h), (tiles[j].h, tiles[j].w)}
+                        if wi_hi != wj_hj:
+                            continue
+                        a = m.NewBoolVar(f"adj_{i}_{j}")
+                        same_neighbors.append(a)
+                        touching = []
+                        for k, (xi, yi, ri, wi, hi) in enumerate(options[i]):
+                            for m2, (xj, yj, rj, wj, hj) in enumerate(options[j]):
+                                vt = (xi + wi == xj or xj + wj == xi) and not (yi + hi <= yj or yj + hj <= yi)
+                                ht = (yi + hi == yj or yj + hj == yi) and not (xi + wi <= xj or xj + wj <= xi)
+                                if vt or ht:
+                                    z = m.NewBoolVar(f"t_{i}_{j}_{k}_{m2}")
+                                    m.AddMultiplicationEquality(z, [p[i][k], p[j][m2]])
+                                    touching.append(z)
+                        if touching:
+                            m.AddMaxEquality(a, touching)
+                        else:
+                            m.Add(a == 0)
+                    if same_neighbors:
+                        m.Add(sum(same_neighbors) <= LMT)
 
-    if bool(getattr(CFG, "NO_PLUS", False)):
-        for nx in range(1, W):
-            for ny in range(1, H):
-                corners = []
-                for i in range(n):
-                    for k, (px, py, rot, w, h) in enumerate(options[i]):
-                        if (px == nx and py == ny) or (px + w == nx and py == ny) or (px == nx and py + h == ny) or (px + w == nx and py + h == ny):
-                            corners.append(p[i][k])
-                if corners:
-                    m.Add(sum(corners) <= 3)
+        # ------- objective / coverage target (no callbacks) -------
+        solver = _cp.CpSolver()
+        solver.parameters.max_time_in_seconds = float(seconds)
+        solver.parameters.max_memory_in_mb = int(getattr(CFG, "MAX_MEMORY_MB", 2048))
+        solver.parameters.num_search_workers = int(getattr(CFG, "WORKERS", 1))
+        solver.parameters.cp_model_presolve = True
+        solver.parameters.linearization_level = 0
+        solver.parameters.log_search_progress = False
+        solver.parameters.symmetry_level = 0
+        solver.parameters.stop_after_first_solution = False  # optimization
 
-    same_shape_limit = getattr(CFG, "SAME_SHAPE_LIMIT", None)
-    if same_shape_limit is not None:
-        LMT = int(same_shape_limit)
-        if LMT < 0:
-            LMT = -1
-        for i in range(n):
-            wi_hi = {(tiles[i].w, tiles[i].h), (tiles[i].h, tiles[i].w)}
-            same_neighbors = []
-            for j in range(n):
-                if j == i: continue
-                wj_hj = {(tiles[j].w, tiles[j].h), (tiles[j].h, tiles[j].w)}
-                if wi_hi != wj_hj: continue
-                a = m.NewBoolVar(f"adj_{i}_{j}")
-                same_neighbors.append(a)
-                touching = []
-                for k, (xi, yi, ri, wi, hi) in enumerate(options[i]):
-                    for m2, (xj, yj, rj, wj, hj) in enumerate(options[j]):
-                        vt = (xi + wi == xj or xj + wj == xi) and not (yi + hi <= yj or yj + hj <= yi)
-                        ht = (yi + hi == yj or yj + hj == yi) and not (xi + wi <= xj or xj + wj <= xi)
-                        if vt or ht:
-                            z = m.NewBoolVar(f"t_{i}_{j}_{k}_{m2}")
-                            m.AddMultiplicationEquality(z, [p[i][k], p[j][m2]])
-                            touching.append(z)
-                if touching: m.AddMaxEquality(a, touching)
-                else:        m.Add(a == 0)
-            if same_neighbors:
-                if LMT >= 0:
-                    m.Add(sum(same_neighbors) <= LMT)
+        if allow_discard:
+            # Maximize total area (in cells); also require a minimum coverage.
+            used_area_terms = []
+            for i in range(n):
+                if not options[i]:
+                    continue
+                # area of tile i in cells:
+                area_i = tiles[i].w * tiles[i].h
+                used_i = m.NewBoolVar(f"used_{i}")
+                m.AddMaxEquality(used_i, p[i])  # used if any placement picked
+                used_area_terms.append(used_i * area_i)
 
-    # ------- objective / coverage target (no callbacks) -------
-    solver = _cp.CpSolver()
-    solver.parameters.max_time_in_seconds = float(max_seconds)
-    solver.parameters.max_memory_in_mb = int(getattr(CFG, "MAX_MEMORY_MB", 2048))
-    solver.parameters.num_search_workers = int(getattr(CFG, "WORKERS", 1))
-    solver.parameters.cp_model_presolve = True
-    solver.parameters.linearization_level = 0
-    solver.parameters.log_search_progress = False
-    solver.parameters.symmetry_level = 0
-    solver.parameters.stop_after_first_solution = False  # optimization
-
-    if allow_discard:
-        # Maximize total area (in cells); also require a minimum coverage.
-        used_area_terms = []
-        for i in range(n):
-            if not options[i]:
-                continue
-            # area of tile i in cells:
-            area_i = tiles[i].w * tiles[i].h
-            used_i = m.NewBoolVar(f"used_{i}")
-            m.AddMaxEquality(used_i, p[i])  # used if any placement picked
-            used_area_terms.append(used_i * area_i)
-
-        if used_area_terms:
-            total_used_area = sum(used_area_terms)
-            target_pct = float(getattr(CFG, "COVERAGE_GOAL_PCT", 99.5))
-            target_cells = int(round((target_pct / 100.0) * (W * H)))
-            # Make target a “soft” requirement: if infeasible, maximize anyway.
-            # (So we still get a best effort layout.)
-            m.Maximize(total_used_area)
-            # Try a feasibility solve first with a hard bound; if infeasible within
-            # the timebox, the solver will still return the best it found because
-            # we’re optimizing. (CP-SAT treats the maximize objective as primary.)
-            # We still add the constraint; if it causes proven infeasible the
-            # return code will say so; if not proven, we get the best-so-far.
-            m.Add(total_used_area >= target_cells)
+            if used_area_terms:
+                total_used_area = sum(used_area_terms)
+                target_pct = float(getattr(CFG, "COVERAGE_GOAL_PCT", 99.5))
+                target_cells = int(round((target_pct / 100.0) * (W * H)))
+                # Make target a “soft” requirement: if infeasible, maximize anyway.
+                # (So we still get a best effort layout.)
+                m.Maximize(total_used_area)
+                # Try a feasibility solve first with a hard bound; if infeasible within
+                # the timebox, the solver will still return the best it found because
+                # we’re optimizing. (CP-SAT treats the maximize objective as primary.)
+                # We still add the constraint; if it causes proven infeasible the
+                # return code will say so; if not proven, we get the best-so-far.
+                m.Add(total_used_area >= target_cells)
+            else:
+                m.Minimize(0)
         else:
+            # exact cover case: nothing to optimize
             m.Minimize(0)
-    else:
-        # exact cover case: nothing to optimize
-        m.Minimize(0)
 
-    res = solver.Solve(m)
+        res = solver.Solve(m)
 
-    if res in (_cp.OPTIMAL, _cp.FEASIBLE):
-        placed: List[Placed] = []
-        for i in range(n):
-            for k, (x, y, rot, w, h) in enumerate(options[i]):
-                if solver.BooleanValue(p[i][k]):
-                    placed.append(Placed(x, y, Rect(w, h, tiles[i].name)))
-                    break
-        return True, placed, None
+        if res in (_cp.OPTIMAL, _cp.FEASIBLE):
+            placed: List[Placed] = []
+            for i in range(n):
+                for k, (x, y, rot, w, h) in enumerate(options[i]):
+                    if solver.BooleanValue(p[i][k]):
+                        placed.append(Placed(x, y, Rect(w, h, tiles[i].name)))
+                        break
+            return True, placed, None
 
-    if res == _cp.INFEASIBLE:
-        return False, [], "Proven infeasible under current constraints"
-    if res == _cp.MODEL_INVALID:
-        return False, [], "Model invalid (configuration error)"
-    return False, [], "Stopped before solution (timebox)"
+        if res == _cp.INFEASIBLE:
+            return False, [], "Proven infeasible under current constraints"
+        if res == _cp.MODEL_INVALID:
+            return False, [], "Model invalid (configuration error)"
+        return False, [], "Stopped before solution (timebox)"
+
+    same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
+    ok, placed, reason = _solve_with_limit(same_shape_cfg, max_seconds)
+
+    if ok or reason != "Proven infeasible under current constraints":
+        return ok, placed, reason
+
+    # If the limit is finite, probe a relaxed model to provide actionable feedback.
+    try:
+        same_shape_int = int(same_shape_cfg)
+    except Exception:
+        same_shape_int = None
+
+    if same_shape_int is None or same_shape_int < 0:
+        return ok, placed, reason
+
+    diag_seconds = min(float(max_seconds), float(getattr(CFG, "SAME_SHAPE_DIAG_SECONDS", 10.0)))
+    diag_seconds = max(1.0, diag_seconds)
+    diag_ok, diag_placed, _ = _solve_with_limit(None, diag_seconds)
+    if diag_ok and diag_placed:
+        msg = (
+            "Proven infeasible under current constraints (same-shape limit "
+            f"{same_shape_int} prevents a feasible layout; try increasing TS_SAME_SHAPE_LIMIT "
+            "or setting it to -1 to disable the guard)."
+        )
+        return False, [], msg
+
+    return ok, placed, reason
