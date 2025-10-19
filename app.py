@@ -9,6 +9,7 @@ from flask import Flask, request, render_template, send_from_directory, jsonify
 
 from solver.orchestrator import solve_orchestrator
 from tiles import parse_demand, fmt_decoded_items
+from config import CFG
 
 from progress import (
     reset as progress_reset,
@@ -20,6 +21,25 @@ from progress import (
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _resolve_output_paths(configured: str, fallback: str) -> Tuple[str, str, str]:
+    name = (configured or "").strip() or fallback
+    if os.path.isabs(name):
+        full_path = name
+    else:
+        full_path = os.path.abspath(os.path.join(BASE_DIR, name))
+    directory = os.path.dirname(full_path) or BASE_DIR
+    filename = os.path.basename(full_path) or fallback
+    return full_path, directory, filename
+
+
+_COORDS_FULL_PATH, COORDS_DIR, COORDS_FILENAME = _resolve_output_paths(
+    CFG.COORDS_OUT, "coords.txt"
+)
+_LAYOUT_FULL_PATH, LAYOUT_DIR, LAYOUT_FILENAME = _resolve_output_paths(
+    CFG.LAYOUT_HTML, "layout_view.html"
+)
 
 LAST_RESULT: Dict[str, Any] = {
     "ok": False,
@@ -34,6 +54,8 @@ LAST_RESULT: Dict[str, Any] = {
     "elapsed_str": "0s",
     "svg": "",
     "demand_items": [],
+    "coords_filename": COORDS_FILENAME,
+    "layout_filename": LAYOUT_FILENAME,
 }
 
 app = Flask(__name__, static_folder=".", template_folder="templates")
@@ -256,6 +278,8 @@ def solve():
             "elapsed_str": _fmt_elapsed(time.time() - t0),
             "svg": "",
             "demand_items": fmt_decoded_items(decoded),
+            "coords_filename": COORDS_FILENAME,
+            "layout_filename": LAYOUT_FILENAME,
         })
         return render_template("result.html", **LAST_RESULT)
 
@@ -299,6 +323,8 @@ def solve():
             "elapsed_str": _fmt_elapsed(time.time() - t0),
             "svg": "",
             "demand_items": fmt_decoded_items(decoded),
+            "coords_filename": COORDS_FILENAME,
+            "layout_filename": LAYOUT_FILENAME,
         })
         return render_template("result.html", **LAST_RESULT)
 
@@ -328,18 +354,20 @@ def solve():
         "elapsed_str": _fmt_elapsed(time.time() - t0),
         "svg": result.get("svg", ""),
         "demand_items": fmt_decoded_items(decoded),
+        "coords_filename": COORDS_FILENAME,
+        "layout_filename": LAYOUT_FILENAME,
     })
     return render_template("result.html", **LAST_RESULT)
 
 
 @app.route("/download/coords")
 def download_coords():
-    return send_from_directory(BASE_DIR, "coords.txt", as_attachment=True)
+    return send_from_directory(COORDS_DIR, COORDS_FILENAME, as_attachment=True)
 
 
 @app.route("/download/html")
 def download_html():
-    return send_from_directory(BASE_DIR, "layout_view.html", as_attachment=True)
+    return send_from_directory(LAYOUT_DIR, LAYOUT_FILENAME, as_attachment=True)
 
 
 @app.route("/progress3")
