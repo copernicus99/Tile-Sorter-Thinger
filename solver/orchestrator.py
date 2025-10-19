@@ -340,6 +340,11 @@ def solve_orchestrator(*args, **kwargs):
                 "best_used": best_used_tiles,
                 "coverage_pct": round(best_used_pct, 2),
                 "elapsed": time.time() - t0,
+                "placed_count": len(placed),
+                "W": Wc,
+                "H": Hc,
+                "W_ft": _fmt_ft(Wc),
+                "H_ft": _fmt_ft(Hc),
             }
             set_status("Solved")
             set_elapsed(meta["elapsed"])
@@ -355,6 +360,11 @@ def solve_orchestrator(*args, **kwargs):
             "best_used": len(placed),
             "coverage_pct": round(100.0 * len(placed) / max(1, demand_count), 2),
             "elapsed": time.time() - t0,
+            "placed_count": len(placed),
+            "W": Wc,
+            "H": Hc,
+            "W_ft": _fmt_ft(Wc),
+            "H_ft": _fmt_ft(Hc),
         }
         set_best_used(len(placed))
         set_coverage_pct(meta["coverage_pct"])
