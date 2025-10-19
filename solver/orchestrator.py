@@ -1,20 +1,21 @@
-# Orchestrator: CP-SAT first, then guaranteed greedy fallback
+# Orchestrator: option-driven CP-SAT workflow (A–F sequence)
 from __future__ import annotations
 
 import os
 import time
 import traceback
+import math
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple, Optional, Any, Iterable
 
 import multiprocessing as mp
 
 from models import Rect, Placed, ft_to_cells
 from tiles import parse_demand
-from config import CFG
+from config import CFG, CELL
 from progress import (
     set_phase, set_phase_total, set_attempt, set_grid, set_progress_pct,
-    set_best_used, set_coverage_pct, set_elapsed, set_status
+    set_best_used, set_coverage_pct, set_elapsed, set_status, set_message
 )
 from solver.cp_sat import try_pack_exact_cover
 
@@ -35,7 +36,7 @@ class CandidateBoard:
 
 
 def _fmt_ft(cells: int) -> float:
-    return round(cells / 2.0, 1)  # 2 cells/ft -> 0.5 ft per cell
+    return round(cells * CELL + 1e-9, 1)
 
 
 def _coerce_bag_ft(maybe: Any) -> Dict[Tuple[float, float], int]:
@@ -85,18 +86,48 @@ def _bag_ft_to_cells(bag_ft: Dict[Tuple[float, float], int]) -> Dict[Tuple[int, 
     return bag_cells
 
 
-def _make_candidate_list(area_cells: int) -> List[CandidateBoard]:
+def _square_candidates(min_side: int, max_side: int, *, descending: bool) -> List[CandidateBoard]:
+    min_side = max(6, int(min_side))
+    max_side = max(min_side, int(max_side))
+    if descending:
+        rng = range(max_side, min_side - 1, -1)
+    else:
+        rng = range(min_side, max_side + 1)
+    return [CandidateBoard(s, s, f"{_fmt_ft(s)} × {_fmt_ft(s)} ft") for s in rng]
+
+
+def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool) -> List[CandidateBoard]:
     out: List[CandidateBoard] = []
-    side = max(6, int(round(area_cells ** 0.5)))
-    candidate_sides = set()
+    seen = set()
+    for w in widths:
+        for h in heights:
+            w_i = max(6, int(w))
+            h_i = max(6, int(h))
+            key = (w_i, h_i)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(CandidateBoard(w_i, h_i, f"{_fmt_ft(w_i)} × {_fmt_ft(h_i)} ft"))
+    key_fn = lambda cb: (cb.W * cb.H, max(cb.W, cb.H), cb.W)
+    return sorted(out, key=key_fn, reverse=descending)
 
-    for delta in range(-4, 5):
-        s = max(6, side + delta)
-        candidate_sides.add(s)
 
-    for s in sorted(candidate_sides):
-        out.append(CandidateBoard(s, s, f"{_fmt_ft(s)} × {_fmt_ft(s)} ft"))
-    return out
+def _ceil_sqrt_cells(area_cells: int) -> int:
+    if area_cells <= 0:
+        return 6
+    return int(math.ceil(area_cells ** 0.5))
+
+
+def _area_sqft(area_cells: int) -> float:
+    return float(area_cells) * (CELL ** 2)
+
+
+def _descending_values(start: int, end: int) -> List[int]:
+    start_i = int(start)
+    end_i = int(end)
+    if start_i < end_i:
+        start_i, end_i = end_i, start_i
+    return list(range(start_i, end_i - 1, -1)) if start_i >= end_i else [start_i]
 
 
 # ---------- CP-SAT isolation ----------
@@ -189,60 +220,12 @@ def _run_cp_sat_isolated(W: int, H: int, bag: Dict[Tuple[int, int], int],
     return ok, placed, reason
 
 
-# ---------- Guaranteed greedy fallback ----------
-
-def _greedy_expand(bag_cells: Dict[Tuple[int, int], int]) -> Tuple[int, int, List[Placed]]:
-    """
-    Always returns a layout by packing left->right and expanding the board.
-    No overlaps; no rotation; keeps given orientations.
-    """
-    # expand the multiset into a list of tiles, largest first for nicer rows
-    tiles: List[Tuple[int, int]] = []
-    for (w, h), c in bag_cells.items():
-        tiles.extend([(w, h)] * int(c))
-    tiles.sort(key=lambda wh: (wh[1], wh[0]), reverse=True)  # by height, then width
-
-    if not tiles:
-        return 0, 0, []
-
-    W = max(w for w, _ in tiles)
-    H = 0
-    x = 0
-    y = 0
-    row_h = 0
-    placed: List[Placed] = []
-
-    for (w, h) in tiles:
-        # wrap row if needed
-        if x + w > W and x > 0:
-            y += row_h
-            x = 0
-            row_h = 0
-        # expand height if this tile doesn't fit vertically
-        if y + h > H:
-            H = y + h
-        # we also expand width if the very first tile in a row is wider than current W
-        if x == 0 and w > W:
-            W = w
-        # place tile
-        placed.append(Placed(x, y, Rect(w, h, f"{w}x{h}")))
-        x += w
-        row_h = max(row_h, h)
-        # if next tile would overflow width, the next loop will wrap automatically
-
-    side = max(W, H)
-    return side, side, placed
-
-
 # ---------- public entrypoint ----------
 
 def solve_orchestrator(*args, **kwargs):
     """
     Returns: (ok, placed, W_ft, H_ft, strategy, reason, meta)
-    Strategy values:
-      - "F"   : CP-SAT phase
-      - "G"   : Greedy fallback (guaranteed)
-      - "error": failure before placement
+    Strategy values are the option letters A–F from the specification.
     """
     t0 = time.time()
     try:
@@ -265,110 +248,257 @@ def solve_orchestrator(*args, **kwargs):
         bag_cells = _bag_ft_to_cells(bag_ft)
         demand_count = sum(bag_cells.values())
         area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
+        area_sqft = _area_sqft(area_cells)
 
+        base_area_sqft = max(1.0, float(getattr(CFG, "BASE_GRID_AREA_SQFT", 1000.0)))
+        base_side_cells = max(6, ft_to_cells(math.sqrt(base_area_sqft)))
+        sqrt_cells = _ceil_sqrt_cells(area_cells)
+
+        set_status("Solving")
         set_phase("S0")
-        set_phase_total(int(getattr(CFG, "TIME_S0", 30)))
-        set_attempt(f"{_fmt_ft(0)} × {_fmt_ft(0)} ft (area)")
+        set_phase_total(1)
+        set_attempt("Computing demand")
         set_grid("—")
         set_progress_pct(0.0)
-        set_status("Solving")
+        set_best_used(0)
+        set_coverage_pct(0.0)
 
-        boards = _make_candidate_list(area_cells)
-        if not boards:
-            side = max(6, int(round((area_cells) ** 0.5)))
-            boards = [
-                CandidateBoard(side, side, f"{_fmt_ft(side)} × {_fmt_ft(side)} ft"),
-                CandidateBoard(side + 2, side + 2, f"{_fmt_ft(side+2)} × {_fmt_ft(side+2)} ft"),
-            ]
-
-        timebox_F = float(getattr(CFG, "TIME_F", 900))
-        per_board = max(10.0, min(180.0, timebox_F / max(1, len(boards))))
-        set_phase("F")
-        set_phase_total(int(timebox_F))
-
-        best_used_pct = 0.0
         best_used_tiles = 0
-        best_solution: Optional[Tuple[int, int, List[Placed]]] = None
+        best_cover_pct = 0.0
 
-        for idx, cb in enumerate(boards, 1):
-            set_attempt(cb.label)
-            set_grid(cb.label)
-
-            ok1, placed1, _ = _run_cp_sat_isolated(
-                W=cb.W, H=cb.H, bag=bag_cells,
-                seconds=min(15.0, per_board * 0.25),
-                allow_discard=False
-            )
-            if ok1:
-                used = len(placed1)
-                best_used_tiles = used
-                best_used_pct = 100.0 * used / max(1, demand_count)
-                best_solution = (cb.W, cb.H, placed1)
-                set_best_used(best_used_tiles)
-                set_coverage_pct(best_used_pct)
-                break
-
-            ok2, placed2, _ = _run_cp_sat_isolated(
-                W=cb.W, H=cb.H, bag=bag_cells,
-                seconds=per_board,
-                allow_discard=True
-            )
-            if ok2 and placed2:
-                used = len(placed2)
-                used_pct = 100.0 * used / max(1, demand_count)
-                if used_pct > best_used_pct + 1e-9:
-                    best_used_pct = used_pct
-                    best_used_tiles = used
-                    best_solution = (cb.W, cb.H, placed2)
-
+        def _record_best(used_tiles: int, coverage_pct: float) -> None:
+            nonlocal best_used_tiles, best_cover_pct
+            coverage_pct = max(0.0, float(coverage_pct))
+            used_tiles = max(0, int(used_tiles))
+            better = False
+            if coverage_pct > best_cover_pct + 1e-9:
+                better = True
+            elif abs(coverage_pct - best_cover_pct) <= 1e-9 and used_tiles > best_used_tiles:
+                better = True
+            if better:
+                best_cover_pct = coverage_pct
+                best_used_tiles = used_tiles
+            else:
+                if used_tiles > best_used_tiles:
+                    best_used_tiles = used_tiles
+                if coverage_pct > best_cover_pct:
+                    best_cover_pct = coverage_pct
             set_best_used(best_used_tiles)
-            set_coverage_pct(best_used_pct)
-            set_progress_pct(min(100.0, 100.0 * idx / max(1, len(boards))))
+            set_coverage_pct(best_cover_pct)
 
-            if (time.time() - t0) >= timebox_F:
-                break
+        def _run_phase(label: str, candidates: List[CandidateBoard], seconds: float,
+                       allow_discard: bool, *, prefer_large: bool) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int]:
+            if seconds <= 0 or not candidates:
+                set_phase(label)
+                set_phase_total(int(max(0.0, seconds)))
+                set_progress_pct(100.0 if not candidates else 0.0)
+                return False, None, [], 0.0, 0
 
-        # If CP-SAT found something, return it
-        if best_solution:
-            Wc, Hc, placed = best_solution
-            meta = {
-                "demand_count": demand_count,
-                "best_used": best_used_tiles,
-                "coverage_pct": round(best_used_pct, 2),
-                "elapsed": time.time() - t0,
-                "placed_count": len(placed),
-                "W": Wc,
-                "H": Hc,
-                "W_ft": _fmt_ft(Wc),
-                "H_ft": _fmt_ft(Hc),
-            }
+            set_phase(label)
+            set_phase_total(int(seconds))
+            phase_start = time.time()
+            total = len(candidates)
+            best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
+
+            for idx, cb in enumerate(candidates, 1):
+                elapsed_phase = time.time() - phase_start
+                remaining = seconds - elapsed_phase
+                if remaining <= 0:
+                    break
+
+                per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
+                set_attempt(cb.label)
+                set_grid(cb.label)
+                ok, placed, _ = _run_cp_sat_isolated(
+                    W=cb.W, H=cb.H, bag=bag_cells,
+                    seconds=per_attempt,
+                    allow_discard=allow_discard
+                )
+
+                coverage_pct = 0.0
+                used_tiles = len(placed) if placed else 0
+                if demand_count > 0:
+                    coverage_pct = 100.0 * used_tiles / float(demand_count)
+                elif used_tiles > 0:
+                    coverage_pct = 100.0
+
+                if ok and placed:
+                    _record_best(used_tiles, coverage_pct)
+                    if not allow_discard and used_tiles >= demand_count:
+                        set_progress_pct(100.0)
+                        return True, cb, placed, coverage_pct, used_tiles
+
+                    if allow_discard:
+                        if best_tuple is None:
+                            best_tuple = (cb, placed, coverage_pct, used_tiles)
+                        else:
+                            best_cb, _, best_cov, best_used = best_tuple
+                            better = False
+                            if coverage_pct > best_cov + 1e-9:
+                                better = True
+                            elif abs(coverage_pct - best_cov) <= 1e-9:
+                                current_area = cb.W * cb.H
+                                best_area = best_cb.W * best_cb.H
+                                if prefer_large and current_area > best_area:
+                                    better = True
+                                elif not prefer_large and current_area < best_area:
+                                    better = True
+                                elif used_tiles > best_used:
+                                    better = True
+                            if better:
+                                best_tuple = (cb, placed, coverage_pct, used_tiles)
+
+                        if used_tiles >= demand_count and demand_count > 0:
+                            set_progress_pct(100.0)
+                            return True, cb, placed, coverage_pct, used_tiles
+
+                set_progress_pct(min(100.0, 100.0 * idx / max(1, total)))
+
+                if (time.time() - phase_start) >= seconds:
+                    break
+
+            if best_tuple and best_tuple[3] > 0:
+                best_cb, best_placed, best_cov, best_used = best_tuple
+                _record_best(best_used, best_cov)
+                set_progress_pct(100.0)
+                return True, best_cb, best_placed, best_cov, best_used
+
+            set_progress_pct(100.0)
+            return False, None, [], 0.0, 0
+
+        success_meta: Optional[Dict[str, Any]] = None
+        final_reason: Optional[str] = None
+        final_strategy: Optional[str] = None
+        final_placed: List[Placed] = []
+        final_board: Optional[CandidateBoard] = None
+
+        message_success = "This is the best that can be done."
+
+        if area_sqft < base_area_sqft:
+            max_side_small = max(6, base_side_cells - 1)
+            if max_side_small < sqrt_cells:
+                max_side_small = sqrt_cells
+            max_side_small = max(max_side_small, 6)
+            candidates_A = [cb for cb in _square_candidates(sqrt_cells, max_side_small, descending=True)
+                            if cb.W * cb.H >= area_cells]
+            res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                "A", candidates_A, float(getattr(CFG, "TIME_A", 600.0)), False, prefer_large=True
+            )
+            if res_ok and res_board:
+                final_strategy = "A"
+                final_board = res_board
+                final_placed = res_placed
+                success_meta = {
+                    "note": message_success,
+                    "coverage_pct": round(res_cov, 2),
+                    "best_used": res_used,
+                }
+            else:
+                min_side_B = max(6, sqrt_cells - 6)
+                widths = _descending_values(max_side_small, min_side_B)
+                heights = _descending_values(max_side_small, min_side_B)
+                candidates_B = _rectangular_candidates(widths, heights, descending=True)[:30]
+                res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                    "B", candidates_B, float(getattr(CFG, "TIME_B", 600.0)), True, prefer_large=True
+                )
+                if res_ok and res_board:
+                    final_strategy = "B"
+                    final_board = res_board
+                    final_placed = res_placed
+                    success_meta = {
+                        "note": message_success,
+                        "coverage_pct": round(res_cov, 2),
+                        "best_used": res_used,
+                    }
+        else:
+            base_candidate = CandidateBoard(base_side_cells, base_side_cells,
+                                            f"{_fmt_ft(base_side_cells)} × {_fmt_ft(base_side_cells)} ft")
+            res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                "C", [base_candidate], float(getattr(CFG, "TIME_C", 300.0)), False, prefer_large=False
+            )
+            if res_ok and res_board:
+                final_strategy = "C"
+                final_board = res_board
+                final_placed = res_placed
+                success_meta = {
+                    "note": message_success,
+                    "coverage_pct": round(res_cov, 2),
+                    "best_used": res_used,
+                }
+            else:
+                res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                    "D", [base_candidate], float(getattr(CFG, "TIME_D", 300.0)), True, prefer_large=True
+                )
+                if res_ok and res_board:
+                    final_strategy = "D"
+                    final_board = res_board
+                    final_placed = res_placed
+                    success_meta = {
+                        "note": message_success,
+                        "coverage_pct": round(res_cov, 2),
+                        "best_used": res_used,
+                    }
+                else:
+                    expand_upper = max(base_side_cells + 12, sqrt_cells)
+                    candidates_E = [cb for cb in _square_candidates(base_side_cells + 1, expand_upper, descending=False)
+                                    if cb.W * cb.H >= area_cells][:30]
+                    res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                        "E", candidates_E, float(getattr(CFG, "TIME_E", 900.0)), False, prefer_large=False
+                    )
+                    if res_ok and res_board:
+                        final_strategy = "E"
+                        final_board = res_board
+                        final_placed = res_placed
+                        success_meta = {
+                            "note": message_success,
+                            "coverage_pct": round(res_cov, 2),
+                            "best_used": res_used,
+                        }
+                    else:
+                        candidates_F = _square_candidates(base_side_cells + 1, expand_upper, descending=False)[:30]
+                        res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                            "F", candidates_F, float(getattr(CFG, "TIME_F", 900.0)), True, prefer_large=False
+                        )
+                        if res_ok and res_board:
+                            final_strategy = "F"
+                            final_board = res_board
+                            final_placed = res_placed
+                            success_meta = {
+                                "note": message_success,
+                                "coverage_pct": round(res_cov, 2),
+                                "best_used": res_used,
+                            }
+
+        if final_strategy and final_board:
+            elapsed = time.time() - t0
             set_status("Solved")
-            set_elapsed(meta["elapsed"])
-            return (True, placed, _fmt_ft(Wc), _fmt_ft(Hc), "F", None, meta)
+            set_elapsed(elapsed)
+            set_message(message_success)
+            if success_meta is None:
+                success_meta = {}
+            success_meta.update({
+                "demand_count": demand_count,
+                "placed_count": len(final_placed),
+                "elapsed": elapsed,
+                "W": final_board.W,
+                "H": final_board.H,
+                "W_ft": _fmt_ft(final_board.W),
+                "H_ft": _fmt_ft(final_board.H),
+            })
+            return (
+                True,
+                final_placed,
+                _fmt_ft(final_board.W),
+                _fmt_ft(final_board.H),
+                final_strategy,
+                None,
+                success_meta,
+            )
 
-        # ---------- Greedy fallback (guaranteed) ----------
-        set_phase("G")
-        set_phase_total(1)
-        set_attempt("Greedy")
-        Wc, Hc, placed = _greedy_expand(bag_cells)
-        meta = {
-            "demand_count": demand_count,
-            "best_used": len(placed),
-            "coverage_pct": round(100.0 * len(placed) / max(1, demand_count), 2),
-            "elapsed": time.time() - t0,
-            "placed_count": len(placed),
-            "W": Wc,
-            "H": Hc,
-            "W_ft": _fmt_ft(Wc),
-            "H_ft": _fmt_ft(Hc),
-        }
-        set_best_used(len(placed))
-        set_coverage_pct(meta["coverage_pct"])
-        set_grid(f"{_fmt_ft(Wc)} × {_fmt_ft(Hc)} ft")
-        set_progress_pct(100.0)
-        set_status("Solved")
-        set_elapsed(meta["elapsed"])
-        return (True, placed, _fmt_ft(Wc), _fmt_ft(Hc), "G", None, meta)
+        set_status("Error")
+        set_message("there is no solution")
+        final_reason = "There is no solution"
+        return (False, [], 0.0, 0.0, "error", final_reason, {"reason": final_reason})
 
     except Exception as e:
         set_status("Error")

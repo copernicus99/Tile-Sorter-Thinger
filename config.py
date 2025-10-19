@@ -17,6 +17,10 @@ MAX_CANDIDATES       = int(os.getenv("TS_MAX_CANDIDATES", "4000"))
 # ======= Rule / guard knobs =======
 BLOCK_EXACT_10x10     = int(os.getenv("TS_BLOCK_EXACT_10x10", "0"))
 MAX_INTERNAL_SEAM_FT  = float(os.getenv("TS_MAX_INTERNAL_SEAM_FT", "3"))
+MAX_EDGE_FT           = float(os.getenv("TS_MAX_EDGE_FT", "6"))
+NO_PLUS               = int(os.getenv("TS_NO_PLUS", "1")) != 0
+SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "1"))
+BASE_GRID_AREA_SQFT   = float(os.getenv("TS_BASE_GRID_AREA_SQFT", "1000"))
 
 # ======= Pre-flight sizing / accounting =======
 S_MAX_EST_PLACEMENTS  = int(os.getenv("TS_S_MAX_EST_PLACEMENTS", "150000"))
@@ -67,6 +71,10 @@ class CFG:
 
     BLOCK_EXACT_10x10    = BLOCK_EXACT_10x10
     MAX_INTERNAL_SEAM_FT = MAX_INTERNAL_SEAM_FT
+    MAX_EDGE_FT          = MAX_EDGE_FT
+    NO_PLUS              = NO_PLUS
+    SAME_SHAPE_LIMIT     = SAME_SHAPE_LIMIT
+    BASE_GRID_AREA_SQFT  = BASE_GRID_AREA_SQFT
 
     S_MAX_EST_PLACEMENTS = S_MAX_EST_PLACEMENTS
     S1_MAX_HEIGHT_FT     = S1_MAX_HEIGHT_FT

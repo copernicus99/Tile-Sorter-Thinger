@@ -181,7 +181,13 @@ def try_pack_exact_cover(
 
     # ---- rule / guard extras ----
     max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
-    max_edge_cells = None if (max_edge_ft is None) else int(round(float(max_edge_ft) / 0.5 + 1e-9))
+    try:
+        max_edge_ft = None if max_edge_ft is None else float(max_edge_ft)
+    except Exception:
+        max_edge_ft = None
+    if max_edge_ft is not None and max_edge_ft <= 0:
+        max_edge_ft = None
+    max_edge_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
 
     if (max_edge_cells is not None) and (max_edge_cells < max(W, H)):
         # vertical
@@ -240,6 +246,8 @@ def try_pack_exact_cover(
     same_shape_limit = getattr(CFG, "SAME_SHAPE_LIMIT", None)
     if same_shape_limit is not None:
         LMT = int(same_shape_limit)
+        if LMT < 0:
+            LMT = -1
         for i in range(n):
             wi_hi = {(tiles[i].w, tiles[i].h), (tiles[i].h, tiles[i].w)}
             same_neighbors = []
@@ -261,7 +269,8 @@ def try_pack_exact_cover(
                 if touching: m.AddMaxEquality(a, touching)
                 else:        m.Add(a == 0)
             if same_neighbors:
-                m.Add(sum(same_neighbors) <= LMT)
+                if LMT >= 0:
+                    m.Add(sum(same_neighbors) <= LMT)
 
     # ------- objective / coverage target (no callbacks) -------
     solver = _cp.CpSolver()
