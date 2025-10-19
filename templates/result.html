@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Result</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="container">
+  <div class="card">
+    <h1>Result</h1>
+    <div>Status: {{ 'Solved' if ok else 'No solution' }}</div>
+    <div>
+      Strategy: {{ strategy }}
+      {% if reason %}
+        <span class="badge warn" title="Why the run ended">{{ reason }}</span>
+      {% endif %}
+    </div>
+    <div class="badge">
+      Grid: {{ W_ft }} × {{ H_ft }} ft ({{ W }} × {{ H }} cells)
+      <span class="badge">{{ edge_label }}</span>
+    </div>
+    <div>Tiles placed: {{ placed_count }} / {{ demand_count }}</div>
+    <div>Elapsed (overall): {{ elapsed_str }}</div>
+    <div class="btn-row" style="margin-top:10px;">
+      <a class="btn" href="/download/coords">Download coords.txt</a>
+      <a class="btn" href="/download/html">Open layout_view.html</a>
+      <a class="btn" href="/">↩ Back to selection</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Decoded request</h2>
+    <table class="table">
+      <thead><tr><th>Tile</th><th>Count</th></tr></thead>
+      <tbody>
+        {% for k, v in demand_items %}
+          <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Preview</h2>
+    <div class="gridwrap">{{ svg|safe }}</div>
+  </div>
+</body>
+</html>
