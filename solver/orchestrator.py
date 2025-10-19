@@ -88,19 +88,14 @@ def _bag_ft_to_cells(bag_ft: Dict[Tuple[float, float], int]) -> Dict[Tuple[int, 
 def _make_candidate_list(area_cells: int) -> List[CandidateBoard]:
     out: List[CandidateBoard] = []
     side = max(6, int(round(area_cells ** 0.5)))
-    candidates = set()
+    candidate_sides = set()
 
-    for d in range(-2, 3):
-        s = max(6, side + d)
-        candidates.add((s, s))
+    for delta in range(-4, 5):
+        s = max(6, side + delta)
+        candidate_sides.add(s)
 
-    for w in range(side - 4, side + 5):
-        for h in (side - 2, side + 2):
-            if w >= 6 and h >= 6:
-                candidates.add((w, h))
-
-    for (Wc, Hc) in sorted(candidates):
-        out.append(CandidateBoard(Wc, Hc, f"{_fmt_ft(Wc)} × {_fmt_ft(Hc)} ft"))
+    for s in sorted(candidate_sides):
+        out.append(CandidateBoard(s, s, f"{_fmt_ft(s)} × {_fmt_ft(s)} ft"))
     return out
 
 
@@ -235,7 +230,8 @@ def _greedy_expand(bag_cells: Dict[Tuple[int, int], int]) -> Tuple[int, int, Lis
         row_h = max(row_h, h)
         # if next tile would overflow width, the next loop will wrap automatically
 
-    return W, H, placed
+    side = max(W, H)
+    return side, side, placed
 
 
 # ---------- public entrypoint ----------
