@@ -58,9 +58,23 @@ def _coerce_bag_ft(maybe: Any) -> Dict[Tuple[float, float], int]:
         if maybe and all(isinstance(k, tuple) and len(k) == 2 for k in maybe.keys()):
             return {(float(k[0]), float(k[1])): int(v) for k, v in maybe.items()}
         parsed = parse_demand(maybe)
-        if isinstance(parsed, tuple) and len(parsed) == 2:
-            ok, bag_ft = parsed
-            return bag_ft if ok else {}
+        if isinstance(parsed, tuple):
+            if len(parsed) == 2:
+                ok, bag_ft = parsed
+                return bag_ft if ok else {}
+            if len(parsed) == 3:
+                bag_list, _decoded, _err = parsed
+                if bag_list:
+                    out: Dict[Tuple[float, float], int] = {}
+                    for wf, hf, cnt in bag_list:
+                        try:
+                            key = (float(wf), float(hf))
+                            out[key] = out.get(key, 0) + int(cnt)
+                        except Exception:
+                            continue
+                    if out:
+                        return out
+                return {}
         return parsed
 
     if hasattr(maybe, "__iter__"):
