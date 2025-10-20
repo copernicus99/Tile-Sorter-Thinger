@@ -300,10 +300,17 @@ def solve_orchestrator(*args, **kwargs):
         area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
         area_sqft = _area_sqft(area_cells)
 
+        max_tile_w = max((abs(int(w)) for (w, _h) in bag_cells.keys()), default=0)
+        max_tile_h = max((abs(int(h)) for (_w, h) in bag_cells.keys()), default=0)
+        max_tile_side = max(6, max_tile_w, max_tile_h)
+        max_tile_side = _align_up_to_multiple(max_tile_side, grid_step)
+
         base_area_sqft = max(1.0, float(getattr(CFG, "BASE_GRID_AREA_SQFT", 1000.0)))
         base_side_cells = max(6, ft_to_cells(math.sqrt(base_area_sqft)))
+        base_side_cells = max(base_side_cells, max_tile_side)
         base_side_cells = _align_up_to_multiple(base_side_cells, grid_step)
         sqrt_cells = _ceil_sqrt_cells(area_cells)
+        sqrt_cells = max(sqrt_cells, max_tile_side)
         sqrt_cells = _align_up_to_multiple(sqrt_cells, grid_step)
 
         set_status("Solving")
