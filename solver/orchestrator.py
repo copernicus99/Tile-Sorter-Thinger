@@ -527,12 +527,34 @@ def solve_orchestrator(*args, **kwargs):
                     "best_used": res_used,
                 }
             else:
+                shrink_floor = max(6, max_tile_side)
+                shrink_floor = _align_up_to_multiple(shrink_floor, grid_step)
+                if shrink_floor > base_side_cells:
+                    shrink_floor = base_side_cells
+                candidates_D = _square_candidates(
+                    shrink_floor,
+                    base_side_cells,
+                    descending=True,
+                    multiple_of=grid_step,
+                )
+                if len(candidates_D) > 60:
+                    head = candidates_D[:30]
+                    tail = candidates_D[-30:]
+                    dedup: List[CandidateBoard] = []
+                    seen = set()
+                    for cb in head + tail:
+                        key = (cb.W, cb.H)
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        dedup.append(cb)
+                    candidates_D = dedup
                 res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "D",
-                    [base_candidate],
+                    candidates_D,
                     float(getattr(CFG, "TIME_D", 300.0)),
                     True,
-                    prefer_large=True,
+                    prefer_large=False,
                 )
                 if res_reason:
                     final_reason = res_reason
