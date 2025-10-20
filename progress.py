@@ -13,6 +13,17 @@ from typing import Any, Dict, Optional
 PROGRESS_LOCK = threading.Lock()
 
 
+# Cache the last non-empty values surfaced to the UI so the overlay keeps
+# showing useful context even if the underlying progress fields are cleared
+# temporarily (for example, during reset).
+DISPLAY_CACHE = {
+    "phase": "",
+    "phase_total": "",
+    "attempt": "",
+    "grid": "",
+}
+
+
 def _init_logger() -> logging.Logger:
     logger = logging.getLogger("solver.attempt_log")
     if logger.handlers:
@@ -180,6 +191,27 @@ PROGRESS: Dict[str, Any] = {
 # Helpers
 # ------------------------------
 
+
+def _remember_display(name: str, value: Any) -> None:
+    if value is None:
+        return
+    text = str(value)
+    if text:
+        DISPLAY_CACHE[name] = text
+
+
+def _clear_display_cache() -> None:
+    for key in DISPLAY_CACHE.keys():
+        DISPLAY_CACHE[key] = ""
+
+
+def _display_value(name: str) -> str:
+    raw = PROGRESS.get(name, "")
+    if raw not in (None, ""):
+        return str(raw)
+    cached = DISPLAY_CACHE.get(name, "")
+    return str(cached) if cached not in (None, "") else ""
+
 def _now() -> float:
     return time.time()
 
@@ -222,6 +254,7 @@ def reset() -> None:
             "grid": "",
             "run_start": None,
         })
+        _clear_display_cache()
         _emit_log("Progress reset")
 
 def start_timer() -> None:
@@ -249,22 +282,30 @@ def set_phase(v: Any) -> None:
     with PROGRESS_LOCK:
         phase_str = "" if v is None else str(v)
         PROGRESS["phase"] = phase_str
+        if phase_str:
+            _remember_display("phase", phase_str)
         _log_phase_transition_locked(phase_str)
 
 def set_phase_total(v: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["phase_total"] = "" if v is None else str(v)
+        if PROGRESS["phase_total"]:
+            _remember_display("phase_total", PROGRESS["phase_total"])
 
 def set_attempt(v: Any) -> None:
     with PROGRESS_LOCK:
         attempt_str = "" if v is None else str(v)
         PROGRESS["attempt"] = attempt_str
+        if attempt_str:
+            _remember_display("attempt", attempt_str)
         _log_attempt_transition_locked(attempt_str)
 
 def set_grid(v: Any) -> None:
     with PROGRESS_LOCK:
         grid_str = "" if v is None else str(v)
         PROGRESS["grid"] = grid_str
+        if grid_str:
+            _remember_display("grid", grid_str)
         _update_grid_locked(grid_str)
 
 def set_progress_pct(pct: Any) -> None:
@@ -446,8 +487,12 @@ def snapshot() -> Dict[str, Any]:
             "status": PROGRESS["status"],
             "phase": PROGRESS["phase"],
             "phase_total": PROGRESS["phase_total"],
+            "phase_display": _display_value("phase"),
+            "phase_total_display": _display_value("phase_total"),
             "attempt": PROGRESS["attempt"],
+            "attempt_display": _display_value("attempt"),
             "grid": PROGRESS["grid"],
+            "grid_display": _display_value("grid"),
             "percent": PROGRESS["percent"],
             "best_used": PROGRESS["best_used"],
             "coverage_pct": PROGRESS["coverage_pct"],

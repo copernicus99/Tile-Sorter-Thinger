@@ -192,6 +192,15 @@
   function hide(){ ov.classList.add('hidden'); }
   function fmtElapsed(sec){ sec=Math.max(0,Math.floor(sec||0)); const m=Math.floor(sec/60), s=sec%60; return (m?m+'m ':'')+s+'s'; }
   function normalize(s){ return s ? String(s).replace(/x/g,' × ') : s; }
+  function pickText(){
+    for (let i = 0; i < arguments.length; i += 1) {
+      const v = arguments[i];
+      if (v === undefined || v === null) continue;
+      const str = String(v).trim();
+      if (str !== '') return str;
+    }
+    return null;
+  }
 
   function updateCard(p){
     const label = "Solving";
@@ -199,23 +208,21 @@
     const showExtra = api && api.toLowerCase() !== label.toLowerCase();
     S.status.textContent = showExtra ? `${label} (${api})` : label;
 
-    const phaseLabel = (p.phase ?? p.strategy);
-    S.strategy.textContent = (phaseLabel !== undefined && phaseLabel !== null && phaseLabel !== '')
-      ? String(phaseLabel)
-      : '—';
-    S.attempt.textContent  = normalize(p.attempt) ?? '—';
+    const phaseLabel = pickText(p.phase_display, p.phase, p.strategy);
+    S.strategy.textContent = phaseLabel ?? '—';
+
+    const attemptRaw = pickText(p.attempt_display, p.attempt);
+    S.attempt.textContent = attemptRaw ? normalize(attemptRaw) : '—';
 
     // Grid fallback: grid → grid_ft → attempt
-    const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? '—';
-    S.grid.textContent = gridText;
+    const gridRaw = pickText(p.grid_display, p.grid, p.grid_ft, attemptRaw);
+    S.grid.textContent = gridRaw ? normalize(gridRaw) : '—';
 
     const elapsedSec = p.elapsed ?? p.overall_elapsed ?? 0;
     S.elapsed.textContent = fmtElapsed(elapsedSec);
 
-    const phaseTotal = p.phase_total ?? p.time_limit;
-    S.phaseTotal.textContent = (phaseTotal !== undefined && phaseTotal !== null && phaseTotal !== '')
-      ? String(phaseTotal)
-      : '—';
+    const phaseTotal = pickText(p.phase_total_display, p.phase_total, p.time_limit);
+    S.phaseTotal.textContent = phaseTotal ?? '—';
 
     let rawPhase = p.percent ?? p.step_pct;
     if (rawPhase == null && p.time_limit) rawPhase = (p.step_elapsed / p.time_limit) * 100;
