@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import logging
 import time
 import threading
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 # ------------------------------
@@ -9,6 +11,150 @@ from typing import Any, Dict, Optional
 # ------------------------------
 
 PROGRESS_LOCK = threading.Lock()
+
+
+def _init_logger() -> logging.Logger:
+    logger = logging.getLogger("solver.attempt_log")
+    if logger.handlers:
+        return logger
+
+    log_path = Path(__file__).resolve().parent / "logs" / "solver_attempts.log"
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        handler = logging.FileHandler(log_path, encoding="utf-8")
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+    except Exception:
+        # If the logger cannot be initialised we silently continue; progress
+        # tracking should not break the solver.
+        logger.handlers.clear()
+    return logger
+
+
+ATTEMPT_LOGGER = _init_logger()
+
+
+def _log_enabled() -> bool:
+    return bool(ATTEMPT_LOGGER.handlers)
+
+
+def _fmt_seconds(seconds: Optional[float]) -> Optional[str]:
+    if seconds is None:
+        return None
+    try:
+        return f"{float(seconds):.2f}s"
+    except Exception:
+        return None
+
+
+def _emit_log(event: str, **fields: Any) -> None:
+    if not _log_enabled():
+        return
+    extras = [
+        f"{key}={value}"
+        for key, value in fields.items()
+        if value is not None and value != ""
+    ]
+    try:
+        if extras:
+            ATTEMPT_LOGGER.info("%s | %s", event, " ".join(extras))
+        else:
+            ATTEMPT_LOGGER.info("%s", event)
+    except Exception:
+        # Logging failures must never bubble back to callers.
+        pass
+
+
+LOG_STATE: Dict[str, Any] = {
+    "run_start": None,
+    "phase": "",
+    "phase_start": None,
+    "attempt": "",
+    "attempt_start": None,
+    "grid": "",
+}
+
+
+def _finalize_attempt_locked(now: Optional[float] = None, *, reason: Optional[str] = None) -> None:
+    attempt = LOG_STATE.get("attempt")
+    if not attempt:
+        return
+    if now is None:
+        now = _now()
+    start = LOG_STATE.get("attempt_start")
+    duration = None
+    if isinstance(start, (int, float)):
+        duration = max(0.0, float(now) - float(start))
+    _emit_log(
+        "Attempt finished",
+        phase=LOG_STATE.get("phase") or "",
+        attempt=attempt,
+        grid=LOG_STATE.get("grid") or "",
+        duration=_fmt_seconds(duration),
+        reason=reason,
+    )
+    LOG_STATE["attempt"] = ""
+    LOG_STATE["attempt_start"] = None
+
+
+def _log_attempt_transition_locked(new_attempt: str) -> None:
+    prev_attempt = LOG_STATE.get("attempt") or ""
+    if new_attempt == prev_attempt:
+        return
+    now = _now()
+    if prev_attempt:
+        _finalize_attempt_locked(now, reason="switch")
+    LOG_STATE["attempt"] = new_attempt
+    if new_attempt:
+        LOG_STATE["attempt_start"] = now
+        _emit_log(
+            "Attempt started",
+            phase=LOG_STATE.get("phase") or "",
+            attempt=new_attempt,
+            grid=(LOG_STATE.get("grid") or new_attempt),
+        )
+    else:
+        LOG_STATE["attempt_start"] = None
+
+
+def _log_phase_transition_locked(new_phase: str) -> None:
+    prev_phase = LOG_STATE.get("phase") or ""
+    if new_phase == prev_phase:
+        return
+    now = _now()
+    if LOG_STATE.get("attempt"):
+        _finalize_attempt_locked(now, reason="phase_change")
+    if prev_phase and LOG_STATE.get("phase_start"):
+        duration = max(0.0, now - float(LOG_STATE["phase_start"]))
+        _emit_log(
+            "Phase finished",
+            phase=prev_phase,
+            duration=_fmt_seconds(duration),
+        )
+    LOG_STATE["phase"] = new_phase
+    LOG_STATE["phase_start"] = now
+    if new_phase:
+        _emit_log("Phase started", phase=new_phase)
+
+
+def _update_grid_locked(new_grid: str) -> None:
+    prev_grid = LOG_STATE.get("grid") or ""
+    if new_grid == prev_grid:
+        return
+    LOG_STATE["grid"] = new_grid
+    if new_grid:
+        _emit_log(
+            "Grid updated",
+            phase=LOG_STATE.get("phase") or "",
+            attempt=LOG_STATE.get("attempt") or new_grid,
+            grid=new_grid,
+        )
 
 # Single source of truth for the modal
 PROGRESS: Dict[str, Any] = {
@@ -49,6 +195,8 @@ def _fmt_elapsed(seconds: float) -> str:
 
 def reset() -> None:
     with PROGRESS_LOCK:
+        now = _now()
+        _finalize_attempt_locked(now, reason="reset")
         PROGRESS.update({
             "status": "Idle",
             "phase": "",
@@ -66,11 +214,23 @@ def reset() -> None:
             "result_url": "",
             "demand_count": 0,
         })
+        LOG_STATE.update({
+            "phase": "",
+            "phase_start": None,
+            "attempt": "",
+            "attempt_start": None,
+            "grid": "",
+            "run_start": None,
+        })
+        _emit_log("Progress reset")
 
 def start_timer() -> None:
     with PROGRESS_LOCK:
-        PROGRESS["elapsed_start"] = _now()
+        now = _now()
+        PROGRESS["elapsed_start"] = now
         PROGRESS["elapsed"] = 0.0
+        LOG_STATE["run_start"] = now
+        _emit_log("Run timer started")
 
 def _touch_elapsed_locked() -> None:
     t0 = PROGRESS.get("elapsed_start")
@@ -87,7 +247,9 @@ def set_status(v: Any) -> None:
 
 def set_phase(v: Any) -> None:
     with PROGRESS_LOCK:
-        PROGRESS["phase"] = "" if v is None else str(v)
+        phase_str = "" if v is None else str(v)
+        PROGRESS["phase"] = phase_str
+        _log_phase_transition_locked(phase_str)
 
 def set_phase_total(v: Any) -> None:
     with PROGRESS_LOCK:
@@ -95,11 +257,15 @@ def set_phase_total(v: Any) -> None:
 
 def set_attempt(v: Any) -> None:
     with PROGRESS_LOCK:
-        PROGRESS["attempt"] = "" if v is None else str(v)
+        attempt_str = "" if v is None else str(v)
+        PROGRESS["attempt"] = attempt_str
+        _log_attempt_transition_locked(attempt_str)
 
 def set_grid(v: Any) -> None:
     with PROGRESS_LOCK:
-        PROGRESS["grid"] = "" if v is None else str(v)
+        grid_str = "" if v is None else str(v)
+        PROGRESS["grid"] = grid_str
+        _update_grid_locked(grid_str)
 
 def set_progress_pct(pct: Any) -> None:
     try:
@@ -168,6 +334,7 @@ def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None
 
     with PROGRESS_LOCK:
         _touch_elapsed_locked()
+        now = _now()
         if final_status is not None:
             PROGRESS["status"] = final_status
             if ok_flag is None:
@@ -182,6 +349,34 @@ def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None
         PROGRESS["done"] = True
         if ok_flag is not None:
             PROGRESS["ok"] = ok_flag
+        _finalize_attempt_locked(now, reason="run_complete")
+        run_start = LOG_STATE.get("run_start")
+        if isinstance(run_start, (int, float)):
+            total = max(0.0, now - float(run_start))
+        else:
+            total = None
+        LOG_STATE.update({
+            "run_start": None,
+            "phase_start": None,
+            "phase": PROGRESS.get("phase", ""),
+            "grid": PROGRESS.get("grid", ""),
+        })
+        coverage_pct = PROGRESS.get("coverage_pct")
+        coverage_str = None
+        if coverage_pct is not None:
+            try:
+                coverage_str = f"{float(coverage_pct):.2f}%"
+            except Exception:
+                coverage_str = str(coverage_pct)
+        _emit_log(
+            "Run finished",
+            status=PROGRESS.get("status"),
+            ok=PROGRESS.get("ok"),
+            duration=_fmt_seconds(total),
+            best_used=PROGRESS.get("best_used"),
+            coverage=coverage_str,
+            message=PROGRESS.get("message"),
+        )
 
 # ------------------------------
 # Backward-compat shims
