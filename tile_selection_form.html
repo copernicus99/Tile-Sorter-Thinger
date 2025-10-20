@@ -241,6 +241,23 @@
     }catch(e){}
   }
 
+  function buildPayload(){
+    const base = new FormData(form);
+    const payload = new FormData();
+    for (const [k, v] of base.entries()) {
+      payload.append(k, v);
+    }
+    $$('input.field').forEach(inp => {
+      const qty = parseInt(inp.value || '0', 10);
+      if (qty > 0) {
+        payload.append('w_ft[]', inp.dataset.w);
+        payload.append('h_ft[]', inp.dataset.h);
+        payload.append('count[]', String(qty));
+      }
+    });
+    return payload;
+  }
+
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     show();
@@ -248,7 +265,7 @@
     await poll();
     window.__pollTimer = setInterval(poll, 400);
     try{
-      const resp = await fetch('/solve', {method:'POST', body:new FormData(form)});
+      const resp = await fetch('/solve', {method:'POST', body:buildPayload()});
       const html = await resp.text();
       // Immediate navigation with the returned page body
       document.open(); document.write(html); document.close();
