@@ -41,3 +41,19 @@ def test_square_candidates_align_to_tile_gcd():
     widths = [cb.W for cb in candidates]
     assert aligned in widths
     assert all(w % step == 0 for w in widths)
+
+
+def test_orchestrator_surfaces_solver_reason(monkeypatch):
+    cp_sat = pytest.importorskip("solver.cp_sat")
+    orchestrator = pytest.importorskip("solver.orchestrator")
+
+    monkeypatch.setattr(cp_sat.CFG, "MAX_EDGE_FT", 0.5, raising=False)
+    monkeypatch.setattr(orchestrator.CFG, "MAX_EDGE_FT", 0.5, raising=False)
+
+    ok, placed, W_ft, H_ft, strategy, reason, meta = orchestrator.solve_orchestrator(
+        bag_ft={(1.0, 1.0): 4}
+    )
+
+    assert not ok
+    assert reason == "Proven infeasible under current constraints"
+    assert meta.get("reason") == reason
