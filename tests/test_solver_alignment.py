@@ -57,3 +57,20 @@ def test_orchestrator_surfaces_solver_reason(monkeypatch):
     assert not ok
     assert reason == "Proven infeasible under current constraints"
     assert meta.get("reason") == reason
+
+
+def test_seam_guard_ignores_empty_runs(monkeypatch):
+    cp_sat = pytest.importorskip("solver.cp_sat")
+
+    monkeypatch.setattr(cp_sat.CFG, "MAX_EDGE_FT", 1.0, raising=False)
+
+    ok, placed, reason = try_pack_exact_cover(
+        W=4,
+        H=6,
+        multiset={(2, 2): 2},
+        allow_discard=False,
+        max_seconds=5.0,
+    )
+
+    assert ok, reason
+    assert len(placed) == 2
