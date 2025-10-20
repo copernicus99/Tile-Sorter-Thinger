@@ -22,7 +22,10 @@ NO_PLUS               = int(os.getenv("TS_NO_PLUS", "1")) != 0
 # By default we allow unlimited reuse of the same shape.  Setting a positive
 # integer (via TS_SAME_SHAPE_LIMIT) restores the guard to cap repeats.
 SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "-1"))
-BASE_GRID_AREA_SQFT   = float(os.getenv("TS_BASE_GRID_AREA_SQFT", "1000"))
+# Default the base grid to 10 ft × 10 ft (100 ft²) so the orchestrator
+# follows the desired A/B (<100 ft²) and C–F (≥100 ft²) phase split without
+# requiring an override.
+BASE_GRID_AREA_SQFT   = float(os.getenv("TS_BASE_GRID_AREA_SQFT", "100"))
 
 # ======= Pre-flight sizing / accounting =======
 S_MAX_EST_PLACEMENTS  = int(os.getenv("TS_S_MAX_EST_PLACEMENTS", "150000"))
