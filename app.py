@@ -5,7 +5,7 @@ import time
 import threading
 from typing import Any, Dict, Iterable, List, Tuple, Optional
 
-from flask import Flask, request, render_template, send_from_directory, jsonify
+from flask import Flask, request, render_template, send_from_directory, jsonify, url_for
 
 from solver.orchestrator import solve_orchestrator
 from tiles import parse_demand, fmt_decoded_items
@@ -20,7 +20,7 @@ from progress import (
     _start_ticker as progress_start,
     set_status, set_phase, set_phase_total, set_attempt, set_grid,
     set_elapsed, set_progress_pct, set_coverage_pct,
-    set_best_used, set_demand_count, set_done,
+    set_best_used, set_demand_count, set_done, set_result_url,
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -79,6 +79,11 @@ def _no_cache_progress(resp):
 @app.route("/")
 def index():
     return send_from_directory(BASE_DIR, "tile_selection_form.html")
+
+
+@app.route("/result/latest")
+def result_latest():
+    return render_template("result.html", **LAST_RESULT)
 
 
 @app.route("/styles.css")
@@ -295,6 +300,7 @@ def solve():
             "coords_filename": COORDS_FILENAME,
             "layout_filename": LAYOUT_FILENAME,
         })
+        set_result_url(url_for("result_latest"))
         return render_template("result.html", **LAST_RESULT)
 
     bag_map = _bag_list_to_map(bag_list)
@@ -340,6 +346,7 @@ def solve():
             "coords_filename": COORDS_FILENAME,
             "layout_filename": LAYOUT_FILENAME,
         })
+        set_result_url(url_for("result_latest"))
         return render_template("result.html", **LAST_RESULT)
 
     result = _normalize_result(result_raw)
@@ -404,6 +411,7 @@ def solve():
         "coords_filename": coords_name,
         "layout_filename": layout_name,
     })
+    set_result_url(url_for("result_latest"))
     return render_template("result.html", **LAST_RESULT)
 
 

@@ -23,6 +23,9 @@ PROGRESS: Dict[str, Any] = {
     "elapsed_start": None,     # t0 (float) when solving started
     "elapsed": 0.0,            # seconds snapshot
     "message": "",             # optional note
+    "done": False,             # run completed
+    "ok": None,               # success flag if known
+    "result_url": "",         # optional navigation target
     # compatibility / counters
     "demand_count": 0,
 }
@@ -58,6 +61,9 @@ def reset() -> None:
             "elapsed_start": None,
             "elapsed": 0.0,
             "message": "",
+            "done": False,
+            "ok": None,
+            "result_url": "",
             "demand_count": 0,
         })
 
@@ -134,6 +140,10 @@ def set_message(msg: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["message"] = "" if msg is None else str(msg)
 
+def set_result_url(url: Any) -> None:
+    with PROGRESS_LOCK:
+        PROGRESS["result_url"] = "" if url is None else str(url)
+
 def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None:
     """Mark the run complete, tolerating legacy arguments.
 
@@ -146,9 +156,11 @@ def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None
     """
 
     final_status: Optional[str] = None
+    ok_flag: Optional[bool] = None
     if ok is not None:
         try:
-            final_status = "Solved" if bool(ok) else "Error"
+            ok_flag = bool(ok)
+            final_status = "Solved" if ok_flag else "Error"
         except Exception:
             final_status = None
 
@@ -158,11 +170,18 @@ def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None
         _touch_elapsed_locked()
         if final_status is not None:
             PROGRESS["status"] = final_status
+            if ok_flag is None:
+                ok_flag = final_status == "Solved"
         elif PROGRESS.get("status") in ("", "Idle", None):
             PROGRESS["status"] = "Solved"
+            if ok_flag is None:
+                ok_flag = True
         PROGRESS["percent"] = 100.0
         if final_message is not None:
             PROGRESS["message"] = str(final_message)
+        PROGRESS["done"] = True
+        if ok_flag is not None:
+            PROGRESS["ok"] = ok_flag
 
 # ------------------------------
 # Backward-compat shims
@@ -240,6 +259,9 @@ def snapshot() -> Dict[str, Any]:
             "elapsed": PROGRESS["elapsed"],
             "elapsed_str": _fmt_elapsed(PROGRESS["elapsed"]),
             "message": PROGRESS["message"],
+            "done": PROGRESS["done"],
+            "ok": PROGRESS["ok"],
+            "result_url": PROGRESS["result_url"],
             "demand_count": PROGRESS["demand_count"],
         }
 
