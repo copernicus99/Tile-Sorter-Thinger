@@ -338,19 +338,27 @@ def solve_orchestrator(*args, **kwargs):
             set_best_used(best_used_tiles)
             set_coverage_pct(best_cover_pct)
 
-        def _run_phase(label: str, candidates: List[CandidateBoard], seconds: float,
-                       allow_discard: bool, *, prefer_large: bool) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int]:
+        def _run_phase(
+            label: str,
+            candidates: List[CandidateBoard],
+            seconds: float,
+            allow_discard: bool,
+            *,
+            prefer_large: bool,
+        ) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int, Optional[str]]:
             if seconds <= 0 or not candidates:
                 set_phase(label)
                 set_phase_total(int(max(0.0, seconds)))
                 set_progress_pct(100.0 if not candidates else 0.0)
-                return False, None, [], 0.0, 0
+                reason = "No board candidates available" if not candidates else "Phase time budget is zero"
+                return False, None, [], 0.0, 0, reason
 
             set_phase(label)
             set_phase_total(int(seconds))
             phase_start = time.time()
             total = len(candidates)
             best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
+            last_reason: Optional[str] = None
 
             for idx, cb in enumerate(candidates, 1):
                 elapsed_phase = time.time() - phase_start
@@ -361,11 +369,14 @@ def solve_orchestrator(*args, **kwargs):
                 per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
                 set_attempt(cb.label)
                 set_grid(cb.label)
-                ok, placed, _ = _run_cp_sat_isolated(
+                ok, placed, reason = _run_cp_sat_isolated(
                     W=cb.W, H=cb.H, bag=bag_cells,
                     seconds=per_attempt,
                     allow_discard=allow_discard
                 )
+
+                if reason:
+                    last_reason = str(reason)
 
                 coverage_pct = 0.0
                 used_tiles = len(placed) if placed else 0
@@ -378,7 +389,7 @@ def solve_orchestrator(*args, **kwargs):
                     _record_best(used_tiles, coverage_pct)
                     if not allow_discard and used_tiles >= demand_count:
                         set_progress_pct(100.0)
-                        return True, cb, placed, coverage_pct, used_tiles
+                        return True, cb, placed, coverage_pct, used_tiles, None
 
                     if allow_discard:
                         if best_tuple is None:
@@ -402,7 +413,7 @@ def solve_orchestrator(*args, **kwargs):
 
                         if used_tiles >= demand_count and demand_count > 0:
                             set_progress_pct(100.0)
-                            return True, cb, placed, coverage_pct, used_tiles
+                            return True, cb, placed, coverage_pct, used_tiles, None
 
                 set_progress_pct(min(100.0, 100.0 * idx / max(1, total)))
 
@@ -413,10 +424,11 @@ def solve_orchestrator(*args, **kwargs):
                 best_cb, best_placed, best_cov, best_used = best_tuple
                 _record_best(best_used, best_cov)
                 set_progress_pct(100.0)
-                return True, best_cb, best_placed, best_cov, best_used
+                return True, best_cb, best_placed, best_cov, best_used, None
 
             set_progress_pct(100.0)
-            return False, None, [], 0.0, 0
+            fallback_reason = last_reason or "Exhausted all board candidates without a feasible layout"
+            return False, None, [], 0.0, 0, fallback_reason
 
         success_meta: Optional[Dict[str, Any]] = None
         final_reason: Optional[str] = None
@@ -444,9 +456,11 @@ def solve_orchestrator(*args, **kwargs):
                 )
                 if cb.W * cb.H >= area_cells
             ]
-            res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+            res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                 "A", candidates_A, float(getattr(CFG, "TIME_A", 600.0)), False, prefer_large=True
             )
+            if res_reason:
+                final_reason = res_reason
             if res_ok and res_board:
                 final_strategy = "A"
                 final_board = res_board
@@ -467,9 +481,11 @@ def solve_orchestrator(*args, **kwargs):
                     descending=True,
                     multiple_of=grid_step,
                 )[:30]
-                res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "B", candidates_B, float(getattr(CFG, "TIME_B", 600.0)), True, prefer_large=True
                 )
+                if res_reason:
+                    final_reason = res_reason
                 if res_ok and res_board:
                     final_strategy = "B"
                     final_board = res_board
@@ -485,13 +501,15 @@ def solve_orchestrator(*args, **kwargs):
                 base_side_cells,
                 f"{_fmt_ft(base_side_cells)} × {_fmt_ft(base_side_cells)} ft",
             )
-            res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+            res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                 "C",
                 [base_candidate],
                 float(getattr(CFG, "TIME_C", 300.0)),
                 False,
                 prefer_large=False,
             )
+            if res_reason:
+                final_reason = res_reason
             if res_ok and res_board:
                 final_strategy = "C"
                 final_board = res_board
@@ -502,13 +520,15 @@ def solve_orchestrator(*args, **kwargs):
                     "best_used": res_used,
                 }
             else:
-                res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "D",
                     [base_candidate],
                     float(getattr(CFG, "TIME_D", 300.0)),
                     True,
                     prefer_large=True,
                 )
+                if res_reason:
+                    final_reason = res_reason
                 if res_ok and res_board:
                     final_strategy = "D"
                     final_board = res_board
@@ -532,9 +552,11 @@ def solve_orchestrator(*args, **kwargs):
                         )
                         if cb.W * cb.H >= area_cells
                     ][:30]
-                    res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                    res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                         "E", candidates_E, float(getattr(CFG, "TIME_E", 900.0)), False, prefer_large=False
                     )
+                    if res_reason:
+                        final_reason = res_reason
                     if res_ok and res_board:
                         final_strategy = "E"
                         final_board = res_board
@@ -551,9 +573,11 @@ def solve_orchestrator(*args, **kwargs):
                             descending=False,
                             multiple_of=grid_step,
                         )[:30]
-                        res_ok, res_board, res_placed, res_cov, res_used = _run_phase(
+                        res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                             "F", candidates_F, float(getattr(CFG, "TIME_F", 900.0)), True, prefer_large=False
                         )
+                        if res_reason:
+                            final_reason = res_reason
                         if res_ok and res_board:
                             final_strategy = "F"
                             final_board = res_board
@@ -591,9 +615,9 @@ def solve_orchestrator(*args, **kwargs):
             )
 
         set_status("Error")
-        set_message("there is no solution")
-        final_reason = "There is no solution"
-        return (False, [], 0.0, 0.0, "error", final_reason, {"reason": final_reason})
+        failure_reason = final_reason or "There is no solution"
+        set_message(failure_reason)
+        return (False, [], 0.0, 0.0, "error", failure_reason, {"reason": failure_reason})
 
     except Exception as e:
         set_status("Error")

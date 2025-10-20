@@ -201,22 +201,44 @@ def try_pack_exact_cover(
         max_edge_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
 
         if (max_edge_cells is not None) and (max_edge_cells < max(W, H)):
+
+            def _or_bool(name, vars_list):
+                b = m.NewBoolVar(name)
+                if vars_list:
+                    m.AddMaxEquality(b, vars_list)
+                else:
+                    m.Add(b == 0)
+                return b
+
             # vertical
             for x in range(1, W):
                 seam_col = []
                 for y in range(H):
                     s = m.NewBoolVar(f"sv_{x}_{y}")
+                    left = []
+                    right = []
                     both = []
                     for i in range(n):
                         for k, (px, py, rot, w, h) in enumerate(options[i]):
-                            if (px <= x - 1 < px + w) and (py <= y < py + h) and (px <= x < px + w):
+                            covers_left = (px <= x - 1 < px + w) and (py <= y < py + h)
+                            covers_right = (px <= x < px + w) and (py <= y < py + h)
+                            if covers_left:
+                                left.append(p[i][k])
+                            if covers_right:
+                                right.append(p[i][k])
+                            if covers_left and covers_right:
                                 both.append(p[i][k])
-                    if both:
-                        share = m.NewBoolVar(f"share_v_{x}_{y}")
-                        m.AddMaxEquality(share, both)
-                        m.Add(s + share == 1)
-                    else:
-                        m.Add(s == 1)
+
+                    left_cover = _or_bool(f"sv_left_{x}_{y}", left)
+                    right_cover = _or_bool(f"sv_right_{x}_{y}", right)
+                    share = _or_bool(f"share_v_{x}_{y}", both)
+
+                    both_cover = m.NewBoolVar(f"sv_both_{x}_{y}")
+                    m.Add(both_cover <= left_cover)
+                    m.Add(both_cover <= right_cover)
+                    m.Add(both_cover >= left_cover + right_cover - 1)
+
+                    m.Add(s + share == both_cover)
                     seam_col.append(s)
                 L = max_edge_cells
                 for y0 in range(0, H - (L + 1) + 1):
@@ -227,17 +249,30 @@ def try_pack_exact_cover(
                 seam_row = []
                 for x in range(W):
                     s = m.NewBoolVar(f"sh_{x}_{y}")
+                    top = []
+                    bottom = []
                     both = []
                     for i in range(n):
                         for k, (px, py, rot, w, h) in enumerate(options[i]):
-                            if (py <= y - 1 < py + h) and (px <= x < px + w) and (py <= y < py + h):
+                            covers_top = (py <= y - 1 < py + h) and (px <= x < px + w)
+                            covers_bottom = (py <= y < py + h) and (px <= x < px + w)
+                            if covers_top:
+                                top.append(p[i][k])
+                            if covers_bottom:
+                                bottom.append(p[i][k])
+                            if covers_top and covers_bottom:
                                 both.append(p[i][k])
-                    if both:
-                        share = m.NewBoolVar(f"share_h_{x}_{y}")
-                        m.AddMaxEquality(share, both)
-                        m.Add(s + share == 1)
-                    else:
-                        m.Add(s == 1)
+
+                    top_cover = _or_bool(f"sh_top_{x}_{y}", top)
+                    bottom_cover = _or_bool(f"sh_bottom_{x}_{y}", bottom)
+                    share = _or_bool(f"share_h_{x}_{y}", both)
+
+                    both_cover = m.NewBoolVar(f"sh_both_{x}_{y}")
+                    m.Add(both_cover <= top_cover)
+                    m.Add(both_cover <= bottom_cover)
+                    m.Add(both_cover >= top_cover + bottom_cover - 1)
+
+                    m.Add(s + share == both_cover)
                     seam_row.append(s)
                 L = max_edge_cells
                 for x0 in range(0, W - (L + 1) + 1):
