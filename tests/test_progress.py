@@ -1,4 +1,14 @@
-from progress import reset, set_status, set_done, set_result_url, snapshot
+from progress import (
+    reset,
+    set_status,
+    set_done,
+    set_result_url,
+    set_phase,
+    set_phase_total,
+    set_attempt,
+    set_grid,
+    snapshot,
+)
 
 
 def test_set_done_no_args_defaults_to_solved():
@@ -30,3 +40,28 @@ def test_set_result_url_tracks_navigation_target():
     snap = snapshot()
     assert snap["result_url"] == "/foo"
     assert snap["done"] is False
+
+
+def test_snapshot_includes_display_fallbacks():
+    reset()
+    set_phase("S1")
+    set_phase_total(3)
+    set_attempt("12 × 18 ft")
+    set_grid("12 × 18 ft")
+
+    snap = snapshot()
+    assert snap["phase_display"] == "S1"
+    assert snap["phase_total_display"] == "3"
+    assert snap["attempt_display"] == "12 × 18 ft"
+    assert snap["grid_display"] == "12 × 18 ft"
+
+    # Clearing the underlying values keeps the cached display entries
+    set_phase("")
+    set_phase_total("")
+    set_attempt("")
+    set_grid("")
+    snap = snapshot()
+    assert snap["phase_display"] == "S1"
+    assert snap["phase_total_display"] == "3"
+    assert snap["attempt_display"] == "12 × 18 ft"
+    assert snap["grid_display"] == "12 × 18 ft"
