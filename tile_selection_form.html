@@ -189,6 +189,10 @@
     grid: $('rc-grid'), elapsed: $('rc-elapsed'),
     phaseTotal: $('rc-phase-total'), phase: $('rc-phase'), barPhase: $('rc-bar-phase')
   };
+  let lastRunId = null;
+  let previousRunId = null;
+  let awaitingNewRun = false;
+  let currentPollToken = 0;
   function show(){ ov.classList.remove('hidden'); }
   function hide(){ ov.classList.add('hidden'); }
   function fmtElapsed(sec){ sec=Math.max(0,Math.floor(sec||0)); const m=Math.floor(sec/60), s=sec%60; return (m?m+'m ':'')+s+'s'; }
@@ -225,19 +229,47 @@
     S.barPhase.setAttribute('width', String(val));
   }
 
-  async function poll(){
+  async function poll(token){
     try{
       const r = await fetch('/progress3', {cache:'no-store'});
       if(!r.ok) return;
       const p = await r.json();
+      if (token !== currentPollToken) return;
       updateCard(p);
-      if (p.done) {
+      const serverRunId = (typeof p.run_id === 'number' && !Number.isNaN(p.run_id)) ? p.run_id : null;
+      const statusText = (p.status || '').toLowerCase();
+      let waitingForReset = false;
+
+      if (awaitingNewRun) {
+        if (statusText === 'solving') {
+          awaitingNewRun = false;
+        } else if (serverRunId !== null && previousRunId !== null) {
+          if (serverRunId !== previousRunId) {
+            awaitingNewRun = false;
+          } else {
+            waitingForReset = true;
+          }
+        }
+        if (!awaitingNewRun) {
+          previousRunId = null;
+          if (serverRunId !== null) {
+            lastRunId = serverRunId;
+          }
+        }
+      } else if (serverRunId !== null) {
+        lastRunId = serverRunId;
+      }
+
+      if (!waitingForReset && !awaitingNewRun && p.done) {
         // If backend gave us a URL, go there (safe fallback)
         if (p.result_url && !window.__navigated) {
           window.__navigated = true;
           window.location.href = p.result_url;
         }
-        clearInterval(window.__pollTimer);
+        if (window.__pollTimer) {
+          clearInterval(window.__pollTimer);
+          window.__pollTimer = null;
+        }
       }
     }catch(e){}
   }
@@ -261,12 +293,21 @@
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    window.__navigated = false;
     show();
-    if (window.__pollTimer) clearInterval(window.__pollTimer);
-    await poll();
-    window.__pollTimer = setInterval(poll, 400);
+    if (window.__pollTimer) {
+      clearInterval(window.__pollTimer);
+      window.__pollTimer = null;
+    }
+    const token = ++currentPollToken;
+    previousRunId = lastRunId;
+    awaitingNewRun = true;
+    const payload = buildPayload();
+    const solvePromise = fetch('/solve', {method:'POST', body:payload});
+    await poll(token);
+    window.__pollTimer = setInterval(() => poll(token), 400);
     try{
-      const resp = await fetch('/solve', {method:'POST', body:buildPayload()});
+      const resp = await solvePromise;
       const html = await resp.text();
       // Immediate navigation with the returned page body
       document.open(); document.write(html); document.close();

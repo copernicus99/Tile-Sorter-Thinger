@@ -229,6 +229,7 @@ PROGRESS: Dict[str, Any] = {
     "done": False,             # run completed
     "ok": None,               # success flag if known
     "result_url": "",         # optional navigation target
+    "run_id": 0,               # monotonically increasing identifier
     # compatibility / counters
     "demand_count": 0,
 }
@@ -254,6 +255,11 @@ def reset() -> None:
     with PROGRESS_LOCK:
         now = _now()
         _finalize_attempt_locked(now, reason="reset")
+        try:
+            current_run_id = int(PROGRESS.get("run_id", 0))
+        except Exception:
+            current_run_id = 0
+        new_run_id = current_run_id + 1
         PROGRESS.update({
             "status": "Idle",
             "phase": "",
@@ -270,6 +276,7 @@ def reset() -> None:
             "done": False,
             "ok": None,
             "result_url": "",
+            "run_id": new_run_id,
             "demand_count": 0,
         })
         LOG_STATE.update({
@@ -538,6 +545,7 @@ def snapshot() -> Dict[str, Any]:
             "done": PROGRESS["done"],
             "ok": PROGRESS["ok"],
             "result_url": PROGRESS["result_url"],
+            "run_id": PROGRESS["run_id"],
             "demand_count": PROGRESS["demand_count"],
         }
 
