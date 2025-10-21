@@ -363,14 +363,22 @@ def solve_orchestrator(*args, **kwargs):
             set_phase(label)
             set_phase_total(int(seconds))
             phase_start = time.time()
+            set_progress_pct(0.0)
             total = len(candidates)
             best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
             last_reason: Optional[str] = None
 
-            for idx, cb in enumerate(candidates, 1):
+            def _update_phase_progress() -> None:
+                elapsed_phase = time.time() - phase_start
+                if seconds > 0:
+                    pct = max(0.0, min(100.0, 100.0 * (elapsed_phase / seconds)))
+                    set_progress_pct(pct)
+
+            for cb in candidates:
                 elapsed_phase = time.time() - phase_start
                 remaining = seconds - elapsed_phase
                 if remaining <= 0:
+                    _update_phase_progress()
                     break
 
                 per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
@@ -422,7 +430,7 @@ def solve_orchestrator(*args, **kwargs):
                             set_progress_pct(100.0)
                             return True, cb, placed, coverage_pct, used_tiles, None
 
-                set_progress_pct(min(100.0, 100.0 * idx / max(1, total)))
+                _update_phase_progress()
 
                 if (time.time() - phase_start) >= seconds:
                     break
