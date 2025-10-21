@@ -183,6 +183,7 @@
   const form = document.getElementById('tileForm');
   const ov = document.getElementById('runOverlay');
   const $ = (id) => document.getElementById(id);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const S = {
     status: $('rc-status'), strategy: $('rc-strategy'), attempt: $('rc-attempt'),
     grid: $('rc-grid'), elapsed: $('rc-elapsed'),
