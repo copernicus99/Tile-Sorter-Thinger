@@ -109,6 +109,48 @@ def test_mirrored_probe_order_handles_duplicates_gracefully():
     assert order == [10, 6, 8, 8]
 
 
+def test_orchestrator_phase_d_restricts_to_base_board(monkeypatch):
+    import math
+    import solver.orchestrator as orchestrator
+    from models import ft_to_cells
+
+    calls = []
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
+        calls.append((W, H, allow_discard))
+        return False, [], "no solution"
+
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+
+    def fake_phase_d_candidates(shrink_floor, base_side, **kwargs):
+        return [
+            orchestrator.CandidateBoard(base_side, base_side, "base"),
+            orchestrator.CandidateBoard(max(6, shrink_floor - 2), max(6, shrink_floor - 2), "smaller"),
+            orchestrator.CandidateBoard(base_side + 2, base_side + 2, "larger"),
+        ]
+
+    monkeypatch.setattr(orchestrator, "_phase_d_candidates", fake_phase_d_candidates)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+
+    bag_ft = {(1.0, 1.0): 100}
+
+    orchestrator.solve_orchestrator(bag_ft=bag_ft)
+
+    bag_cells = orchestrator._bag_ft_to_cells(bag_ft)
+    grid_step = orchestrator._grid_step_from_bag(bag_cells)
+    max_tile_side = max((max(w, h) for (w, h) in bag_cells.keys()), default=6)
+    base_side_cells = max(6, ft_to_cells(math.sqrt(orchestrator.CFG.BASE_GRID_AREA_SQFT)))
+    base_side_cells = max(base_side_cells, max_tile_side)
+    base_side_cells = orchestrator._align_up_to_multiple(base_side_cells, grid_step)
+
+    d_calls = [(W, H) for (W, H, allow) in calls if allow]
+    assert d_calls, "Phase D should have attempted the base board"
+    assert all((W, H) == (base_side_cells, base_side_cells) for (W, H) in d_calls)
+
 def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
     import solver.orchestrator as orchestrator
     from models import ft_to_cells
