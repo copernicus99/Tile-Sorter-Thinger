@@ -208,7 +208,26 @@
     S.strategy.textContent = (phaseLabel !== undefined && phaseLabel !== null && phaseLabel !== '')
       ? String(phaseLabel)
       : '—';
-    S.attempt.textContent  = normalize(p.attempt) ?? '—';
+    let attemptText = normalize(p.attempt);
+    if (attemptText && attemptText.trim() !== '') {
+      const extras = [];
+      const attemptIdx = Number(p.attempt_idx);
+      const attemptTotal = Number(p.attempt_total);
+      if (Number.isFinite(attemptIdx) && Number.isFinite(attemptTotal) && attemptIdx > 0 && attemptTotal > 0) {
+        extras.push(`${attemptIdx}/${attemptTotal}`);
+      }
+      const attemptBudget = Number(p.attempt_budget);
+      if (Number.isFinite(attemptBudget) && attemptBudget > 0) {
+        const rounded = attemptBudget >= 100 ? Math.round(attemptBudget) : Math.round(attemptBudget * 10) / 10;
+        extras.push(`≤${rounded}s`);
+      }
+      if (extras.length) {
+        attemptText = `${attemptText} (${extras.join(', ')})`;
+      }
+    } else {
+      attemptText = '—';
+    }
+    S.attempt.textContent  = attemptText;
 
     // Grid fallback: grid → grid_ft → attempt
     const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? '—';

@@ -470,23 +470,35 @@ def solve_orchestrator(*args, **kwargs):
                 ticker.start()
 
             try:
-                for cb in candidates:
+                for idx, cb in enumerate(candidates, 1):
                     elapsed_phase = time.time() - phase_start
                     if elapsed_phase >= seconds:
                         _update_phase_progress()
                         break
 
                     remaining = seconds - elapsed_phase
-                    per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
+                    remaining_candidates = max(1, total - idx + 1)
+                    ideal_slice = remaining / float(remaining_candidates)
+                    per_attempt = min(max(5.0, ideal_slice), remaining)
 
-                    set_attempt(cb.label)
+                    set_attempt(
+                        cb.label,
+                        budget=per_attempt,
+                        idx=idx,
+                        total=total,
+                    )
                     set_grid(cb.label)
+                    attempt_started = time.time()
                     ok, placed, reason = _run_cp_sat_isolated(
                         W=cb.W,
                         H=cb.H,
                         bag=bag_cells,
                         seconds=per_attempt,
                         allow_discard=allow_discard,
+                    )
+                    attempt_elapsed = time.time() - attempt_started
+                    set_message(
+                        f"Phase {label} attempt {idx}/{total} ran {attempt_elapsed:.1f}s (budget ≤{per_attempt:.1f}s)"
                     )
 
                     if reason:

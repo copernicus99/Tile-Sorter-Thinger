@@ -35,7 +35,7 @@ S1_MAX_HEIGHT_FT      = float(os.getenv("TS_S1_MAX_HEIGHT_FT", "16"))
 TIME_A = int(os.getenv("TS_TIME_A", "600"))
 TIME_B = int(os.getenv("TS_TIME_B", "600"))
 TIME_C = int(os.getenv("TS_TIME_C", "300"))
-TIME_D = int(os.getenv("TS_TIME_D", "300"))
+TIME_D = int(os.getenv("TS_TIME_D", "1800"))
 TIME_E = int(os.getenv("TS_TIME_E", "900"))
 TIME_F = int(os.getenv("TS_TIME_F", "900"))
 
