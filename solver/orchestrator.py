@@ -654,19 +654,7 @@ def solve_orchestrator(*args, **kwargs):
                 shrink_floor = _align_up_to_multiple(shrink_floor, grid_step)
                 if shrink_floor > base_side_cells:
                     shrink_floor = base_side_cells
-                raw_candidates_D = _phase_d_candidates(
-                    shrink_floor,
-                    base_side_cells,
-                    grid_step=grid_step,
-                    area_cells=area_cells,
-                )
-                candidates_D = [
-                    cb
-                    for cb in raw_candidates_D
-                    if cb.W == base_candidate.W and cb.H == base_candidate.H
-                ]
-                if not candidates_D:
-                    candidates_D = [base_candidate]
+                candidates_D = [base_candidate]
                 res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "D",
                     candidates_D,
