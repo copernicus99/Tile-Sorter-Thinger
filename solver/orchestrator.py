@@ -5,6 +5,7 @@ import os
 import time
 import traceback
 import math
+import threading
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Any, Iterable
 
@@ -374,12 +375,28 @@ def solve_orchestrator(*args, **kwargs):
                     pct = max(0.0, min(100.0, 100.0 * (elapsed_phase / seconds)))
                     set_progress_pct(pct)
 
-            for cb in candidates:
-                elapsed_phase = time.time() - phase_start
-                remaining = seconds - elapsed_phase
-                if remaining <= 0:
+            progress_stop = threading.Event()
+
+            def _progress_ticker() -> None:
+                while not progress_stop.wait(0.5):
                     _update_phase_progress()
-                    break
+
+            ticker: Optional[threading.Thread] = None
+            if seconds > 0:
+                ticker = threading.Thread(
+                    target=_progress_ticker,
+                    name="phase-progress",
+                    daemon=True,
+                )
+                ticker.start()
+
+            try:
+                for cb in candidates:
+                    elapsed_phase = time.time() - phase_start
+                    remaining = seconds - elapsed_phase
+                    if remaining <= 0:
+                        _update_phase_progress()
+                        break
 
                 per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
                 set_attempt(cb.label)
@@ -434,6 +451,11 @@ def solve_orchestrator(*args, **kwargs):
 
                 if (time.time() - phase_start) >= seconds:
                     break
+            finally:
+                progress_stop.set()
+                _update_phase_progress()
+                if ticker is not None:
+                    ticker.join(timeout=0.2)
 
             if best_tuple and best_tuple[3] > 0:
                 best_cb, best_placed, best_cov, best_used = best_tuple
