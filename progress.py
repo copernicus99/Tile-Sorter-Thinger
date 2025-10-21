@@ -67,6 +67,25 @@ def _fmt_seconds(seconds: Optional[float]) -> Optional[str]:
         return None
 
 
+def _coerce_int(value: Any) -> Optional[int]:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except Exception:
+        return None
+
+
+def _fmt_slice(idx: Any, total: Any) -> Optional[str]:
+    idx_i = _coerce_int(idx)
+    total_i = _coerce_int(total)
+    if idx_i is None or total_i is None:
+        return None
+    if idx_i <= 0 or total_i <= 0:
+        return None
+    return f"{idx_i}/{total_i}"
+
+
 def _emit_log(event: str, **fields: Any) -> None:
     if not _log_enabled():
         return
@@ -92,6 +111,9 @@ LOG_STATE: Dict[str, Any] = {
     "attempt": "",
     "attempt_start": None,
     "grid": "",
+    "attempt_budget": None,
+    "attempt_idx": None,
+    "attempt_total": None,
 }
 
 
@@ -153,13 +175,24 @@ def _finalize_attempt_locked(now: Optional[float] = None, *, reason: Optional[st
         attempt=attempt,
         grid=LOG_STATE.get("grid") or "",
         duration=_fmt_seconds(duration),
+        budget=_fmt_seconds(LOG_STATE.get("attempt_budget")),
+        slice=_fmt_slice(LOG_STATE.get("attempt_idx"), LOG_STATE.get("attempt_total")),
         reason=reason,
     )
     LOG_STATE["attempt"] = ""
     LOG_STATE["attempt_start"] = None
+    LOG_STATE["attempt_budget"] = None
+    LOG_STATE["attempt_idx"] = None
+    LOG_STATE["attempt_total"] = None
 
 
-def _log_attempt_transition_locked(new_attempt: str) -> None:
+def _log_attempt_transition_locked(
+    new_attempt: str,
+    *,
+    budget: Optional[float] = None,
+    idx: Optional[int] = None,
+    total: Optional[int] = None,
+) -> None:
     prev_attempt = LOG_STATE.get("attempt") or ""
     if new_attempt == prev_attempt:
         return
@@ -167,6 +200,9 @@ def _log_attempt_transition_locked(new_attempt: str) -> None:
     if prev_attempt:
         _finalize_attempt_locked(now, reason="switch")
     LOG_STATE["attempt"] = new_attempt
+    LOG_STATE["attempt_budget"] = float(budget) if budget is not None else None
+    LOG_STATE["attempt_idx"] = _coerce_int(idx)
+    LOG_STATE["attempt_total"] = _coerce_int(total)
     if new_attempt:
         LOG_STATE["attempt_start"] = now
         _emit_log(
@@ -174,9 +210,14 @@ def _log_attempt_transition_locked(new_attempt: str) -> None:
             phase=LOG_STATE.get("phase") or "",
             attempt=new_attempt,
             grid=(LOG_STATE.get("grid") or new_attempt),
+            budget=_fmt_seconds(budget),
+            slice=_fmt_slice(idx, total),
         )
     else:
         LOG_STATE["attempt_start"] = None
+        LOG_STATE["attempt_budget"] = None
+        LOG_STATE["attempt_idx"] = None
+        LOG_STATE["attempt_total"] = None
 
 
 def _log_phase_transition_locked(new_phase: str) -> None:
@@ -218,6 +259,9 @@ PROGRESS: Dict[str, Any] = {
     "phase": "",               # e.g. S0 | F | G
     "phase_total": "",         # total for the phase, string or number
     "attempt": "",             # e.g. "21.5 × 22.5 ft"
+    "attempt_budget": None,     # seconds budgeted for current attempt
+    "attempt_idx": None,        # 1-based index of current attempt within phase
+    "attempt_total": None,      # total attempts queued for phase
     "grid": "",                # e.g. "21.5 × 22.5 ft"
     "strategy": "",            # e.g. S0 | C | F
     "percent": 0.0,            # 0..100 float
@@ -265,6 +309,9 @@ def reset() -> None:
             "phase": "",
             "phase_total": "",
             "attempt": "",
+            "attempt_budget": None,
+            "attempt_idx": None,
+            "attempt_total": None,
             "grid": "",
             "strategy": "",
             "percent": 0.0,
@@ -325,11 +372,28 @@ def set_phase_total(v: Any) -> None:
         PROGRESS["phase_total"] = "" if v is None else str(v)
         _persist_locked()
 
-def set_attempt(v: Any) -> None:
+def set_attempt(
+    v: Any,
+    *,
+    budget: Optional[float] = None,
+    idx: Optional[int] = None,
+    total: Optional[int] = None,
+) -> None:
     with PROGRESS_LOCK:
         attempt_str = "" if v is None else str(v)
         PROGRESS["attempt"] = attempt_str
-        _log_attempt_transition_locked(attempt_str)
+        budget_f = float(budget) if budget is not None else None
+        idx_i = _coerce_int(idx)
+        total_i = _coerce_int(total)
+        PROGRESS["attempt_budget"] = budget_f
+        PROGRESS["attempt_idx"] = idx_i
+        PROGRESS["attempt_total"] = total_i
+        _log_attempt_transition_locked(
+            attempt_str,
+            budget=budget_f,
+            idx=idx_i,
+            total=total_i,
+        )
         _persist_locked()
 
 def set_grid(v: Any) -> None:
@@ -534,6 +598,9 @@ def snapshot() -> Dict[str, Any]:
             "phase": PROGRESS["phase"],
             "phase_total": PROGRESS["phase_total"],
             "attempt": PROGRESS["attempt"],
+            "attempt_budget": PROGRESS["attempt_budget"],
+            "attempt_idx": PROGRESS["attempt_idx"],
+            "attempt_total": PROGRESS["attempt_total"],
             "grid": PROGRESS["grid"],
             "strategy": PROGRESS["strategy"],
             "percent": PROGRESS["percent"],
