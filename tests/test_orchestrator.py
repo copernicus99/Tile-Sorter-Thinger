@@ -40,7 +40,7 @@ if "ortools" not in sys.modules:
     sys.modules["ortools.sat.python"] = python_mod
     sys.modules["ortools.sat.python.cp_model"] = cp_model_mod
 
-from solver.orchestrator import _coerce_bag_ft
+from solver.orchestrator import _coerce_bag_ft, _phase_d_candidates, _mirrored_probe_order
 
 # Remove the temporary stubs so other tests that rely on pytest.importorskip
 # still see the absence of the optional dependency and skip accordingly.
@@ -68,6 +68,45 @@ def test_coerce_bag_ft_from_tiles_form_list():
 def test_coerce_bag_ft_empty_when_parse_fails():
     # No tiles -> parse_demand would report nothing parsed
     assert _coerce_bag_ft({}) == {}
+
+
+def test_phase_d_candidates_follow_mirrored_pop_order():
+    shrink_floor = 12
+    base_side = 20
+    grid_step = 2
+    area_cells = 12 * 12  # force inclusion of all candidates in range
+
+    candidates = _phase_d_candidates(
+        shrink_floor,
+        base_side,
+        grid_step=grid_step,
+        area_cells=area_cells,
+    )
+
+    # Expect mirrored order: start from 20 (10×10 ft), then 12, 18, 14, 16.
+    assert [cb.W for cb in candidates] == [20, 12, 18, 14, 16]
+
+
+def test_phase_d_candidates_drop_boards_too_small():
+    shrink_floor = 12
+    base_side = 20
+    grid_step = 2
+    area_cells = 19 * 19  # only 20×20 satisfies area ≥ area_cells
+
+    candidates = _phase_d_candidates(
+        shrink_floor,
+        base_side,
+        grid_step=grid_step,
+        area_cells=area_cells,
+    )
+
+    assert [cb.W for cb in candidates] == [20]
+
+
+def test_mirrored_probe_order_handles_duplicates_gracefully():
+    order = _mirrored_probe_order([6, 8, 8, 10])
+    # duplicates should not break the alternating pattern
+    assert order == [10, 6, 8, 8]
 
 
 def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):

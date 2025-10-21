@@ -138,6 +138,78 @@ def _square_candidates(min_side: int, max_side: int, *, descending: bool, multip
     return out
 
 
+def _mirrored_probe_order(values: List[int]) -> List[int]:
+    """Return a high/low interleaving (pop-in/out) ordering.
+
+    Phase D is meant to “fit tiles to a 10×10 grid,” so we start from the base
+    grid (the largest candidate) and then mirror probes toward the smaller
+    boards.  This alternates popping from the high and low ends of the sorted
+    sequence to avoid biasing the search toward only shrinking or only growing
+    boards.
+    """
+
+    if not values:
+        return []
+
+    ordered: List[int] = []
+    lo = 0
+    hi = len(values) - 1
+    while hi >= lo:
+        ordered.append(values[hi])
+        if hi == lo:
+            break
+        ordered.append(values[lo])
+        hi -= 1
+        lo += 1
+    return ordered
+
+
+def _phase_d_candidates(
+    shrink_floor: int,
+    base_side: int,
+    *,
+    grid_step: int,
+    area_cells: int,
+) -> List[CandidateBoard]:
+    """Generate Phase D square boards in mirrored pop-in/out order.
+
+    Only boards capable of containing the full tile area are considered – any
+    board whose area is smaller than the total demand is discarded up-front so
+    Phase D does not settle for layouts that can never accommodate every tile.
+    """
+
+    all_candidates = _square_candidates(
+        shrink_floor,
+        base_side,
+        descending=False,
+        multiple_of=max(1, grid_step),
+    )
+
+    viable = [cb for cb in all_candidates if cb.W * cb.H >= max(0, int(area_cells))]
+    if not viable:
+        return []
+
+    sides = [cb.W for cb in viable]
+    mirrored = _mirrored_probe_order(sorted(set(sides)))
+
+    side_to_cb = {cb.W: cb for cb in viable}
+    ordered_candidates: List[CandidateBoard] = []
+    for side in mirrored:
+        cb = side_to_cb.get(side)
+        if cb is not None:
+            ordered_candidates.append(cb)
+
+    if len(ordered_candidates) > 60:
+        # Preserve mirrored flavour while respecting legacy cap.
+        kept: List[CandidateBoard] = []
+        for cb in ordered_candidates[:30] + ordered_candidates[-30:]:
+            if cb not in kept:
+                kept.append(cb)
+        ordered_candidates = kept
+
+    return ordered_candidates
+
+
 def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:
     out: List[CandidateBoard] = []
     seen = set()
@@ -563,30 +635,18 @@ def solve_orchestrator(*args, **kwargs):
                 shrink_floor = _align_up_to_multiple(shrink_floor, grid_step)
                 if shrink_floor > base_side_cells:
                     shrink_floor = base_side_cells
-                candidates_D = _square_candidates(
+                candidates_D = _phase_d_candidates(
                     shrink_floor,
                     base_side_cells,
-                    descending=True,
-                    multiple_of=grid_step,
+                    grid_step=grid_step,
+                    area_cells=area_cells,
                 )
-                if len(candidates_D) > 60:
-                    head = candidates_D[:30]
-                    tail = candidates_D[-30:]
-                    dedup: List[CandidateBoard] = []
-                    seen = set()
-                    for cb in head + tail:
-                        key = (cb.W, cb.H)
-                        if key in seen:
-                            continue
-                        seen.add(key)
-                        dedup.append(cb)
-                    candidates_D = dedup
                 res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "D",
                     candidates_D,
                     float(getattr(CFG, "TIME_D", 300.0)),
                     True,
-                    prefer_large=False,
+                    prefer_large=True,
                 )
                 if res_reason:
                     final_reason = res_reason
