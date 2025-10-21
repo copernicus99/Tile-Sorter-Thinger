@@ -1,4 +1,4 @@
-from progress import reset, set_status, set_done, set_result_url, snapshot
+from progress import reset, set_status, set_done, set_result_url, snapshot, _set_progress
 
 
 def test_set_done_no_args_defaults_to_solved():
@@ -30,3 +30,12 @@ def test_set_result_url_tracks_navigation_target():
     snap = snapshot()
     assert snap["result_url"] == "/foo"
     assert snap["done"] is False
+
+
+def test_strategy_field_populated_via_set_progress():
+    reset()
+    _set_progress(strategy="S0", phase="", phase_total=3)
+    snap = snapshot()
+    assert snap["strategy"] == "S0"
+    # phase remains blank when only strategy is provided
+    assert snap["phase"] == ""

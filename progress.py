@@ -163,6 +163,7 @@ PROGRESS: Dict[str, Any] = {
     "phase_total": "",         # total for the phase, string or number
     "attempt": "",             # e.g. "21.5 × 22.5 ft"
     "grid": "",                # e.g. "21.5 × 22.5 ft"
+    "strategy": "",            # e.g. S0 | C | F
     "percent": 0.0,            # 0..100 float
     "best_used": 0,            # tiles placed best-so-far
     "coverage_pct": 0.0,       # % of demand covered
@@ -203,6 +204,7 @@ def reset() -> None:
             "phase_total": "",
             "attempt": "",
             "grid": "",
+            "strategy": "",
             "percent": 0.0,
             "best_used": 0,
             "coverage_pct": 0.0,
@@ -266,6 +268,10 @@ def set_grid(v: Any) -> None:
         grid_str = "" if v is None else str(v)
         PROGRESS["grid"] = grid_str
         _update_grid_locked(grid_str)
+
+def set_strategy(v: Any) -> None:
+    with PROGRESS_LOCK:
+        PROGRESS["strategy"] = "" if v is None else str(v)
 
 def set_progress_pct(pct: Any) -> None:
     try:
@@ -423,6 +429,7 @@ def _set_progress(value: Any = None, **kw: Any) -> None:
         "phase_total": set_phase_total,
         "attempt": set_attempt,
         "grid": set_grid,
+        "strategy": set_strategy,
         "percent": set_progress_pct,
         "best_used": set_best_used,
         "coverage_pct": set_coverage_pct,
@@ -448,6 +455,7 @@ def snapshot() -> Dict[str, Any]:
             "phase_total": PROGRESS["phase_total"],
             "attempt": PROGRESS["attempt"],
             "grid": PROGRESS["grid"],
+            "strategy": PROGRESS["strategy"],
             "percent": PROGRESS["percent"],
             "best_used": PROGRESS["best_used"],
             "coverage_pct": PROGRESS["coverage_pct"],
