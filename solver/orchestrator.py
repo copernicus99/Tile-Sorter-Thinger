@@ -164,6 +164,16 @@ def _mirrored_probe_order(values: List[int]) -> List[int]:
     return ordered
 
 
+def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoard]:
+    """Return the single Phase C base board candidate."""
+
+    step = max(1, int(grid_step))
+    base_side = max(6, int(base_side))
+    aligned_base = _align_up_to_multiple(base_side, step)
+
+    return [CandidateBoard(aligned_base, aligned_base, f"{_fmt_ft(aligned_base)} × {_fmt_ft(aligned_base)} ft")]
+
+
 def _phase_d_candidates(
     shrink_floor: int,
     base_side: int,
@@ -171,50 +181,26 @@ def _phase_d_candidates(
     grid_step: int,
     area_cells: int,
 ) -> List[CandidateBoard]:
-    """Generate Phase D square boards in mirrored pop-in/out order.
+    """Return the single Phase D base board candidate.
 
-    Boards large enough to contain the entire demand are preferred, but if none
-    exist we still provide the mirrored list of candidates so Phase D can probe
-    the base grid even when a full-cover solution is impossible.
+    Phase D is intended to focus exclusively on the base board (nominally
+    10 ft × 10 ft) while allowing discards.  Previous iterations mirrored across
+    many square sizes which diluted the per-board time budget.  To keep Phase D
+    aligned with its design, we now return only the aligned base board so the
+    solver can spend the entire phase on that grid.
     """
 
-    all_candidates = _square_candidates(
-        shrink_floor,
-        base_side,
-        descending=False,
-        multiple_of=max(1, grid_step),
-    )
+    _ = area_cells  # retained for signature compatibility / diagnostics
 
-    viable = [cb for cb in all_candidates if cb.W * cb.H >= max(0, int(area_cells))]
-    if not viable:
-        # When the total tile area exceeds the Phase D base board size we still
-        # want to probe the base grid (and smaller boards) even though they can
-        # no longer cover every tile.  Phase D permits discards and the run-time
-        # logging expects the phase to execute at least once, so fall back to
-        # the unfiltered candidate list instead of skipping the phase entirely.
-        viable = list(all_candidates)
-        if not viable:
-            return []
+    step = max(1, int(grid_step))
+    base_side = max(6, int(base_side))
+    shrink_floor = max(6, int(shrink_floor))
 
-    sides = [cb.W for cb in viable]
-    mirrored = _mirrored_probe_order(sorted(set(sides)))
+    aligned_base = _phase_c_candidates(base_side, grid_step=step)[0]
+    if shrink_floor > aligned_base.W:
+        aligned_base = _phase_c_candidates(shrink_floor, grid_step=step)[0]
 
-    side_to_cb = {cb.W: cb for cb in viable}
-    ordered_candidates: List[CandidateBoard] = []
-    for side in mirrored:
-        cb = side_to_cb.get(side)
-        if cb is not None:
-            ordered_candidates.append(cb)
-
-    if len(ordered_candidates) > 60:
-        # Preserve mirrored flavour while respecting legacy cap.
-        kept: List[CandidateBoard] = []
-        for cb in ordered_candidates[:30] + ordered_candidates[-30:]:
-            if cb not in kept:
-                kept.append(cb)
-        ordered_candidates = kept
-
-    return ordered_candidates
+    return [aligned_base]
 
 
 def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:
@@ -626,11 +612,7 @@ def solve_orchestrator(*args, **kwargs):
                         "best_used": res_used,
                     }
         else:
-            base_candidate = CandidateBoard(
-                base_side_cells,
-                base_side_cells,
-                f"{_fmt_ft(base_side_cells)} × {_fmt_ft(base_side_cells)} ft",
-            )
+            base_candidate = _phase_c_candidates(base_side_cells, grid_step=grid_step)[0]
             res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                 "C",
                 [base_candidate],
@@ -654,7 +636,14 @@ def solve_orchestrator(*args, **kwargs):
                 shrink_floor = _align_up_to_multiple(shrink_floor, grid_step)
                 if shrink_floor > base_side_cells:
                     shrink_floor = base_side_cells
-                candidates_D = [base_candidate]
+                candidates_D = _phase_d_candidates(
+                    shrink_floor=shrink_floor,
+                    base_side=base_side_cells,
+                    grid_step=grid_step,
+                    area_cells=area_cells,
+                )
+                if not candidates_D:
+                    candidates_D = [base_candidate]
                 res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
                     "D",
                     candidates_D,
