@@ -173,9 +173,9 @@ def _phase_d_candidates(
 ) -> List[CandidateBoard]:
     """Generate Phase D square boards in mirrored pop-in/out order.
 
-    Only boards capable of containing the full tile area are considered – any
-    board whose area is smaller than the total demand is discarded up-front so
-    Phase D does not settle for layouts that can never accommodate every tile.
+    Boards large enough to contain the entire demand are preferred, but if none
+    exist we still provide the mirrored list of candidates so Phase D can probe
+    the base grid even when a full-cover solution is impossible.
     """
 
     all_candidates = _square_candidates(
@@ -187,7 +187,14 @@ def _phase_d_candidates(
 
     viable = [cb for cb in all_candidates if cb.W * cb.H >= max(0, int(area_cells))]
     if not viable:
-        return []
+        # When the total tile area exceeds the Phase D base board size we still
+        # want to probe the base grid (and smaller boards) even though they can
+        # no longer cover every tile.  Phase D permits discards and the run-time
+        # logging expects the phase to execute at least once, so fall back to
+        # the unfiltered candidate list instead of skipping the phase entirely.
+        viable = list(all_candidates)
+        if not viable:
+            return []
 
     sides = [cb.W for cb in viable]
     mirrored = _mirrored_probe_order(sorted(set(sides)))
