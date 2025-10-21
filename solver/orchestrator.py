@@ -393,32 +393,37 @@ def solve_orchestrator(*args, **kwargs):
             try:
                 for cb in candidates:
                     elapsed_phase = time.time() - phase_start
-                    remaining = seconds - elapsed_phase
-                    if remaining <= 0:
+                    if elapsed_phase >= seconds:
                         _update_phase_progress()
                         break
 
+                    remaining = seconds - elapsed_phase
                     per_attempt = min(max(5.0, seconds / max(1, total)), remaining)
+
                     set_attempt(cb.label)
                     set_grid(cb.label)
                     ok, placed, reason = _run_cp_sat_isolated(
-                        W=cb.W, H=cb.H, bag=bag_cells,
+                        W=cb.W,
+                        H=cb.H,
+                        bag=bag_cells,
                         seconds=per_attempt,
-                        allow_discard=allow_discard
+                        allow_discard=allow_discard,
                     )
 
                     if reason:
                         last_reason = str(reason)
 
-                    coverage_pct = 0.0
                     used_tiles = len(placed) if placed else 0
                     if demand_count > 0:
                         coverage_pct = 100.0 * used_tiles / float(demand_count)
                     elif used_tiles > 0:
                         coverage_pct = 100.0
+                    else:
+                        coverage_pct = 0.0
 
                     if ok and placed:
                         _record_best(used_tiles, coverage_pct)
+
                         if not allow_discard and used_tiles >= demand_count:
                             set_progress_pct(100.0)
                             return True, cb, placed, coverage_pct, used_tiles, None
@@ -443,14 +448,11 @@ def solve_orchestrator(*args, **kwargs):
                                 if better:
                                     best_tuple = (cb, placed, coverage_pct, used_tiles)
 
-                            if used_tiles >= demand_count and demand_count > 0:
+                            if demand_count > 0 and used_tiles >= demand_count:
                                 set_progress_pct(100.0)
                                 return True, cb, placed, coverage_pct, used_tiles, None
 
                     _update_phase_progress()
-
-                    if (time.time() - phase_start) >= seconds:
-                        break
             finally:
                 progress_stop.set()
                 _update_phase_progress()
