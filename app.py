@@ -240,16 +240,57 @@ def _call_orchestrator_forgiving(
 def _start_overlay_spinner(t0: float) -> threading.Event:
     stop_evt = threading.Event()
 
+    def _snapshot_fields() -> Dict[str, str]:
+        try:
+            snap = progress_json()
+        except Exception:
+            return {}
+        normalize = lambda v: "" if v is None else str(v)
+        return {
+            "phase": normalize(snap.get("phase")),
+            "phase_total": normalize(snap.get("phase_total")),
+            "attempt": normalize(snap.get("attempt")),
+            "grid": normalize(snap.get("grid")),
+        }
+
+    baseline: Optional[Dict[str, str]] = None
+
+    def _solver_started(current: Dict[str, str]) -> bool:
+        if not baseline:
+            return False
+        # Any change away from the placeholder bootstrap values means the
+        # orchestrator has started publishing real progress.
+        if current.get("phase") and current.get("phase") != baseline.get("phase"):
+            return True
+        if current.get("phase_total") and current.get("phase_total") != baseline.get("phase_total"):
+            return True
+        if current.get("attempt") and current.get("attempt") != baseline.get("attempt"):
+            return True
+        grid = current.get("grid")
+        if grid and grid not in {baseline.get("grid"), "—"}:
+            return True
+        return False
+
     def _run():
-        # Keep some motion in the bar until the solver reports real progress.
+        nonlocal baseline
+        max_pct = 0.0
         while not stop_evt.is_set():
+            if stop_evt.wait(0.5):
+                break
+            fields = _snapshot_fields()
+            if not baseline and fields:
+                baseline = fields
+            elif fields and _solver_started(fields):
+                break
             try:
                 dt = time.time() - t0
-                pct = max(5.0, min(60.0, (dt / 45.0) * 60.0))
-                set_progress_pct(pct)
+                pct = max(5.0, min(35.0, (dt / 45.0) * 60.0))
+                if pct > max_pct:
+                    max_pct = pct
+                set_progress_pct(max_pct)
             except Exception:
-                pass
-            time.sleep(0.5)
+                continue
+        stop_evt.set()
 
     th = threading.Thread(target=_run, daemon=True)
     th.start()
