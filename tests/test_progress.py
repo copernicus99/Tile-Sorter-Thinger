@@ -37,6 +37,16 @@ def test_set_result_url_tracks_navigation_target():
     assert snap["done"] is False
 
 
+def test_reset_increments_run_identifier():
+    reset()
+    first = snapshot()["run_id"]
+    reset()
+    second = snapshot()["run_id"]
+    assert isinstance(first, int)
+    assert isinstance(second, int)
+    assert second == first + 1
+
+
 def test_strategy_field_populated_via_set_progress():
     reset()
     _set_progress(strategy="S0", phase="", phase_total=3)
