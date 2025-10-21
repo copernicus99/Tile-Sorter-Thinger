@@ -1,3 +1,8 @@
+import importlib
+import json
+import os
+import time
+
 from progress import reset, set_status, set_done, set_result_url, snapshot, _set_progress
 
 
@@ -39,3 +44,35 @@ def test_strategy_field_populated_via_set_progress():
     assert snap["strategy"] == "S0"
     # phase remains blank when only strategy is provided
     assert snap["phase"] == ""
+
+
+def test_snapshot_reads_state_written_by_other_process(tmp_path, monkeypatch):
+    import progress as progress_module
+
+    state_path = tmp_path / "state.json"
+    monkeypatch.setenv("PROGRESS_STATE_FILE", str(state_path))
+    progress = importlib.reload(progress_module)
+
+    progress.reset()
+    progress.set_phase("S0")
+    first = progress.snapshot()
+    assert first["phase"] == "S0"
+
+    data = dict(first)
+    data["phase"] = "F"
+    data["phase_total"] = "9"
+    state_path.write_text(json.dumps(data))
+    os.utime(state_path, None)
+
+    with progress.PROGRESS_LOCK:
+        progress.PROGRESS["phase"] = ""
+        progress.PROGRESS["phase_total"] = ""
+        progress._LAST_STATE_MTIME = 0.0
+
+    time.sleep(0.01)
+    updated = progress.snapshot()
+    assert updated["phase"] == "F"
+    assert updated["phase_total"] == "9"
+
+    monkeypatch.delenv("PROGRESS_STATE_FILE", raising=False)
+    importlib.reload(progress_module)

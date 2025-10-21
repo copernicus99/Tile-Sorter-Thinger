@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import logging
+import os
 import time
 import threading
 from pathlib import Path
@@ -11,6 +13,18 @@ from typing import Any, Dict, Optional
 # ------------------------------
 
 PROGRESS_LOCK = threading.Lock()
+
+
+def _state_file_path() -> Path:
+    configured = os.environ.get("PROGRESS_STATE_FILE")
+    if configured:
+        return Path(configured)
+    return Path(__file__).resolve().parent / "logs" / "progress_state.json"
+
+
+STATE_FILE = _state_file_path()
+STATE_FILE_TMP = STATE_FILE.with_name(STATE_FILE.name + ".tmp")
+_LAST_STATE_MTIME: float = 0.0
 
 
 def _init_logger() -> logging.Logger:
@@ -79,6 +93,48 @@ LOG_STATE: Dict[str, Any] = {
     "attempt_start": None,
     "grid": "",
 }
+
+
+def _persist_locked() -> None:
+    global _LAST_STATE_MTIME
+    try:
+        STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with STATE_FILE_TMP.open("w", encoding="utf-8") as fh:
+            json.dump(PROGRESS, fh, ensure_ascii=False, separators=(",", ":"))
+        STATE_FILE_TMP.replace(STATE_FILE)
+        try:
+            _LAST_STATE_MTIME = STATE_FILE.stat().st_mtime
+        except OSError:
+            _LAST_STATE_MTIME = time.time()
+    except Exception:
+        # Persistence must never break solver progress updates.
+        pass
+
+
+def _load_persisted_locked(force: bool = False) -> None:
+    global _LAST_STATE_MTIME
+    try:
+        stat = STATE_FILE.stat()
+    except FileNotFoundError:
+        return
+    except OSError:
+        return
+    if not force and stat.st_mtime <= _LAST_STATE_MTIME:
+        return
+    try:
+        with STATE_FILE.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except Exception:
+        return
+    if not isinstance(data, dict):
+        return
+    for key in PROGRESS.keys():
+        if key in data:
+            PROGRESS[key] = data[key]
+    # ``elapsed_start`` may be missing on very old state files.
+    if "elapsed_start" not in data:
+        PROGRESS["elapsed_start"] = None
+    _LAST_STATE_MTIME = stat.st_mtime
 
 
 def _finalize_attempt_locked(now: Optional[float] = None, *, reason: Optional[str] = None) -> None:
@@ -225,6 +281,7 @@ def reset() -> None:
             "run_start": None,
         })
         _emit_log("Progress reset")
+        _persist_locked()
 
 def start_timer() -> None:
     with PROGRESS_LOCK:
@@ -233,6 +290,7 @@ def start_timer() -> None:
         PROGRESS["elapsed"] = 0.0
         LOG_STATE["run_start"] = now
         _emit_log("Run timer started")
+        _persist_locked()
 
 def _touch_elapsed_locked() -> None:
     t0 = PROGRESS.get("elapsed_start")
@@ -246,32 +304,38 @@ def _touch_elapsed_locked() -> None:
 def set_status(v: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["status"] = str(v)
+        _persist_locked()
 
 def set_phase(v: Any) -> None:
     with PROGRESS_LOCK:
         phase_str = "" if v is None else str(v)
         PROGRESS["phase"] = phase_str
         _log_phase_transition_locked(phase_str)
+        _persist_locked()
 
 def set_phase_total(v: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["phase_total"] = "" if v is None else str(v)
+        _persist_locked()
 
 def set_attempt(v: Any) -> None:
     with PROGRESS_LOCK:
         attempt_str = "" if v is None else str(v)
         PROGRESS["attempt"] = attempt_str
         _log_attempt_transition_locked(attempt_str)
+        _persist_locked()
 
 def set_grid(v: Any) -> None:
     with PROGRESS_LOCK:
         grid_str = "" if v is None else str(v)
         PROGRESS["grid"] = grid_str
         _update_grid_locked(grid_str)
+        _persist_locked()
 
 def set_strategy(v: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["strategy"] = "" if v is None else str(v)
+        _persist_locked()
 
 def set_progress_pct(pct: Any) -> None:
     try:
@@ -282,6 +346,7 @@ def set_progress_pct(pct: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["percent"] = f
         _touch_elapsed_locked()
+        _persist_locked()
 
 def set_best_used(n: Any) -> None:
     try:
@@ -290,6 +355,7 @@ def set_best_used(n: Any) -> None:
         i = 0
     with PROGRESS_LOCK:
         PROGRESS["best_used"] = max(0, i)
+        _persist_locked()
 
 def set_coverage_pct(pct: Any) -> None:
     try:
@@ -299,6 +365,7 @@ def set_coverage_pct(pct: Any) -> None:
     f = max(0.0, min(100.0, f))
     with PROGRESS_LOCK:
         PROGRESS["coverage_pct"] = f
+        _persist_locked()
 
 def set_elapsed(seconds: Any) -> None:
     try:
@@ -307,14 +374,17 @@ def set_elapsed(seconds: Any) -> None:
         f = 0.0
     with PROGRESS_LOCK:
         PROGRESS["elapsed"] = max(0.0, f)
+        _persist_locked()
 
 def set_message(msg: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["message"] = "" if msg is None else str(msg)
+        _persist_locked()
 
 def set_result_url(url: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["result_url"] = "" if url is None else str(url)
+        _persist_locked()
 
 def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None:
     """Mark the run complete, tolerating legacy arguments.
@@ -383,6 +453,7 @@ def set_done(ok: Any = None, *, reason: Any = None, message: Any = None) -> None
             coverage=coverage_str,
             message=PROGRESS.get("message"),
         )
+        _persist_locked()
 
 # ------------------------------
 # Backward-compat shims
@@ -395,6 +466,7 @@ def set_demand_count(n: Any) -> None:
         i = 0
     with PROGRESS_LOCK:
         PROGRESS["demand_count"] = max(0, i)
+        _persist_locked()
 
 def set_attempt_wh(w: Any, h: Any) -> None:
     try:
@@ -448,6 +520,7 @@ def _set_progress(value: Any = None, **kw: Any) -> None:
 
 def snapshot() -> Dict[str, Any]:
     with PROGRESS_LOCK:
+        _load_persisted_locked()
         _touch_elapsed_locked()
         return {
             "status": PROGRESS["status"],
@@ -471,3 +544,7 @@ def snapshot() -> Dict[str, Any]:
 def as_json() -> Dict[str, Any]:
     # Alias used by /progress3
     return snapshot()
+
+
+with PROGRESS_LOCK:
+    _load_persisted_locked(force=True)
