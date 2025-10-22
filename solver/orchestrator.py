@@ -445,6 +445,7 @@ def solve_orchestrator(*args, **kwargs):
             allow_discard: bool,
             *,
             prefer_large: bool,
+            continue_on_partial: bool = False,
         ) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int, Optional[str]]:
             if seconds <= 0 or not candidates:
                 set_phase(label)
@@ -571,6 +572,20 @@ def solve_orchestrator(*args, **kwargs):
                     key = (cb.W, cb.H)
                     retries = retry_counts.get(key, 0)
                     if (
+                        continue_on_partial
+                        and demand_count > 0
+                        and used_tiles > 0
+                        and used_tiles < demand_count
+                        and remaining_after > 1.0
+                    ):
+                        queue.append(cb)
+                        total = max(total, attempt_idx + len(queue))
+                        set_message(
+                            f"Phase {label} re-queue {cb.label} to chase full coverage ({coverage_pct:.2f}% so far)"
+                        )
+                        _update_phase_progress()
+                        continue
+                    if (
                         not ok
                         and _should_retry_phase(last_reason)
                         and remaining_after >= max(5.0, min_retry_remaining)
@@ -675,6 +690,7 @@ def solve_orchestrator(*args, **kwargs):
                 float(getattr(CFG, "TIME_C", 300.0)),
                 False,
                 prefer_large=False,
+                continue_on_partial=True,
             )
             if res_reason:
                 final_reason = res_reason
@@ -706,6 +722,7 @@ def solve_orchestrator(*args, **kwargs):
                     float(getattr(CFG, "TIME_D", 300.0)),
                     True,
                     prefer_large=True,
+                    continue_on_partial=True,
                 )
                 if res_reason:
                     final_reason = res_reason
