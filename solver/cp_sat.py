@@ -1,5 +1,6 @@
 import math
-from typing import List, Tuple, Dict, Iterable, Union
+import random
+from typing import List, Tuple, Dict, Iterable, Union, Optional
 from ortools.sat.python import cp_model as _cp
 
 from models import Placed, Rect
@@ -46,16 +47,33 @@ def _expand_multiset(multiset: Union[Iterable, Dict]) -> Tuple[bool, List[Rect],
 def est_positions(W, H, w, h, stride):
     return max(0, (W - w) // max(1, stride) + 1) * max(0, (H - h) // max(1, stride) + 1)
 
-def build_options(W: int, H: int, tiles: List[Rect], stride: int):
+_RNG: Optional[random.Random] = None
+
+
+def _system_rng() -> random.Random:
+    global _RNG
+    if _RNG is None:
+        try:
+            _RNG = random.SystemRandom()
+        except NotImplementedError:
+            _RNG = random.Random()
+    return _RNG
+
+
+def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Optional[random.Random] = None, randomize: bool = False):
     opts = []
     phase_seed = (W * 1315423911 ^ H * 2654435761) & 0xFFFFFFFF
     max_opts_per_tile = int(getattr(CFG, "MAX_OPTIONS_PER_TILE", 2000))
     max_opts_per_rect = int(getattr(CFG, "MAX_OPTIONS_PER_RECT", 2000))
+    rng_local = _system_rng() if (randomize and rng is None) else rng
 
     for idx, r in enumerate(tiles):
         t = []
         cfgs = [(r.w, r.h, 0)] if r.w == r.h else [(r.w, r.h, 0), (r.h, r.w, 1)]
         total_for_rect = 0
+
+        if randomize and rng_local is not None and len(cfgs) > 1:
+            rng_local.shuffle(cfgs)
 
         for (w, h, rot) in cfgs:
             locs = []
@@ -64,18 +82,31 @@ def build_options(W: int, H: int, tiles: List[Rect], stride: int):
                 for y in range(0, H - h + 1, sy):
                     locs.append((x, y, rot, w, h))
 
+            if randomize and rng_local is not None and len(locs) > 1:
+                rng_local.shuffle(locs)
+
             if len(locs) > max_opts_per_tile:
-                step = max(1, len(locs) // max_opts_per_tile)
-                offset = (phase_seed + idx * 97 + w * 17 + h * 23 + rot * 31) % step
-                locs = locs[offset::step][:max_opts_per_tile]
+                if randomize and rng_local is not None:
+                    locs = locs[:max_opts_per_tile]
+                else:
+                    step = max(1, len(locs) // max_opts_per_tile)
+                    offset = (phase_seed + idx * 97 + w * 17 + h * 23 + rot * 31) % step
+                    locs = locs[offset::step][:max_opts_per_tile]
 
             t.extend(locs)
             total_for_rect += len(locs)
 
         if total_for_rect > max_opts_per_rect and len(t) > max_opts_per_rect:
-            step = max(1, len(t) // max_opts_per_rect)
-            offset = (phase_seed + idx * 31337) % step
-            t = t[offset::step][:max_opts_per_rect]
+            if randomize and rng_local is not None:
+                rng_local.shuffle(t)
+                t = t[:max_opts_per_rect]
+            else:
+                step = max(1, len(t) // max_opts_per_rect)
+                offset = (phase_seed + idx * 31337) % step
+                t = t[offset::step][:max_opts_per_rect]
+
+        if randomize and rng_local is not None and len(t) > 1:
+            rng_local.shuffle(t)
 
         opts.append(t)
 
@@ -105,6 +136,13 @@ def try_pack_exact_cover(
     if not tiles:
         return False, [], "Bad demand: nothing parsed from request"
 
+    randomize = bool(getattr(CFG, "RANDOMIZE_PLACEMENTS", False))
+    rng = _system_rng() if randomize else None
+
+    tiles = list(tiles)
+    if randomize and rng is not None and len(tiles) > 1:
+        rng.shuffle(tiles)
+
     stride = max(1, int(getattr(CFG, "GRID_STRIDE_BASE", 1)))
     dims = []
     for r in tiles:
@@ -130,7 +168,7 @@ def try_pack_exact_cover(
             break
         stride *= 2
 
-    options = build_options(W, H, tiles, stride)
+    options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
     total_places = sum(len(o) for o in options)
     if total_places == 0:
         return False, [], "No placements remain (thinned away or grid too small)"
