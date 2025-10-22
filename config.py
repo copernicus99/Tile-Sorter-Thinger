@@ -9,6 +9,9 @@ WORKERS              = int(os.getenv("TS_WORKERS", "1"))
 MAX_PLACEMENTS       = int(os.getenv("TS_MAX_PLACEMENTS", "200000"))
 MAX_MEMORY_MB        = int(os.getenv("TS_MAX_MEMORY_MB", "2048"))
 
+# ======= Solver heuristics =======
+RANDOMIZE_PLACEMENTS = int(os.getenv("TS_RANDOMIZE_PLACEMENTS", "1")) != 0
+
 # ======= Candidate generation knobs =======
 CAND_WIDTHS          = os.getenv("TS_CAND_WIDTHS", "auto")
 CAND_NEIGHBOR_DELTAS = os.getenv("TS_CAND_NEIGHBOR_DELTAS", "auto")
@@ -110,6 +113,7 @@ class CFG:
     LAYOUT_HTML = LAYOUT_HTML
 
     TEST_MODE = TEST_MODE
+    RANDOMIZE_PLACEMENTS = RANDOMIZE_PLACEMENTS
 
 # legacy convenience
 CELL      = CFG.CELL
