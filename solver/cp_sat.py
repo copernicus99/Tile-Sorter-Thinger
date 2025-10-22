@@ -290,7 +290,7 @@ def try_pack_exact_cover(
             f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
         )
 
-    def _solve_with_limit(limit_value, seconds):
+    def _solve_with_limit(limit_value, seconds, *, edge_guard_cells):
         m = _cp.CpModel()
         n = len(tiles)
 
@@ -355,14 +355,7 @@ def try_pack_exact_cover(
                     m.Add(sum(vars_here) == 1)
 
         # ---- rule / guard extras ----
-        max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
-        try:
-            max_edge_ft = None if max_edge_ft is None else float(max_edge_ft)
-        except Exception:
-            max_edge_ft = None
-        if max_edge_ft is not None and max_edge_ft <= 0:
-            max_edge_ft = None
-        max_edge_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
+        max_edge_cells = edge_guard_cells
 
         if (max_edge_cells is not None) and (max_edge_cells < max(W, H)):
 
@@ -613,7 +606,39 @@ def try_pack_exact_cover(
         return False, [], "Stopped before solution (timebox)"
 
     same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
-    ok, placed, reason = _solve_with_limit(same_shape_cfg, max_seconds)
+
+    try:
+        max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
+    except Exception:
+        max_edge_ft_cfg = None
+
+    try:
+        max_edge_ft = None if max_edge_ft_cfg is None else float(max_edge_ft_cfg)
+    except Exception:
+        max_edge_ft = None
+
+    if max_edge_ft is not None and max_edge_ft <= 0:
+        max_edge_ft = None
+
+    edge_guard_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
+    guard_applies = (edge_guard_cells is not None) and (edge_guard_cells < max(W, H))
+
+    ok, placed, reason = _solve_with_limit(
+        same_shape_cfg,
+        max_seconds,
+        edge_guard_cells=edge_guard_cells,
+    )
+
+    if (not ok) and guard_applies and reason == "Proven infeasible under current constraints":
+        relaxed_ok, relaxed_placed, relaxed_reason = _solve_with_limit(
+            same_shape_cfg,
+            max_seconds,
+            edge_guard_cells=None,
+        )
+        if relaxed_ok:
+            return True, relaxed_placed, None
+        if relaxed_reason != "Proven infeasible under current constraints":
+            return relaxed_ok, relaxed_placed, relaxed_reason
 
     if ok or reason != "Proven infeasible under current constraints":
         return ok, placed, reason
@@ -629,7 +654,11 @@ def try_pack_exact_cover(
 
     diag_seconds = min(float(max_seconds), float(getattr(CFG, "SAME_SHAPE_DIAG_SECONDS", 10.0)))
     diag_seconds = max(1.0, diag_seconds)
-    diag_ok, diag_placed, _ = _solve_with_limit(None, diag_seconds)
+    diag_ok, diag_placed, _ = _solve_with_limit(
+        None,
+        diag_seconds,
+        edge_guard_cells=edge_guard_cells,
+    )
     if diag_ok and diag_placed:
         msg = (
             "Proven infeasible under current constraints (same-shape limit "
