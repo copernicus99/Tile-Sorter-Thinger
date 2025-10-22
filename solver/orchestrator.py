@@ -164,6 +164,33 @@ def _mirrored_probe_order(values: List[int]) -> List[int]:
     return ordered
 
 
+def _should_retry_phase(reason: Optional[str]) -> bool:
+    """Return True when a phase attempt should be retried on the same board."""
+
+    if not reason:
+        return False
+
+    text = str(reason).strip().lower()
+    if not text:
+        return False
+
+    if "proven infeasible" in text:
+        return False
+
+    retry_tokens = (
+        "timebox",
+        "timeout",
+        "stopped before solution",
+        "subprocess",
+        "crash",
+        "capped",
+        "limit",
+        "killed",
+    )
+
+    return any(token in text for token in retry_tokens)
+
+
 def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoard]:
     """Return the single Phase C base board candidate."""
 
@@ -430,9 +457,15 @@ def solve_orchestrator(*args, **kwargs):
             set_phase_total(int(seconds))
             phase_start = time.time()
             set_progress_pct(0.0)
-            total = len(candidates)
+
+            queue: List[CandidateBoard] = list(candidates)
+            total = len(queue)
             best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
             last_reason: Optional[str] = None
+            attempt_idx = 0
+            retry_counts: Dict[Tuple[int, int], int] = {}
+            max_retries = max(0, int(getattr(CFG, "PHASE_RETRY_LIMIT", 3)))
+            min_retry_remaining = min(60.0, max(10.0, 0.2 * seconds)) if seconds > 0 else 0.0
 
             def _update_phase_progress() -> None:
                 elapsed_phase = time.time() - phase_start
@@ -456,22 +489,24 @@ def solve_orchestrator(*args, **kwargs):
                 ticker.start()
 
             try:
-                for idx, cb in enumerate(candidates, 1):
+                while queue:
                     elapsed_phase = time.time() - phase_start
                     if elapsed_phase >= seconds:
                         _update_phase_progress()
                         break
 
                     remaining = seconds - elapsed_phase
-                    remaining_candidates = max(1, total - idx + 1)
+                    cb = queue.pop(0)
+                    attempt_idx += 1
+                    remaining_candidates = max(1, len(queue) + 1)
                     ideal_slice = remaining / float(remaining_candidates)
                     per_attempt = min(max(5.0, ideal_slice), remaining)
 
                     set_attempt(
                         cb.label,
                         budget=per_attempt,
-                        idx=idx,
-                        total=total,
+                        idx=attempt_idx,
+                        total=max(total, attempt_idx + len(queue)),
                     )
                     set_grid(cb.label)
                     attempt_started = time.time()
@@ -484,7 +519,7 @@ def solve_orchestrator(*args, **kwargs):
                     )
                     attempt_elapsed = time.time() - attempt_started
                     set_message(
-                        f"Phase {label} attempt {idx}/{total} ran {attempt_elapsed:.1f}s (budget ≤{per_attempt:.1f}s)"
+                        f"Phase {label} attempt {attempt_idx}/{max(total, attempt_idx + len(queue))} ran {attempt_elapsed:.1f}s (budget ≤{per_attempt:.1f}s)"
                     )
 
                     if reason:
@@ -498,36 +533,57 @@ def solve_orchestrator(*args, **kwargs):
                     else:
                         coverage_pct = 0.0
 
-                    if ok and placed:
+                    if used_tiles > 0:
                         _record_best(used_tiles, coverage_pct)
 
-                        if not allow_discard and used_tiles >= demand_count:
+                    if allow_discard and placed:
+                        if best_tuple is None:
+                            best_tuple = (cb, placed, coverage_pct, used_tiles)
+                        else:
+                            best_cb, _, best_cov, best_used = best_tuple
+                            better = False
+                            if coverage_pct > best_cov + 1e-9:
+                                better = True
+                            elif abs(coverage_pct - best_cov) <= 1e-9:
+                                current_area = cb.W * cb.H
+                                best_area = best_cb.W * best_cb.H
+                                if prefer_large and current_area > best_area:
+                                    better = True
+                                elif not prefer_large and current_area < best_area:
+                                    better = True
+                                elif used_tiles > best_used:
+                                    better = True
+                            if better:
+                                best_tuple = (cb, placed, coverage_pct, used_tiles)
+
+                        if demand_count > 0 and used_tiles >= demand_count:
                             set_progress_pct(100.0)
                             return True, cb, placed, coverage_pct, used_tiles, None
 
-                        if allow_discard:
-                            if best_tuple is None:
-                                best_tuple = (cb, placed, coverage_pct, used_tiles)
-                            else:
-                                best_cb, _, best_cov, best_used = best_tuple
-                                better = False
-                                if coverage_pct > best_cov + 1e-9:
-                                    better = True
-                                elif abs(coverage_pct - best_cov) <= 1e-9:
-                                    current_area = cb.W * cb.H
-                                    best_area = best_cb.W * best_cb.H
-                                    if prefer_large and current_area > best_area:
-                                        better = True
-                                    elif not prefer_large and current_area < best_area:
-                                        better = True
-                                    elif used_tiles > best_used:
-                                        better = True
-                                if better:
-                                    best_tuple = (cb, placed, coverage_pct, used_tiles)
+                    elif ok and placed:
+                        if demand_count == 0 or used_tiles >= demand_count:
+                            set_progress_pct(100.0)
+                            return True, cb, placed, coverage_pct, used_tiles, None
 
-                            if demand_count > 0 and used_tiles >= demand_count:
-                                set_progress_pct(100.0)
-                                return True, cb, placed, coverage_pct, used_tiles, None
+                    elapsed_now = time.time() - phase_start
+                    remaining_after = seconds - elapsed_now
+                    total = max(total, attempt_idx + len(queue))
+                    key = (cb.W, cb.H)
+                    retries = retry_counts.get(key, 0)
+                    if (
+                        not ok
+                        and _should_retry_phase(last_reason)
+                        and remaining_after >= max(5.0, min_retry_remaining)
+                        and retries < max_retries
+                    ):
+                        retry_counts[key] = retries + 1
+                        queue.append(cb)
+                        total = max(total, attempt_idx + len(queue))
+                        set_message(
+                            f"Phase {label} re-queue {cb.label} after '{last_reason}' ({retry_counts[key]}/{max_retries})"
+                        )
+                        _update_phase_progress()
+                        continue
 
                     _update_phase_progress()
             finally:

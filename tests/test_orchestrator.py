@@ -45,6 +45,7 @@ from solver.orchestrator import (
     _phase_c_candidates,
     _phase_d_candidates,
     _mirrored_probe_order,
+    _should_retry_phase,
 )
 
 # Remove the temporary stubs so other tests that rely on pytest.importorskip
@@ -130,6 +131,14 @@ def test_mirrored_probe_order_handles_duplicates_gracefully():
     assert order == [10, 6, 8, 8]
 
 
+def test_should_retry_phase_reason_tokens():
+    assert _should_retry_phase("Stopped before solution (timebox)")
+    assert _should_retry_phase("Model capped: placements limit hit")
+    assert not _should_retry_phase("Proven infeasible under current constraints")
+    assert not _should_retry_phase("no solution")
+    assert not _should_retry_phase(None)
+
+
 def test_orchestrator_phase_d_sticks_to_base_board(monkeypatch):
     import math
     import solver.orchestrator as orchestrator
@@ -161,6 +170,30 @@ def test_orchestrator_phase_d_sticks_to_base_board(monkeypatch):
 
     d_calls = [(W, H) for (W, H, allow) in calls if allow]
     assert d_calls == [(base_side_cells, base_side_cells)]
+
+
+def test_orchestrator_retries_timebox_attempts(monkeypatch):
+    import solver.orchestrator as orchestrator
+
+    calls = []
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
+        calls.append(seconds)
+        return False, [], "Stopped before solution (timebox)"
+
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 30)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 2, raising=False)
+
+    bag_ft = {(1.0, 1.0): 100}
+
+    orchestrator.solve_orchestrator(bag_ft=bag_ft)
+
+    assert len(calls) == 3
 
 def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
     import solver.orchestrator as orchestrator
