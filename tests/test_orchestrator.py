@@ -1,5 +1,8 @@
 import sys
+import time
 import types
+
+import pytest
 
 # Provide a lightweight stub for ortools so importing the orchestrator works in
 # environments where the optional dependency is unavailable (e.g. CI for unit
@@ -47,6 +50,7 @@ from solver.orchestrator import (
     _mirrored_probe_order,
     _should_retry_phase,
 )
+from models import ft_to_cells
 
 # Remove the temporary stubs so other tests that rely on pytest.importorskip
 # still see the absence of the optional dependency and skip accordingly.
@@ -77,51 +81,31 @@ def test_coerce_bag_ft_empty_when_parse_fails():
 
 
 def test_phase_c_candidates_returns_only_base_board():
-    base_side = 20
+    base_side = 26
     grid_step = 2
 
     candidates = _phase_c_candidates(base_side, grid_step=grid_step)
 
     assert len(candidates) == 1
     cb = candidates[0]
-    assert cb.W == cb.H == 20
+    ten_cells = ft_to_cells(10.0)
+    assert cb.W == cb.H == ten_cells
     assert "10.0 × 10.0 ft" in cb.label
 
 
-def test_phase_d_candidates_prioritize_base_and_neighbors():
-    shrink_floor = 12
-    base_side = 20
-    grid_step = 2
-    area_cells = 24 * 24
-
+def test_phase_d_candidates_force_10x10_board():
     candidates = _phase_d_candidates(
-        shrink_floor,
-        base_side,
-        grid_step=grid_step,
-        area_cells=area_cells,
+        shrink_floor=12,
+        base_side=32,
+        grid_step=4,
+        area_cells=40 * 40,
     )
 
-    sides = [cb.W for cb in candidates]
-    assert sides[:5] == [20, 22, 18, 24, 16]
-    assert sides[-1] == 12
-
-
-def test_phase_d_candidates_honor_minimum_board_size():
-    shrink_floor = 22
-    base_side = 20
-    grid_step = 2
-    area_cells = 0
-
-    candidates = _phase_d_candidates(
-        shrink_floor,
-        base_side,
-        grid_step=grid_step,
-        area_cells=area_cells,
-    )
-
-    sides = [cb.W for cb in candidates]
-    assert sides[0] == 22
-    assert all(side >= 22 for side in sides)
+    assert len(candidates) == 1
+    cb = candidates[0]
+    ten_cells = ft_to_cells(10.0)
+    assert cb.W == cb.H == ten_cells
+    assert "10.0 × 10.0 ft" in cb.label
 
 
 def test_mirrored_probe_order_handles_duplicates_gracefully():
@@ -138,72 +122,67 @@ def test_should_retry_phase_reason_tokens():
     assert not _should_retry_phase(None)
 
 
-def test_orchestrator_phase_d_sticks_to_base_board(monkeypatch):
-    import math
+def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
     import solver.orchestrator as orchestrator
-    from models import ft_to_cells
 
     calls = []
 
     def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
-        calls.append((W, H, allow_discard))
+        calls.append((W, H, allow_discard, seconds))
         return False, [], "no solution"
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
 
     monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
     monkeypatch.setattr(orchestrator.CFG, "TIME_D", 1)
-    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 1)
     monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
 
     bag_ft = {(1.0, 1.0): 100}
 
     orchestrator.solve_orchestrator(bag_ft=bag_ft)
 
-    bag_cells = orchestrator._bag_ft_to_cells(bag_ft)
-    grid_step = orchestrator._grid_step_from_bag(bag_cells)
-    max_tile_side = max((max(w, h) for (w, h) in bag_cells.keys()), default=6)
-    base_side_cells = max(6, ft_to_cells(math.sqrt(orchestrator.CFG.BASE_GRID_AREA_SQFT)))
-    base_side_cells = max(base_side_cells, max_tile_side)
-    base_side_cells = orchestrator._align_up_to_multiple(base_side_cells, grid_step)
-    min_board = orchestrator._align_up_to_multiple(max_tile_side, grid_step)
-    if min_board > base_side_cells:
-        base_side_cells = min_board
-    area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
-    needed_side = orchestrator._align_up_to_multiple(orchestrator._ceil_sqrt_cells(area_cells), grid_step)
-    if area_cells <= 0:
-        expand_ceiling = base_side_cells
-    else:
-        expand_ceiling = max(base_side_cells + grid_step, needed_side)
-
-    d_calls = [(W, H) for (W, H, allow) in calls if allow]
+    ten_cells = ft_to_cells(10.0)
+    assert calls
+    first_W, first_H, first_allow, _first_seconds = calls[0]
+    assert first_W == first_H == ten_cells
+    assert not first_allow
+    # The Phase D attempt should use the entire configured budget on a 10×10 grid
+    d_calls = [(W, H, seconds) for (W, H, allow, seconds) in calls if allow]
     assert d_calls
-    assert d_calls[0] == (base_side_cells, base_side_cells)
-    assert all(min_board <= W <= expand_ceiling for (W, _H) in d_calls)
+    for W, H, seconds in d_calls:
+        assert W == H == ten_cells
+        assert seconds == pytest.approx(orchestrator.CFG.TIME_D, rel=0.05)
 
 
-def test_orchestrator_retries_timebox_attempts(monkeypatch):
+def test_orchestrator_phase_c_consumes_full_timebox(monkeypatch):
     import solver.orchestrator as orchestrator
 
-    calls = []
+    budgets = []
 
     def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
-        calls.append(seconds)
-        return False, [], "Stopped before solution (timebox)"
+        budgets.append((W, H, seconds))
+        return False, [], "no solution"
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
 
-    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 30)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
     monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0)
-    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 1)
     monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
-    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 2, raising=False)
 
     bag_ft = {(1.0, 1.0): 100}
 
+    start = time.time()
     orchestrator.solve_orchestrator(bag_ft=bag_ft)
+    elapsed = time.time() - start
 
-    assert len(calls) == 3
+    assert budgets
+    ten_cells = ft_to_cells(10.0)
+    W, H, seconds = budgets[0]
+    assert W == H == ten_cells
+    assert seconds == pytest.approx(orchestrator.CFG.TIME_C, rel=0.01)
+    assert elapsed >= orchestrator.CFG.TIME_C
 
 def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
     import solver.orchestrator as orchestrator
@@ -228,6 +207,11 @@ def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
         return True, placed, None
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
 
     bag_ft = {
         (1.0, 25.0): 1,

@@ -194,11 +194,10 @@ def _should_retry_phase(reason: Optional[str]) -> bool:
 def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoard]:
     """Return the single Phase C base board candidate."""
 
-    step = max(1, int(grid_step))
-    base_side = max(6, int(base_side))
-    aligned_base = _align_up_to_multiple(base_side, step)
-
-    return [CandidateBoard(aligned_base, aligned_base, f"{_fmt_ft(aligned_base)} × {_fmt_ft(aligned_base)} ft")]
+    _ = base_side  # kept for signature compatibility
+    _ = grid_step
+    ten_cells = max(6, ft_to_cells(10.0))
+    return [CandidateBoard(ten_cells, ten_cells, f"{_fmt_ft(ten_cells)} × {_fmt_ft(ten_cells)} ft")]
 
 
 _PHASE_D_MAX_CANDIDATES = 15
@@ -211,68 +210,12 @@ def _phase_d_candidates(
     grid_step: int,
     area_cells: int,
 ) -> List[CandidateBoard]:
-    """Return Phase D board candidates focused around the base grid.
-
-    Phase D should prioritise the nominal base board while still probing a
-    handful of nearby sizes so we can recover when the exact board is
-    infeasible.  We bias towards slight expansions when the demand area exceeds
-    the base grid and otherwise alternate shrinking and growing to stay close
-    to the target.
-    """
-
-    step = max(1, int(grid_step))
-    base_side = max(6, int(base_side))
-    shrink_floor = max(6, int(shrink_floor))
-
-    aligned_base_side = _align_up_to_multiple(base_side, step)
-    min_board_side = _align_up_to_multiple(shrink_floor, step)
-    if min_board_side > aligned_base_side:
-        aligned_base_side = min_board_side
-
-    needed_side = _align_up_to_multiple(_ceil_sqrt_cells(area_cells), step)
-    if area_cells <= 0:
-        expand_ceiling = aligned_base_side
-    else:
-        expand_ceiling = max(aligned_base_side + step, needed_side)
-
-    down_values: List[int] = []
-    side = aligned_base_side - step
-    while side >= min_board_side:
-        down_values.append(side)
-        side -= step
-
-    up_values: List[int] = []
-    side = aligned_base_side + step
-    while side <= expand_ceiling:
-        up_values.append(side)
-        side += step
-
-    prefer_expand_first = area_cells >= aligned_base_side * aligned_base_side
-    ordered_sides: List[int] = [aligned_base_side]
-    while up_values or down_values:
-        if prefer_expand_first and up_values:
-            ordered_sides.append(up_values.pop(0))
-        if down_values:
-            ordered_sides.append(down_values.pop(0))
-        if not prefer_expand_first and up_values:
-            ordered_sides.append(up_values.pop(0))
-
-        if not up_values:
-            prefer_expand_first = False
-
-    if len(ordered_sides) > _PHASE_D_MAX_CANDIDATES:
-        ordered_sides = ordered_sides[:_PHASE_D_MAX_CANDIDATES]
-
-    candidates: List[CandidateBoard] = []
-    seen = set()
-    for side in ordered_sides:
-        if side in seen:
-            continue
-        seen.add(side)
-        label = f"{_fmt_ft(side)} × {_fmt_ft(side)} ft"
-        candidates.append(CandidateBoard(side, side, label))
-
-    return candidates
+    _ = shrink_floor
+    _ = base_side
+    _ = grid_step
+    _ = area_cells
+    ten_cells = max(6, ft_to_cells(10.0))
+    return [CandidateBoard(ten_cells, ten_cells, f"{_fmt_ft(ten_cells)} × {_fmt_ft(ten_cells)} ft")]
 
 
 def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:
@@ -491,6 +434,7 @@ def solve_orchestrator(*args, **kwargs):
             *,
             prefer_large: bool,
             continue_on_partial: bool = False,
+            require_full_duration: bool = False,
         ) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int, Optional[str]]:
             if seconds <= 0 or not candidates:
                 set_phase(label)
@@ -505,6 +449,7 @@ def solve_orchestrator(*args, **kwargs):
             set_progress_pct(0.0)
 
             queue: List[CandidateBoard] = list(candidates)
+            base_candidates: List[CandidateBoard] = list(queue)
             total = len(queue)
             best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
             last_reason: Optional[str] = None
@@ -535,11 +480,20 @@ def solve_orchestrator(*args, **kwargs):
                 ticker.start()
 
             try:
-                while queue:
+                while True:
                     elapsed_phase = time.time() - phase_start
                     if elapsed_phase >= seconds:
                         _update_phase_progress()
                         break
+
+                    if not queue:
+                        if not require_full_duration:
+                            break
+                        if not base_candidates:
+                            break
+                        queue = list(base_candidates)
+                        total = max(total, attempt_idx + len(queue))
+                        continue
 
                     remaining = seconds - elapsed_phase
                     cb = queue.pop(0)
@@ -645,6 +599,13 @@ def solve_orchestrator(*args, **kwargs):
                         _update_phase_progress()
                         continue
 
+                    if require_full_duration:
+                        wait_remaining = max(0.0, per_attempt - attempt_elapsed)
+                        if wait_remaining > 0:
+                            future_remaining = seconds - (time.time() - phase_start)
+                            if future_remaining > 0:
+                                time.sleep(min(wait_remaining, future_remaining))
+
                     _update_phase_progress()
             finally:
                 progress_stop.set()
@@ -736,6 +697,7 @@ def solve_orchestrator(*args, **kwargs):
                 False,
                 prefer_large=False,
                 continue_on_partial=True,
+                require_full_duration=True,
             )
             if res_reason:
                 final_reason = res_reason
@@ -768,6 +730,7 @@ def solve_orchestrator(*args, **kwargs):
                     True,
                     prefer_large=True,
                     continue_on_partial=True,
+                    require_full_duration=True,
                 )
                 if res_reason:
                     final_reason = res_reason
