@@ -6,6 +6,7 @@ import time
 import traceback
 import math
 import threading
+import heapq
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Any, Iterable
 
@@ -210,12 +211,68 @@ def _phase_d_candidates(
     grid_step: int,
     area_cells: int,
 ) -> List[CandidateBoard]:
-    _ = shrink_floor
-    _ = base_side
-    _ = grid_step
-    _ = area_cells
-    ten_cells = max(6, ft_to_cells(10.0))
-    return [CandidateBoard(ten_cells, ten_cells, f"{_fmt_ft(ten_cells)} × {_fmt_ft(ten_cells)} ft")]
+    """Return Phase D boards by walking neighbors around the base grid.
+
+    Phase D is the "pop-in/out" search over grids near the base 10×10 board.
+    Earlier iterations of the orchestrator hard-coded this phase to probe only
+    the 10×10 grid which prevented it from exploring slightly wider/taller
+    boards required by some puzzles.  This helper now performs a small best-
+    first search around the base grid, bounded by the maximum tile dimension
+    (``shrink_floor``) on the lower side and by both the total demand area and
+    a modest expansion budget on the upper side.  The resulting sequence keeps
+    the base board first, then alternates between shrinking and expanding to
+    mirror the desired "pop-in/out" behaviour while respecting the
+    ``_PHASE_D_MAX_CANDIDATES`` limit.
+    """
+
+    step = max(1, int(grid_step))
+    base = max(6, int(base_side))
+
+    floor_val = max(6, int(shrink_floor))
+    if floor_val > base:
+        floor_val = base
+
+    if area_cells <= 0:
+        area_side = base
+    else:
+        area_side = _align_up_to_multiple(_ceil_sqrt_cells(area_cells), step)
+
+    expand_cap = max(base, area_side)
+    expand_cap = max(expand_cap, base + step * 4)
+    expand_cap = _align_up_to_multiple(expand_cap, step)
+
+    heap: List[Tuple[int, int, int]] = []
+    heapq.heappush(heap, (0, base, base))
+    seen: set[Tuple[int, int]] = set()
+    out: List[CandidateBoard] = []
+
+    while heap and len(out) < _PHASE_D_MAX_CANDIDATES:
+        priority, Wc, Hc = heapq.heappop(heap)
+        key = (Wc, Hc)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        Wc = max(6, int(Wc))
+        Hc = max(6, int(Hc))
+        out.append(CandidateBoard(Wc, Hc, f"{_fmt_ft(Wc)} × {_fmt_ft(Hc)} ft"))
+
+        for dW, dH in ((-step, 0), (step, 0), (0, -step), (0, step)):
+            next_W = Wc + dW
+            next_H = Hc + dH
+            if next_W < floor_val or next_H < floor_val:
+                continue
+            if next_W > expand_cap or next_H > expand_cap:
+                continue
+            if (next_W, next_H) in seen:
+                continue
+            next_priority = max(abs(next_W - base), abs(next_H - base))
+            heapq.heappush(heap, (next_priority, next_W, next_H))
+
+    if not out:
+        out.append(CandidateBoard(base, base, f"{_fmt_ft(base)} × {_fmt_ft(base)} ft"))
+
+    return out
 
 
 def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:

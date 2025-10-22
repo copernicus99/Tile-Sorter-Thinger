@@ -44,7 +44,11 @@ if "ortools" not in sys.modules:
     sys.modules["ortools.sat.python.cp_model"] = cp_model_mod
 
 from solver.orchestrator import (
+    _PHASE_D_MAX_CANDIDATES,
+    _align_up_to_multiple,
+    _bag_ft_to_cells,
     _coerce_bag_ft,
+    _grid_step_from_bag,
     _phase_c_candidates,
     _phase_d_candidates,
     _mirrored_probe_order,
@@ -93,19 +97,27 @@ def test_phase_c_candidates_returns_only_base_board():
     assert "10.0 × 10.0 ft" in cb.label
 
 
-def test_phase_d_candidates_force_10x10_board():
+def test_phase_d_candidates_walk_nearby_grids():
+    base_side = ft_to_cells(10.0)
+    shrink_floor = max(6, base_side - 4)
+    area_cells = (base_side + 2) * (base_side + 1)
+
     candidates = _phase_d_candidates(
-        shrink_floor=12,
-        base_side=32,
-        grid_step=4,
-        area_cells=40 * 40,
+        shrink_floor=shrink_floor,
+        base_side=base_side,
+        grid_step=1,
+        area_cells=area_cells,
     )
 
-    assert len(candidates) == 1
-    cb = candidates[0]
-    ten_cells = ft_to_cells(10.0)
-    assert cb.W == cb.H == ten_cells
-    assert "10.0 × 10.0 ft" in cb.label
+    dims = [(cb.W, cb.H) for cb in candidates]
+
+    assert dims
+    assert dims[0] == (base_side, base_side)
+    assert len(dims) <= _PHASE_D_MAX_CANDIDATES
+    assert any(w > base_side or h > base_side for w, h in dims)
+    assert any(w < base_side or h < base_side for w, h in dims)
+    assert all(shrink_floor <= min(w, h) for w, h in dims)
+    assert all(max(w, h) <= base_side + 4 for w, h in dims)
 
 
 def test_mirrored_probe_order_handles_duplicates_gracefully():
@@ -150,9 +162,30 @@ def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
     # The Phase D attempt should use the entire configured budget on a 10×10 grid
     d_calls = [(W, H, seconds) for (W, H, allow, seconds) in calls if allow]
     assert d_calls
+    _first_d_W, _first_d_H, first_d_seconds = d_calls[0]
+    assert first_d_seconds == pytest.approx(orchestrator.CFG.TIME_D, rel=0.05)
+
+    bag_cells = _bag_ft_to_cells(bag_ft)
+    grid_step = _grid_step_from_bag(bag_cells)
+    max_tile_side = max(max(abs(int(w)), abs(int(h))) for (w, h) in bag_cells.keys())
+    shrink_floor = _align_up_to_multiple(max(6, max_tile_side), grid_step)
+    if shrink_floor > ten_cells:
+        shrink_floor = ten_cells
+    area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
+    expected_dims = {
+        (cb.W, cb.H)
+        for cb in _phase_d_candidates(
+            shrink_floor=shrink_floor,
+            base_side=ten_cells,
+            grid_step=grid_step,
+            area_cells=area_cells,
+        )
+    }
+    assert expected_dims
+
     for W, H, seconds in d_calls:
-        assert W == H == ten_cells
-        assert seconds == pytest.approx(orchestrator.CFG.TIME_D, rel=0.05)
+        assert (W, H) in expected_dims
+        assert seconds <= orchestrator.CFG.TIME_D + 1e-6
 
 
 def test_orchestrator_phase_c_consumes_full_timebox(monkeypatch):
