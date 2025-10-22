@@ -1,6 +1,7 @@
 import math
 import random
-from typing import List, Tuple, Dict, Iterable, Union, Optional
+from collections import defaultdict
+from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence
 from ortools.sat.python import cp_model as _cp
 
 from models import Placed, Rect
@@ -48,6 +49,7 @@ def est_positions(W, H, w, h, stride):
     return max(0, (W - w) // max(1, stride) + 1) * max(0, (H - h) // max(1, stride) + 1)
 
 _RNG: Optional[random.Random] = None
+_PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
 
 
 def _system_rng() -> random.Random:
@@ -58,6 +60,37 @@ def _system_rng() -> random.Random:
         except NotImplementedError:
             _RNG = random.Random()
     return _RNG
+
+
+def _placement_key(W: int, H: int, w: int, h: int, stride: int) -> Tuple[int, int, int, int, int]:
+    return (int(W), int(H), int(w), int(h), max(1, int(stride)))
+
+
+def _compute_locs(W: int, H: int, w: int, h: int, stride: int) -> Tuple[Tuple[int, int, int, int, int], ...]:
+    key = _placement_key(W, H, w, h, stride)
+    cached = _PLACEMENT_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    sx = max(1, stride)
+    sy = max(1, stride)
+
+    xs: Sequence[int]
+    ys: Sequence[int]
+
+    if w >= W:
+        xs = (0,)
+    else:
+        xs = tuple(range(0, W - w + 1, sx))
+
+    if h >= H:
+        ys = (0,)
+    else:
+        ys = tuple(range(0, H - h + 1, sy))
+
+    locs = tuple((x, y, 0, w, h) for x in xs for y in ys)
+    _PLACEMENT_CACHE[key] = locs
+    return locs
 
 
 def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Optional[random.Random] = None, randomize: bool = False):
@@ -76,11 +109,7 @@ def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Option
             rng_local.shuffle(cfgs)
 
         for (w, h, rot) in cfgs:
-            locs = []
-            sx = max(1, stride); sy = max(1, stride)
-            for x in range(0, W - w + 1, sx):
-                for y in range(0, H - h + 1, sy):
-                    locs.append((x, y, rot, w, h))
+            locs = [(*loc[:2], rot, loc[3], loc[4]) for loc in _compute_locs(W, H, w, h, stride)]
 
             if randomize and rng_local is not None and len(locs) > 1:
                 rng_local.shuffle(locs)
@@ -118,7 +147,9 @@ def try_pack_exact_cover(
     H: int,
     multiset: Union[Iterable, Dict],
     allow_discard: bool = False,
-    max_seconds: float = 30.0
+    max_seconds: float = 30.0,
+    *,
+    initial_hint: Optional[List[Placed]] = None,
 ) -> Tuple[bool, List[Placed], str]:
     """Exact-cover model; if allow_discard=True, coverage model (no callbacks)."""
     # validate grid
@@ -168,6 +199,88 @@ def try_pack_exact_cover(
             break
         stride *= 2
 
+    # forced placements: whole-board or strip fills that fully determine layout
+    forced: List[Placed] = []
+    remaining_tiles: List[Rect] = []
+
+    for rect in tiles:
+        if (rect.w == W and rect.h == H) or (rect.w == H and rect.h == W):
+            orientation = Rect(W, H, rect.name)
+            forced.append(Placed(0, 0, orientation))
+        else:
+            remaining_tiles.append(rect)
+
+    if len(forced) > 1:
+        # Multiple whole-board tiles cannot coexist.
+        return False, [], "Bad demand: multiple tiles match entire board"
+
+    if forced and remaining_tiles:
+        return False, [], "Bad demand: full-board tile conflicts with other tiles"
+
+    if forced and not remaining_tiles:
+        return True, forced, None
+
+    if not forced:
+        remaining_tiles = list(tiles)
+
+    # Detect strip fills that deterministically cover the board
+    def _orient_strip(rect: Rect, target: str) -> Optional[Rect]:
+        if target == "width":
+            if rect.w == W:
+                return rect
+            if rect.h == W:
+                return Rect(rect.h, rect.w, rect.name)
+        if target == "height":
+            if rect.h == H:
+                return rect
+            if rect.w == H:
+                return Rect(rect.h, rect.w, rect.name)
+        return None
+
+    width_strips: List[Rect] = []
+    other_tiles: List[Rect] = []
+    for rect in remaining_tiles:
+        oriented = _orient_strip(rect, "width")
+        if oriented is not None and oriented.w == W:
+            width_strips.append(oriented)
+        else:
+            other_tiles.append(rect)
+
+    if width_strips and not other_tiles:
+        total_height = sum(r.h for r in width_strips)
+        if total_height == H:
+            y = 0
+            strip_forced: List[Placed] = []
+            for rect in sorted(width_strips, key=lambda r: (-r.h, r.name or "")):
+                strip_forced.append(Placed(0, y, Rect(rect.w, rect.h, rect.name)))
+                y += rect.h
+            if y == H:
+                strip_forced.extend(forced)
+                return True, strip_forced, None
+
+    height_strips: List[Rect] = []
+    other_tiles_h: List[Rect] = []
+    for rect in remaining_tiles:
+        oriented = _orient_strip(rect, "height")
+        if oriented is not None and oriented.h == H:
+            height_strips.append(oriented)
+        else:
+            other_tiles_h.append(rect)
+
+    if height_strips and not other_tiles_h:
+        total_width = sum(r.w for r in height_strips)
+        if total_width == W:
+            x = 0
+            strip_forced = []
+            for rect in sorted(height_strips, key=lambda r: (-r.w, r.name or "")):
+                strip_forced.append(Placed(x, 0, Rect(rect.w, rect.h, rect.name)))
+                x += rect.w
+            if x == W:
+                strip_forced.extend(forced)
+                return True, strip_forced, None
+
+    tiles = remaining_tiles
+
     options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
     total_places = sum(len(o) for o in options)
     if total_places == 0:
@@ -214,19 +327,32 @@ def try_pack_exact_cover(
         #
         # In coverage mode we must still prevent overlap, so use ≤ 1 coverage per cell.
         # In strict mode it’s the usual == 1 exact cover.
+        cell_to_vars: Dict[Tuple[int, int], List[Tuple[int, int]]] = defaultdict(list)
+        corner_to_vars: Dict[Tuple[int, int], List[_cp.IntVar]] = defaultdict(list)
+        for i in range(n):
+            for k, (px, py, _rot, w, h) in enumerate(options[i]):
+                for dx in range(w):
+                    for dy in range(h):
+                        cx = px + dx
+                        cy = py + dy
+                        cell_to_vars[(cx, cy)].append((i, k))
+                corner_to_vars[(px, py)].append(p[i][k])
+                corner_to_vars[(px + w, py)].append(p[i][k])
+                corner_to_vars[(px, py + h)].append(p[i][k])
+                corner_to_vars[(px + w, py + h)].append(p[i][k])
+
         for x in range(W):
             for y in range(H):
-                covers = []
-                for i in range(n):
-                    for k, (px, py, rot, w, h) in enumerate(options[i]):
-                        if (px <= x < px + w) and (py <= y < py + h):
-                            covers.append(p[i][k])
-                if not covers:
+                placements_here = cell_to_vars.get((x, y))
+                if not placements_here:
                     if not allow_discard:
                         return False, [], f"Coverage impossible with stride={stride} (un-coverable cell)"
-                    # coverage mode can tolerate uncovered cells
                     continue
-                m.Add(sum(covers) <= 1)
+                vars_here = [p[i][k] for i, k in placements_here]
+                if allow_discard:
+                    m.AddAtMostOne(vars_here)
+                else:
+                    m.Add(sum(vars_here) == 1)
 
         # ---- rule / guard extras ----
         max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
@@ -253,19 +379,15 @@ def try_pack_exact_cover(
                 seam_col = []
                 for y in range(H):
                     s = m.NewBoolVar(f"sv_{x}_{y}")
-                    left = []
-                    right = []
-                    both = []
-                    for i in range(n):
-                        for k, (px, py, rot, w, h) in enumerate(options[i]):
-                            covers_left = (px <= x - 1 < px + w) and (py <= y < py + h)
-                            covers_right = (px <= x < px + w) and (py <= y < py + h)
-                            if covers_left:
-                                left.append(p[i][k])
-                            if covers_right:
-                                right.append(p[i][k])
-                            if covers_left and covers_right:
-                                both.append(p[i][k])
+                    left_ids = cell_to_vars.get((x - 1, y), [])
+                    right_ids = cell_to_vars.get((x, y), [])
+
+                    left = [p[i][k] for i, k in left_ids]
+                    right = [p[i][k] for i, k in right_ids]
+                    left_set = set(left_ids)
+                    right_set = set(right_ids)
+                    both_pairs = left_set & right_set
+                    both = [p[i][k] for i, k in both_pairs]
 
                     left_cover = _or_bool(f"sv_left_{x}_{y}", left)
                     right_cover = _or_bool(f"sv_right_{x}_{y}", right)
@@ -287,19 +409,15 @@ def try_pack_exact_cover(
                 seam_row = []
                 for x in range(W):
                     s = m.NewBoolVar(f"sh_{x}_{y}")
-                    top = []
-                    bottom = []
-                    both = []
-                    for i in range(n):
-                        for k, (px, py, rot, w, h) in enumerate(options[i]):
-                            covers_top = (py <= y - 1 < py + h) and (px <= x < px + w)
-                            covers_bottom = (py <= y < py + h) and (px <= x < px + w)
-                            if covers_top:
-                                top.append(p[i][k])
-                            if covers_bottom:
-                                bottom.append(p[i][k])
-                            if covers_top and covers_bottom:
-                                both.append(p[i][k])
+                    top_ids = cell_to_vars.get((x, y - 1), [])
+                    bottom_ids = cell_to_vars.get((x, y), [])
+
+                    top = [p[i][k] for i, k in top_ids]
+                    bottom = [p[i][k] for i, k in bottom_ids]
+                    top_set = set(top_ids)
+                    bottom_set = set(bottom_ids)
+                    both_pairs = top_set & bottom_set
+                    both = [p[i][k] for i, k in both_pairs]
 
                     top_cover = _or_bool(f"sh_top_{x}_{y}", top)
                     bottom_cover = _or_bool(f"sh_bottom_{x}_{y}", bottom)
@@ -319,11 +437,7 @@ def try_pack_exact_cover(
         if bool(getattr(CFG, "NO_PLUS", False)):
             for nx in range(1, W):
                 for ny in range(1, H):
-                    corners = []
-                    for i in range(n):
-                        for k, (px, py, rot, w, h) in enumerate(options[i]):
-                            if (px == nx and py == ny) or (px + w == nx and py == ny) or (px == nx and py + h == ny) or (px + w == nx and py + h == ny):
-                                corners.append(p[i][k])
+                    corners = corner_to_vars.get((nx, ny))
                     if corners:
                         m.Add(sum(corners) <= 3)
 
@@ -335,32 +449,68 @@ def try_pack_exact_cover(
             if LMT < 0:
                 LMT = -1
             if LMT >= 0:
+                vertical_left = defaultdict(list)
+                vertical_right = defaultdict(list)
+                horizontal_bottom = defaultdict(list)
+                horizontal_top = defaultdict(list)
+
                 for i in range(n):
-                    wi_hi = {(tiles[i].w, tiles[i].h), (tiles[i].h, tiles[i].w)}
-                    same_neighbors = []
-                    for j in range(n):
-                        if j == i:
-                            continue
-                        wj_hj = {(tiles[j].w, tiles[j].h), (tiles[j].h, tiles[j].w)}
-                        if wi_hi != wj_hj:
-                            continue
-                        a = m.NewBoolVar(f"adj_{i}_{j}")
-                        same_neighbors.append(a)
-                        touching = []
-                        for k, (xi, yi, ri, wi, hi) in enumerate(options[i]):
-                            for m2, (xj, yj, rj, wj, hj) in enumerate(options[j]):
-                                vt = (xi + wi == xj or xj + wj == xi) and not (yi + hi <= yj or yj + hj <= yi)
-                                ht = (yi + hi == yj or yj + hj == yi) and not (xi + wi <= xj or xj + wj <= xi)
-                                if vt or ht:
-                                    z = m.NewBoolVar(f"t_{i}_{j}_{k}_{m2}")
-                                    m.AddMultiplicationEquality(z, [p[i][k], p[j][m2]])
-                                    touching.append(z)
-                        if touching:
-                            m.AddMaxEquality(a, touching)
-                        else:
-                            m.Add(a == 0)
-                    if same_neighbors:
-                        m.Add(sum(same_neighbors) <= LMT)
+                    for k, (px, py, _rot, w, h) in enumerate(options[i]):
+                        vertical_left[px].append((py, py + h, i, k))
+                        vertical_right[px + w].append((py, py + h, i, k))
+                        horizontal_bottom[py].append((px, px + w, i, k))
+                        horizontal_top[py + h].append((px, px + w, i, k))
+
+                def _overlaps(a0: int, a1: int, b0: int, b1: int) -> bool:
+                    return not (a1 <= b0 or b1 <= a0)
+
+                adjacency_pairs: Dict[Tuple[int, int], List[Tuple[int, int, int, int]]] = defaultdict(list)
+
+                for edge_x, right_list in vertical_right.items():
+                    left_list = vertical_left.get(edge_x, [])
+                    if not left_list:
+                        continue
+                    for (ay0, ay1, ai, ak) in right_list:
+                        for (by0, by1, bi, bk) in left_list:
+                            if _overlaps(ay0, ay1, by0, by1) and ai != bi:
+                                key = (min(ai, bi), max(ai, bi))
+                                adjacency_pairs[key].append((ai, ak, bi, bk))
+
+                for edge_y, top_list in horizontal_top.items():
+                    bottom_list = horizontal_bottom.get(edge_y, [])
+                    if not bottom_list:
+                        continue
+                    for (ax0, ax1, ai, ak) in top_list:
+                        for (bx0, bx1, bi, bk) in bottom_list:
+                            if _overlaps(ax0, ax1, bx0, bx1) and ai != bi:
+                                key = (min(ai, bi), max(ai, bi))
+                                adjacency_pairs[key].append((ai, ak, bi, bk))
+
+                tile_adj_vars: Dict[int, List[_cp.IntVar]] = defaultdict(list)
+
+                for (ai, bi), combos in adjacency_pairs.items():
+                    wi_hi = {(tiles[ai].w, tiles[ai].h), (tiles[ai].h, tiles[ai].w)}
+                    wj_hj = {(tiles[bi].w, tiles[bi].h), (tiles[bi].h, tiles[bi].w)}
+                    if wi_hi != wj_hj:
+                        continue
+
+                    bools = []
+                    for (i_idx, k_idx, j_idx, m_idx) in combos:
+                        z = m.NewBoolVar(f"t_{i_idx}_{j_idx}_{k_idx}_{m_idx}")
+                        m.AddMultiplicationEquality(z, [p[i_idx][k_idx], p[j_idx][m_idx]])
+                        bools.append(z)
+
+                    if not bools:
+                        continue
+
+                    pair_var = m.NewBoolVar(f"adj_{ai}_{bi}")
+                    m.AddMaxEquality(pair_var, bools)
+                    tile_adj_vars[ai].append(pair_var)
+                    tile_adj_vars[bi].append(pair_var)
+
+                for idx, vars_list in tile_adj_vars.items():
+                    if vars_list:
+                        m.Add(sum(vars_list) <= LMT)
 
         # ------- objective / coverage target (no callbacks) -------
         solver = _cp.CpSolver()
@@ -371,7 +521,18 @@ def try_pack_exact_cover(
         solver.parameters.linearization_level = 0
         solver.parameters.log_search_progress = False
         solver.parameters.symmetry_level = 0
-        solver.parameters.stop_after_first_solution = False  # optimization
+        branching_mode = str(getattr(CFG, "SEARCH_BRANCHING", "AUTOMATIC")).upper()
+        branching_map = {
+            "AUTOMATIC": getattr(_cp, "AUTOMATIC_SEARCH", _cp.PORTFOLIO_SEARCH),
+            "PORTFOLIO": getattr(_cp, "PORTFOLIO_SEARCH", _cp.PORTFOLIO_SEARCH),
+            "FIXED": getattr(_cp, "FIXED_SEARCH", _cp.PORTFOLIO_SEARCH),
+            "LP": getattr(_cp, "LP_SEARCH", _cp.PORTFOLIO_SEARCH),
+        }
+        solver.parameters.search_branching = branching_map.get(branching_mode, _cp.PORTFOLIO_SEARCH)
+        solver.parameters.random_seed = int(getattr(CFG, "RANDOM_SEED", 0))
+        solver.parameters.stop_after_first_solution = bool(
+            getattr(CFG, "STOP_AFTER_FIRST_SOLUTION", False)
+        )
 
         if allow_discard:
             # Maximize total area (in cells); also require a minimum coverage.
@@ -403,6 +564,36 @@ def try_pack_exact_cover(
             # exact cover case: nothing to optimize
             m.Minimize(0)
 
+        # Apply solution hints when provided
+        if initial_hint:
+            hint_remaining = list(initial_hint)
+            matched = [False] * len(hint_remaining)
+            for i, rect in enumerate(tiles):
+                for idx_hint, placed_hint in enumerate(hint_remaining):
+                    if matched[idx_hint]:
+                        continue
+                    rect_hint = placed_hint.rect
+                    if rect_hint is None:
+                        continue
+                    if rect_hint.name and rect.name and rect_hint.name != rect.name:
+                        continue
+                    dims_match = (
+                        (rect_hint.w == rect.w and rect_hint.h == rect.h)
+                        or (rect_hint.w == rect.h and rect_hint.h == rect.w)
+                    )
+                    if not dims_match:
+                        continue
+                    for k, (px, py, rot, w, h) in enumerate(options[i]):
+                        if placed_hint.x == px and placed_hint.y == py and (
+                            (rect_hint.w == w and rect_hint.h == h)
+                            or (rect_hint.w == h and rect_hint.h == w)
+                        ):
+                            m.AddHint(p[i][k], 1)
+                            matched[idx_hint] = True
+                            break
+                    if matched[idx_hint]:
+                        break
+
         res = solver.Solve(m)
 
         if res in (_cp.OPTIMAL, _cp.FEASIBLE):
@@ -412,6 +603,7 @@ def try_pack_exact_cover(
                     if solver.BooleanValue(p[i][k]):
                         placed.append(Placed(x, y, Rect(w, h, tiles[i].name)))
                         break
+            placed.extend(forced)
             return True, placed, None
 
         if res == _cp.INFEASIBLE:
