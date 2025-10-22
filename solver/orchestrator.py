@@ -201,6 +201,9 @@ def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoar
     return [CandidateBoard(aligned_base, aligned_base, f"{_fmt_ft(aligned_base)} × {_fmt_ft(aligned_base)} ft")]
 
 
+_PHASE_D_MAX_CANDIDATES = 15
+
+
 def _phase_d_candidates(
     shrink_floor: int,
     base_side: int,
@@ -208,26 +211,68 @@ def _phase_d_candidates(
     grid_step: int,
     area_cells: int,
 ) -> List[CandidateBoard]:
-    """Return the single Phase D base board candidate.
+    """Return Phase D board candidates focused around the base grid.
 
-    Phase D is intended to focus exclusively on the base board (nominally
-    10 ft × 10 ft) while allowing discards.  Previous iterations mirrored across
-    many square sizes which diluted the per-board time budget.  To keep Phase D
-    aligned with its design, we now return only the aligned base board so the
-    solver can spend the entire phase on that grid.
+    Phase D should prioritise the nominal base board while still probing a
+    handful of nearby sizes so we can recover when the exact board is
+    infeasible.  We bias towards slight expansions when the demand area exceeds
+    the base grid and otherwise alternate shrinking and growing to stay close
+    to the target.
     """
-
-    _ = area_cells  # retained for signature compatibility / diagnostics
 
     step = max(1, int(grid_step))
     base_side = max(6, int(base_side))
     shrink_floor = max(6, int(shrink_floor))
 
-    aligned_base = _phase_c_candidates(base_side, grid_step=step)[0]
-    if shrink_floor > aligned_base.W:
-        aligned_base = _phase_c_candidates(shrink_floor, grid_step=step)[0]
+    aligned_base_side = _align_up_to_multiple(base_side, step)
+    min_board_side = _align_up_to_multiple(shrink_floor, step)
+    if min_board_side > aligned_base_side:
+        aligned_base_side = min_board_side
 
-    return [aligned_base]
+    needed_side = _align_up_to_multiple(_ceil_sqrt_cells(area_cells), step)
+    if area_cells <= 0:
+        expand_ceiling = aligned_base_side
+    else:
+        expand_ceiling = max(aligned_base_side + step, needed_side)
+
+    down_values: List[int] = []
+    side = aligned_base_side - step
+    while side >= min_board_side:
+        down_values.append(side)
+        side -= step
+
+    up_values: List[int] = []
+    side = aligned_base_side + step
+    while side <= expand_ceiling:
+        up_values.append(side)
+        side += step
+
+    prefer_expand_first = area_cells >= aligned_base_side * aligned_base_side
+    ordered_sides: List[int] = [aligned_base_side]
+    while up_values or down_values:
+        if prefer_expand_first and up_values:
+            ordered_sides.append(up_values.pop(0))
+        if down_values:
+            ordered_sides.append(down_values.pop(0))
+        if not prefer_expand_first and up_values:
+            ordered_sides.append(up_values.pop(0))
+
+        if not up_values:
+            prefer_expand_first = False
+
+    if len(ordered_sides) > _PHASE_D_MAX_CANDIDATES:
+        ordered_sides = ordered_sides[:_PHASE_D_MAX_CANDIDATES]
+
+    candidates: List[CandidateBoard] = []
+    seen = set()
+    for side in ordered_sides:
+        if side in seen:
+            continue
+        seen.add(side)
+        label = f"{_fmt_ft(side)} × {_fmt_ft(side)} ft"
+        candidates.append(CandidateBoard(side, side, label))
+
+    return candidates
 
 
 def _rectangular_candidates(widths: Iterable[int], heights: Iterable[int], *, descending: bool, multiple_of: int = 1) -> List[CandidateBoard]:

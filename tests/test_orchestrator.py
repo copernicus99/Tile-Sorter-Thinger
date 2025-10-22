@@ -88,11 +88,11 @@ def test_phase_c_candidates_returns_only_base_board():
     assert "10.0 × 10.0 ft" in cb.label
 
 
-def test_phase_d_candidates_returns_only_aligned_base_board():
+def test_phase_d_candidates_prioritize_base_and_neighbors():
     shrink_floor = 12
     base_side = 20
     grid_step = 2
-    area_cells = 12 * 12
+    area_cells = 24 * 24
 
     candidates = _phase_d_candidates(
         shrink_floor,
@@ -101,10 +101,9 @@ def test_phase_d_candidates_returns_only_aligned_base_board():
         area_cells=area_cells,
     )
 
-    assert len(candidates) == 1
-    cb = candidates[0]
-    assert cb.W == cb.H == 20
-    assert "10.0 × 10.0 ft" in cb.label
+    sides = [cb.W for cb in candidates]
+    assert sides[:5] == [20, 22, 18, 24, 16]
+    assert sides[-1] == 12
 
 
 def test_phase_d_candidates_honor_minimum_board_size():
@@ -120,9 +119,9 @@ def test_phase_d_candidates_honor_minimum_board_size():
         area_cells=area_cells,
     )
 
-    assert len(candidates) == 1
-    cb = candidates[0]
-    assert cb.W == cb.H == 22
+    sides = [cb.W for cb in candidates]
+    assert sides[0] == 22
+    assert all(side >= 22 for side in sides)
 
 
 def test_mirrored_probe_order_handles_duplicates_gracefully():
@@ -167,9 +166,20 @@ def test_orchestrator_phase_d_sticks_to_base_board(monkeypatch):
     base_side_cells = max(6, ft_to_cells(math.sqrt(orchestrator.CFG.BASE_GRID_AREA_SQFT)))
     base_side_cells = max(base_side_cells, max_tile_side)
     base_side_cells = orchestrator._align_up_to_multiple(base_side_cells, grid_step)
+    min_board = orchestrator._align_up_to_multiple(max_tile_side, grid_step)
+    if min_board > base_side_cells:
+        base_side_cells = min_board
+    area_cells = sum((w * h) * c for (w, h), c in bag_cells.items())
+    needed_side = orchestrator._align_up_to_multiple(orchestrator._ceil_sqrt_cells(area_cells), grid_step)
+    if area_cells <= 0:
+        expand_ceiling = base_side_cells
+    else:
+        expand_ceiling = max(base_side_cells + grid_step, needed_side)
 
     d_calls = [(W, H) for (W, H, allow) in calls if allow]
-    assert d_calls == [(base_side_cells, base_side_cells)]
+    assert d_calls
+    assert d_calls[0] == (base_side_cells, base_side_cells)
+    assert all(min_board <= W <= expand_ceiling for (W, _H) in d_calls)
 
 
 def test_orchestrator_retries_timebox_attempts(monkeypatch):
