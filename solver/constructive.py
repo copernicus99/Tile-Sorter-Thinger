@@ -1,5 +1,5 @@
 # solver/constructive.py
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 from tiles import NAME_TO_RECT_DIMS
 from models import Placed, Rect, ft_to_cells, cells_to_ft
 
@@ -78,3 +78,94 @@ def quick_banded_fill_width10(demand: Dict[str, int]) -> Tuple[Optional[List[Pla
         return None, 0, 0
 
     return placed, ft_to_cells(W_ft), ft_to_cells(target_H_ft)
+
+
+def quick_strip_fill_common_dimension(demand: Dict[str, int]) -> Tuple[Optional[List[Placed]], int, int]:
+    """Construct layouts when every tile shares a common strip dimension.
+
+    The solver looks for a dimension (width or height) that every tile can
+    adopt through rotation.  When such a dimension exists and the total area
+    forms an integer number of strips, the layout can be assembled instantly
+    without invoking CP-SAT.
+    """
+
+    if not demand:
+        return None, 0, 0
+
+    bag: List[Tuple[int, int, int, str]] = []
+    candidate_dims: Optional[Set[int]] = None
+    total_area = 0
+
+    for name, cnt in demand.items():
+        if cnt <= 0:
+            continue
+        w, h = NAME_TO_RECT_DIMS[name]
+        bag.append((w, h, int(cnt), name))
+        total_area += int(cnt) * w * h
+        dims = {w, h}
+        if candidate_dims is None:
+            candidate_dims = set(dims)
+        else:
+            candidate_dims &= dims
+
+    if not bag or not candidate_dims:
+        return None, 0, 0
+
+    def _attempt_strip(strip_width: int, align_width: bool) -> Tuple[Optional[List[Placed]], int, int]:
+        if strip_width <= 0:
+            return None, 0, 0
+        if total_area % strip_width != 0:
+            return None, 0, 0
+
+        strip_height = total_area // strip_width
+        placements: List[Placed] = []
+        cursor = 0
+
+        # Prepare oriented tiles (width aligned if align_width else height)
+        oriented: List[Tuple[int, int, int, str]] = []
+        for w, h, cnt, name in bag:
+            if align_width:
+                if w == strip_width:
+                    oriented.append((w, h, cnt, name))
+                elif h == strip_width:
+                    oriented.append((h, w, cnt, name))
+                else:
+                    return None, 0, 0
+            else:
+                if h == strip_width:
+                    oriented.append((w, h, cnt, name))
+                elif w == strip_width:
+                    oriented.append((h, w, cnt, name))
+                else:
+                    return None, 0, 0
+
+        for width, height, cnt, name in sorted(oriented, key=lambda t: (-t[1], t[3])):
+            for _ in range(cnt):
+                if align_width:
+                    if cursor + height > strip_height:
+                        return None, 0, 0
+                    placements.append(Placed(0, cursor, Rect(width, height, name)))
+                    cursor += height
+                else:
+                    if cursor + width > strip_height:
+                        return None, 0, 0
+                    placements.append(Placed(cursor, 0, Rect(width, height, name)))
+                    cursor += width
+
+        if cursor != strip_height:
+            return None, 0, 0
+
+        if align_width:
+            return placements, strip_width, strip_height
+        return placements, strip_height, strip_width
+
+    # Try aligning widths first, then heights
+    for dim in sorted(candidate_dims, reverse=True):
+        res = _attempt_strip(dim, align_width=True)
+        if res[0]:
+            return res
+        res = _attempt_strip(dim, align_width=False)
+        if res[0]:
+            return res
+
+    return None, 0, 0

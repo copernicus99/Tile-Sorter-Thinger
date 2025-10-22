@@ -127,7 +127,7 @@ def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
 
     calls = []
 
-    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
         calls.append((W, H, allow_discard, seconds))
         return False, [], "no solution"
 
@@ -160,7 +160,7 @@ def test_orchestrator_phase_c_consumes_full_timebox(monkeypatch):
 
     budgets = []
 
-    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
         budgets.append((W, H, seconds))
         return False, [], "no solution"
 
@@ -190,7 +190,7 @@ def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
 
     calls = []
 
-    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard):
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
         calls.append((W, H, allow_discard))
         max_h = max(h for _w, h in bag.keys())
         if H < max_h:

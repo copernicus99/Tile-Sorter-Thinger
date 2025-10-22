@@ -14,7 +14,7 @@ from typing import Dict, List, Tuple, Optional
 from models import Meta, Rect, ft_to_cells, cells_to_ft
 from tiles import NAME_TO_RECT_DIMS
 from progress import _set_progress
-from solver.constructive import quick_banded_fill_width10
+from solver.constructive import quick_banded_fill_width10, quick_strip_fill_common_dimension
 from solver.cp_isolate import run_cp_sat_isolated
 from config import CFG as DEFAULT_CFG
 
@@ -138,6 +138,24 @@ def run_pre_flight(demand: Dict[str, int], start: float, cfg=DEFAULT_CFG):
     if quick:
         _set_grid_fields(Wc0, Hc0, attempt_label="10 × H (banded)")
         return True, quick, Wc0, Hc0, "S0", None, _meta(start, cfg)
+
+    _set_progress(
+        status="solving",
+        strategy="S0",
+        step_started=start,
+        time_limit=getattr(cfg, "TIME_S0", 30),
+        attempt="Common strip fill",
+        grid="?",
+        grid_ft="?",
+        grid_w_ft=None,
+        grid_h_ft=None,
+        grid_w_cells=None,
+        grid_h_cells=None,
+    )
+    strip_quick, strip_Wc, strip_Hc = quick_strip_fill_common_dimension(demand)
+    if strip_quick:
+        _set_grid_fields(strip_Wc, strip_Hc, attempt_label="Common strip fill")
+        return True, strip_quick, strip_Wc, strip_Hc, "S0", None, _meta(start, cfg)
 
     # Shared context
     bag = _demand_to_bag(demand)

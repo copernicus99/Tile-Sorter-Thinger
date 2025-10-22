@@ -262,12 +262,17 @@ def _descending_values(start: int, end: int, *, step: int = 1) -> List[int]:
 
 # ---------- CP-SAT isolation ----------
 
-def _cp_worker(conn, W, H, bag, seconds, allow_discard):
+def _cp_worker(conn, W, H, bag, seconds, allow_discard, hint):
     try:
         os.environ["ORTOOLS_CP_SAT_NUM_THREADS"] = "1"
         os.environ["NUM_CPUS"] = "1"
         ok, placed, reason = try_pack_exact_cover(
-            W=W, H=H, multiset=bag, allow_discard=allow_discard, max_seconds=seconds
+            W=W,
+            H=H,
+            multiset=bag,
+            allow_discard=allow_discard,
+            max_seconds=seconds,
+            initial_hint=hint,
         )
         out = []
         for p in placed:
@@ -292,10 +297,17 @@ def _safe_parent_poll(parent, timeout):
         return True
 
 
-def _run_cp_sat_isolated(W: int, H: int, bag: Dict[Tuple[int, int], int],
-                         seconds: float, allow_discard: bool):
+def _run_cp_sat_isolated(
+    W: int,
+    H: int,
+    bag: Dict[Tuple[int, int], int],
+    seconds: float,
+    allow_discard: bool,
+    *,
+    hint: Optional[List[Placed]] = None,
+):
     parent, child = mp.Pipe(duplex=False)
-    proc = mp.Process(target=_cp_worker, args=(child, W, H, bag, seconds, allow_discard))
+    proc = mp.Process(target=_cp_worker, args=(child, W, H, bag, seconds, allow_discard, hint))
     proc.daemon = True
     proc.start()
     try:
@@ -405,6 +417,7 @@ def solve_orchestrator(*args, **kwargs):
 
         best_used_tiles = 0
         best_cover_pct = 0.0
+        hint_cache: Dict[Tuple[int, int], List[Placed]] = {}
 
         def _record_best(used_tiles: int, coverage_pct: float) -> None:
             nonlocal best_used_tiles, best_cover_pct
@@ -436,6 +449,7 @@ def solve_orchestrator(*args, **kwargs):
             continue_on_partial: bool = False,
             require_full_duration: bool = False,
         ) -> Tuple[bool, Optional[CandidateBoard], List[Placed], float, int, Optional[str]]:
+            nonlocal hint_cache
             if seconds <= 0 or not candidates:
                 set_phase(label)
                 set_phase_total(int(max(0.0, seconds)))
@@ -448,7 +462,13 @@ def solve_orchestrator(*args, **kwargs):
             phase_start = time.time()
             set_progress_pct(0.0)
 
-            queue: List[CandidateBoard] = list(candidates)
+            def _sort_key(cb: CandidateBoard) -> Tuple[int, float]:
+                has_hint = 0 if (cb.W, cb.H) in hint_cache else 1
+                area = cb.W * cb.H
+                size_rank = -area if prefer_large else area
+                return (has_hint, size_rank)
+
+            queue: List[CandidateBoard] = sorted(list(candidates), key=_sort_key)
             base_candidates: List[CandidateBoard] = list(queue)
             total = len(queue)
             best_tuple: Optional[Tuple[CandidateBoard, List[Placed], float, int]] = None
@@ -457,6 +477,7 @@ def solve_orchestrator(*args, **kwargs):
             retry_counts: Dict[Tuple[int, int], int] = {}
             max_retries = max(0, int(getattr(CFG, "PHASE_RETRY_LIMIT", 3)))
             min_retry_remaining = min(60.0, max(10.0, 0.2 * seconds)) if seconds > 0 else 0.0
+            recent_attempts: List[float] = []
 
             def _update_phase_progress() -> None:
                 elapsed_phase = time.time() - phase_start
@@ -491,7 +512,7 @@ def solve_orchestrator(*args, **kwargs):
                             break
                         if not base_candidates:
                             break
-                        queue = list(base_candidates)
+                        queue = sorted(base_candidates, key=_sort_key)
                         total = max(total, attempt_idx + len(queue))
                         continue
 
@@ -500,7 +521,12 @@ def solve_orchestrator(*args, **kwargs):
                     attempt_idx += 1
                     remaining_candidates = max(1, len(queue) + 1)
                     ideal_slice = remaining / float(remaining_candidates)
-                    per_attempt = min(max(5.0, ideal_slice), remaining)
+                    adaptive_slice = ideal_slice
+                    recent_window = recent_attempts[-3:]
+                    if recent_window:
+                        observed = max(recent_window)
+                        adaptive_slice = min(adaptive_slice, observed * 1.25)
+                    per_attempt = min(max(5.0, adaptive_slice), remaining)
 
                     set_attempt(
                         cb.label,
@@ -510,14 +536,19 @@ def solve_orchestrator(*args, **kwargs):
                     )
                     set_grid(cb.label)
                     attempt_started = time.time()
+                    hint = hint_cache.get((cb.W, cb.H))
                     ok, placed, reason = _run_cp_sat_isolated(
                         W=cb.W,
                         H=cb.H,
                         bag=bag_cells,
                         seconds=per_attempt,
                         allow_discard=allow_discard,
+                        hint=hint,
                     )
                     attempt_elapsed = time.time() - attempt_started
+                    recent_attempts.append(attempt_elapsed)
+                    if len(recent_attempts) > 10:
+                        recent_attempts.pop(0)
                     set_message(
                         f"Phase {label} attempt {attempt_idx}/{max(total, attempt_idx + len(queue))} ran {attempt_elapsed:.1f}s (budget ≤{per_attempt:.1f}s)"
                     )
@@ -525,20 +556,24 @@ def solve_orchestrator(*args, **kwargs):
                     if reason:
                         last_reason = str(reason)
 
+                    if placed:
+                        hint_cache[(cb.W, cb.H)] = list(placed)
+
                     used_tiles = len(placed) if placed else 0
-                    if demand_count > 0:
-                        coverage_pct = 100.0 * used_tiles / float(demand_count)
-                    elif used_tiles > 0:
-                        coverage_pct = 100.0
-                    else:
-                        coverage_pct = 0.0
+                    used_area = sum(p.rect.w * p.rect.h for p in placed) if placed else 0
+                    board_area = cb.W * cb.H if cb else 0
+                    coverage_pct = (
+                        100.0 * used_area / float(board_area)
+                        if board_area > 0 and used_area > 0
+                        else 0.0
+                    )
 
                     if used_tiles > 0:
                         _record_best(used_tiles, coverage_pct)
 
                     if allow_discard and placed:
                         if best_tuple is None:
-                            best_tuple = (cb, placed, coverage_pct, used_tiles)
+                            best_tuple = (cb, list(placed), coverage_pct, used_tiles)
                         else:
                             best_cb, _, best_cov, best_used = best_tuple
                             better = False
@@ -554,14 +589,14 @@ def solve_orchestrator(*args, **kwargs):
                                 elif used_tiles > best_used:
                                     better = True
                             if better:
-                                best_tuple = (cb, placed, coverage_pct, used_tiles)
+                                best_tuple = (cb, list(placed), coverage_pct, used_tiles)
 
-                        if demand_count > 0 and used_tiles >= demand_count:
+                        if board_area > 0 and used_area >= board_area:
                             set_progress_pct(100.0)
                             return True, cb, placed, coverage_pct, used_tiles, None
 
                     elif ok and placed:
-                        if demand_count == 0 or used_tiles >= demand_count:
+                        if area_cells == 0 or used_area >= area_cells:
                             set_progress_pct(100.0)
                             return True, cb, placed, coverage_pct, used_tiles, None
 
@@ -572,12 +607,13 @@ def solve_orchestrator(*args, **kwargs):
                     retries = retry_counts.get(key, 0)
                     if (
                         continue_on_partial
-                        and demand_count > 0
-                        and used_tiles > 0
-                        and used_tiles < demand_count
+                        and board_area > 0
+                        and used_area > 0
+                        and used_area < board_area
                         and remaining_after > 1.0
                     ):
-                        queue.append(cb)
+                        queue.insert(0, cb)
+                        queue = sorted(queue, key=_sort_key)
                         total = max(total, attempt_idx + len(queue))
                         set_message(
                             f"Phase {label} re-queue {cb.label} to chase full coverage ({coverage_pct:.2f}% so far)"
@@ -591,7 +627,8 @@ def solve_orchestrator(*args, **kwargs):
                         and retries < max_retries
                     ):
                         retry_counts[key] = retries + 1
-                        queue.append(cb)
+                        queue.insert(0, cb)
+                        queue = sorted(queue, key=_sort_key)
                         total = max(total, attempt_idx + len(queue))
                         set_message(
                             f"Phase {label} re-queue {cb.label} after '{last_reason}' ({retry_counts[key]}/{max_retries})"
@@ -617,7 +654,8 @@ def solve_orchestrator(*args, **kwargs):
                 best_cb, best_placed, best_cov, best_used = best_tuple
                 _record_best(best_used, best_cov)
                 set_progress_pct(100.0)
-                return True, best_cb, best_placed, best_cov, best_used, None
+                hint_cache[(best_cb.W, best_cb.H)] = list(best_placed)
+                return True, best_cb, list(best_placed), best_cov, best_used, None
 
             set_progress_pct(100.0)
             fallback_reason = last_reason or "Exhausted all board candidates without a feasible layout"
