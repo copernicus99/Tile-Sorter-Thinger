@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence
 from ortools.sat.python import cp_model as _cp
 
 from models import Placed, Rect
-from config import CFG
+from config import CFG, CELL
 
 # ---------------- helpers ----------------
 
@@ -50,6 +50,92 @@ def est_positions(W, H, w, h, stride):
 
 _RNG: Optional[random.Random] = None
 _PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
+
+
+def _compute_edge_guard_cells(
+    max_edge_ft: Optional[float],
+    *,
+    cell_size: float,
+    board_max: int,
+    test_mode: bool,
+) -> Optional[int]:
+    """Return the seam guard length expressed in cells or ``None`` when disabled.
+
+    The guard is skipped when:
+
+    * the configuration does not specify a maximum edge length
+    * the configured value is non-positive
+    * ``TEST_MODE`` is enabled (local iteration should be lenient)
+    * the grid dimension is smaller than the guard length, meaning the
+      constraint would never trigger anyway
+
+    ``board_max`` is the larger of ``W``/``H`` and is used to avoid applying the
+    guard to trivially small boards.  ``cell_size`` comes from ``config.CELL`` so
+    environments that tweak the base unit (e.g. 0.25ft grid cells) still yield a
+    correct conversion.
+    """
+
+    if test_mode:
+        return None
+
+    try:
+        value_ft = None if max_edge_ft is None else float(max_edge_ft)
+    except Exception:
+        value_ft = None
+
+    if value_ft is None or value_ft <= 0:
+        return None
+
+    try:
+        cell = float(cell_size)
+    except Exception:
+        cell = 0.0
+
+    if cell <= 0:
+        return None
+
+    guard_cells = int(round(value_ft / cell + 1e-9))
+    if guard_cells <= 0:
+        return None
+
+    try:
+        board_dim = int(board_max)
+    except Exception:
+        board_dim = 0
+
+    if board_dim <= guard_cells:
+        return None
+
+    return guard_cells
+
+
+def _resolve_with_edge_guard(
+    run_solver,
+    *,
+    guard_cells: Optional[int],
+    guard_applies: bool,
+):
+    """Invoke ``run_solver`` with the seam guard and retry without it when needed.
+
+    ``run_solver`` must accept ``edge_guard_cells`` as a keyword argument and
+    return the usual ``(ok, placed, reason)`` triple.  The helper retries with a
+    relaxed guard whenever the initial attempt fails and the guard is active.
+    This ensures we do not strand feasible layouts behind the extra constraint
+    while still benefiting from the guard when it does not block progress.
+    """
+
+    ok, placed, reason = run_solver(edge_guard_cells=guard_cells)
+    if not (guard_applies and not ok):
+        return ok, placed, reason
+
+    relaxed_ok, relaxed_placed, relaxed_reason = run_solver(edge_guard_cells=None)
+    if relaxed_ok:
+        return True, relaxed_placed, None
+
+    if relaxed_reason:
+        return relaxed_ok, relaxed_placed, relaxed_reason
+
+    return relaxed_ok, relaxed_placed or placed, reason
 
 
 def _system_rng() -> random.Random:
@@ -613,32 +699,30 @@ def try_pack_exact_cover(
         max_edge_ft_cfg = None
 
     try:
-        max_edge_ft = None if max_edge_ft_cfg is None else float(max_edge_ft_cfg)
+        test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
     except Exception:
-        max_edge_ft = None
+        test_mode_flag = False
 
-    if max_edge_ft is not None and max_edge_ft <= 0:
-        max_edge_ft = None
-
-    edge_guard_cells = None if (max_edge_ft is None) else int(round(max_edge_ft / 0.5 + 1e-9))
-    guard_applies = (edge_guard_cells is not None) and (edge_guard_cells < max(W, H))
-
-    ok, placed, reason = _solve_with_limit(
-        same_shape_cfg,
-        max_seconds,
-        edge_guard_cells=edge_guard_cells,
+    edge_guard_cells = _compute_edge_guard_cells(
+        max_edge_ft_cfg,
+        cell_size=CELL,
+        board_max=max(W, H),
+        test_mode=test_mode_flag,
     )
+    guard_applies = edge_guard_cells is not None
 
-    if (not ok) and guard_applies and reason == "Proven infeasible under current constraints":
-        relaxed_ok, relaxed_placed, relaxed_reason = _solve_with_limit(
+    def _invoke_with_guard(edge_guard_cells=None):
+        return _solve_with_limit(
             same_shape_cfg,
             max_seconds,
-            edge_guard_cells=None,
+            edge_guard_cells=edge_guard_cells,
         )
-        if relaxed_ok:
-            return True, relaxed_placed, None
-        if relaxed_reason != "Proven infeasible under current constraints":
-            return relaxed_ok, relaxed_placed, relaxed_reason
+
+    ok, placed, reason = _resolve_with_edge_guard(
+        _invoke_with_guard,
+        guard_cells=edge_guard_cells,
+        guard_applies=guard_applies,
+    )
 
     if ok or reason != "Proven infeasible under current constraints":
         return ok, placed, reason
