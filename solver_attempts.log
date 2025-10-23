@@ -1,511 +1,1074 @@
-2025-10-23 06:02:10 [INFO] Run timer started
-2025-10-23 06:02:13 [INFO] Progress reset
-2025-10-23 06:02:13 [INFO] Run timer started
+2025-10-23 13:00:53 [INFO] Run timer started
+2025-10-23 13:01:00 [INFO] Progress reset
+2025-10-23 13:01:00 [INFO] Run timer started
 
-2025-10-23 06:02:13 [INFO] Phase started | phase=1
-2025-10-23 06:02:13 [INFO] Phase finished | phase=1 duration=0.01s
+2025-10-23 13:01:00 [INFO] Phase started | phase=1
+2025-10-23 13:01:00 [INFO] Phase finished | phase=1 duration=0.01s
 
-2025-10-23 06:02:13 [INFO] Phase started | phase=S0
-2025-10-23 06:02:13 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
-2025-10-23 06:02:13 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
-2025-10-23 06:02:13 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.00s reason=phase_change
-2025-10-23 06:02:13 [INFO] Phase finished | phase=S0 duration=0.00s
+2025-10-23 13:01:00 [INFO] Phase started | phase=S0
+2025-10-23 13:01:00 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
+2025-10-23 13:01:00 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
+2025-10-23 13:01:00 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.00s reason=phase_change
+2025-10-23 13:01:00 [INFO] Phase finished | phase=S0 duration=0.01s
 
-2025-10-23 06:02:13 [INFO] Phase started | phase=C
-2025-10-23 06:02:13 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=300.00s slice=1/1
-2025-10-23 06:02:13 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:07:13 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=300.00s budget=300.00s slice=1/1 reason=phase_change
-2025-10-23 06:07:13 [INFO] Phase finished | phase=C duration=300.01s
+2025-10-23 13:01:00 [INFO] Phase started | phase=C
+2025-10-23 13:01:00 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=300.00s slice=1/1
+2025-10-23 13:01:00 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:06:00 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=300.01s budget=300.00s slice=1/1 reason=phase_change
+2025-10-23 13:06:00 [INFO] Phase finished | phase=C duration=300.01s
 
-2025-10-23 06:07:13 [INFO] Phase started | phase=D
-2025-10-23 06:07:13 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=10.0 × 10.0 ft budget=120.00s slice=1/15
-2025-10-23 06:07:13 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:09:13 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=120.01s budget=120.00s slice=1/15 reason=switch
-2025-10-23 06:09:13 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/15
-2025-10-23 06:09:13 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:09:18 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=2/15 reason=switch
-2025-10-23 06:09:18 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=3/15
-2025-10-23 06:09:18 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:09:23 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=3/15 reason=switch
-2025-10-23 06:09:23 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=4/15
-2025-10-23 06:09:23 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:09:28 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=4/15 reason=switch
-2025-10-23 06:09:28 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=5/15
-2025-10-23 06:09:28 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:09:33 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=5/15 reason=switch
-2025-10-23 06:09:33 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=6/15
-2025-10-23 06:09:33 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:09:38 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=6/15 reason=switch
-2025-10-23 06:09:38 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=7/15
-2025-10-23 06:09:38 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:09:43 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.00s budget=5.00s slice=7/15 reason=switch
-2025-10-23 06:09:43 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=8/15
-2025-10-23 06:09:43 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:09:48 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.00s budget=5.00s slice=8/15 reason=switch
-2025-10-23 06:09:48 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=9/15
-2025-10-23 06:09:48 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:09:53 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=9/15 reason=switch
-2025-10-23 06:09:53 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=10/15
-2025-10-23 06:09:53 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:09:58 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=10/15 reason=switch
-2025-10-23 06:09:58 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=11/15
-2025-10-23 06:09:58 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:10:03 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=11/15 reason=switch
-2025-10-23 06:10:03 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=12/15
-2025-10-23 06:10:03 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:10:08 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.00s budget=5.00s slice=12/15 reason=switch
-2025-10-23 06:10:08 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=13/15
-2025-10-23 06:10:08 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:10:13 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=13/15 reason=switch
-2025-10-23 06:10:13 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=14/15
-2025-10-23 06:10:13 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:10:18 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=14/15 reason=switch
-2025-10-23 06:10:18 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=15/15
-2025-10-23 06:10:18 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:10:23 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=15/15 reason=switch
-2025-10-23 06:10:23 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=16/30
-2025-10-23 06:10:23 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:10:28 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=16/30 reason=switch
-2025-10-23 06:10:28 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=17/30
-2025-10-23 06:10:28 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:10:33 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=17/30 reason=switch
-2025-10-23 06:10:33 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=18/30
-2025-10-23 06:10:33 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:10:38 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=18/30 reason=switch
-2025-10-23 06:10:38 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=19/30
-2025-10-23 06:10:38 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:10:43 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=19/30 reason=switch
-2025-10-23 06:10:43 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=20/30
-2025-10-23 06:10:43 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:10:48 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=20/30 reason=switch
-2025-10-23 06:10:48 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=21/30
-2025-10-23 06:10:48 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:10:53 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=21/30 reason=switch
-2025-10-23 06:10:53 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=22/30
-2025-10-23 06:10:53 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:10:58 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=22/30 reason=switch
-2025-10-23 06:10:58 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=23/30
-2025-10-23 06:10:58 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:11:03 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=23/30 reason=switch
-2025-10-23 06:11:03 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=24/30
-2025-10-23 06:11:03 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:11:08 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=24/30 reason=switch
-2025-10-23 06:11:08 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=25/30
-2025-10-23 06:11:08 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:11:13 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=25/30 reason=switch
-2025-10-23 06:11:13 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=26/30
-2025-10-23 06:11:13 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:11:18 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=26/30 reason=switch
-2025-10-23 06:11:18 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=27/30
-2025-10-23 06:11:18 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:11:23 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=27/30 reason=switch
-2025-10-23 06:11:23 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=28/30
-2025-10-23 06:11:23 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:11:28 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=28/30 reason=switch
-2025-10-23 06:11:28 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=29/30
-2025-10-23 06:11:28 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:11:33 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=29/30 reason=switch
-2025-10-23 06:11:33 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=30/30
-2025-10-23 06:11:33 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:11:38 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=30/30 reason=switch
-2025-10-23 06:11:38 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=31/45
-2025-10-23 06:11:38 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:11:43 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.00s budget=5.00s slice=31/45 reason=switch
-2025-10-23 06:11:43 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=32/45
-2025-10-23 06:11:43 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:11:48 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=32/45 reason=switch
-2025-10-23 06:11:48 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=33/45
-2025-10-23 06:11:48 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:11:53 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=33/45 reason=switch
-2025-10-23 06:11:53 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=34/45
-2025-10-23 06:11:53 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:11:58 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=34/45 reason=switch
-2025-10-23 06:11:58 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=35/45
-2025-10-23 06:11:58 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:12:03 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=35/45 reason=switch
-2025-10-23 06:12:03 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=36/45
-2025-10-23 06:12:03 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:12:08 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=36/45 reason=switch
-2025-10-23 06:12:08 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=37/45
-2025-10-23 06:12:08 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:12:13 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=37/45 reason=switch
-2025-10-23 06:12:13 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=38/45
-2025-10-23 06:12:13 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:12:18 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=38/45 reason=switch
-2025-10-23 06:12:18 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=39/45
-2025-10-23 06:12:18 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:12:23 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=39/45 reason=switch
-2025-10-23 06:12:23 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=40/45
-2025-10-23 06:12:23 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:12:28 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=40/45 reason=switch
-2025-10-23 06:12:28 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=41/45
-2025-10-23 06:12:28 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:12:33 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=41/45 reason=switch
-2025-10-23 06:12:33 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=42/45
-2025-10-23 06:12:33 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:12:38 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=42/45 reason=switch
-2025-10-23 06:12:38 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=43/45
-2025-10-23 06:12:38 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:12:43 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=43/45 reason=switch
-2025-10-23 06:12:43 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=44/45
-2025-10-23 06:12:43 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:12:48 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=44/45 reason=switch
-2025-10-23 06:12:48 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=45/45
-2025-10-23 06:12:48 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:12:53 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=45/45 reason=switch
-2025-10-23 06:12:53 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=46/60
-2025-10-23 06:12:53 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:12:58 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=46/60 reason=switch
-2025-10-23 06:12:58 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=47/60
-2025-10-23 06:12:58 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:13:03 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=47/60 reason=switch
-2025-10-23 06:13:03 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=48/60
-2025-10-23 06:13:03 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:13:08 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=48/60 reason=switch
-2025-10-23 06:13:08 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=49/60
-2025-10-23 06:13:08 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:13:13 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.00s budget=5.00s slice=49/60 reason=switch
-2025-10-23 06:13:13 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=50/60
-2025-10-23 06:13:13 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:13:18 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=50/60 reason=switch
-2025-10-23 06:13:18 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=51/60
-2025-10-23 06:13:18 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:13:23 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=51/60 reason=switch
-2025-10-23 06:13:23 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=52/60
-2025-10-23 06:13:23 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:13:28 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=52/60 reason=switch
-2025-10-23 06:13:28 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=53/60
-2025-10-23 06:13:28 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:13:33 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=53/60 reason=switch
-2025-10-23 06:13:33 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=54/60
-2025-10-23 06:13:33 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:13:38 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=54/60 reason=switch
-2025-10-23 06:13:38 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=55/60
-2025-10-23 06:13:38 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:13:43 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=55/60 reason=switch
-2025-10-23 06:13:43 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=56/60
-2025-10-23 06:13:43 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:13:48 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=56/60 reason=switch
-2025-10-23 06:13:48 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=57/60
-2025-10-23 06:13:48 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:13:53 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=57/60 reason=switch
-2025-10-23 06:13:53 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=58/60
-2025-10-23 06:13:53 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:13:58 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=58/60 reason=switch
-2025-10-23 06:13:58 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=59/60
-2025-10-23 06:13:58 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:14:03 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=59/60 reason=switch
-2025-10-23 06:14:03 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=60/60
-2025-10-23 06:14:03 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:14:08 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=60/60 reason=switch
-2025-10-23 06:14:08 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=61/75
-2025-10-23 06:14:08 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:14:13 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.00s budget=5.00s slice=61/75 reason=switch
-2025-10-23 06:14:13 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=62/75
-2025-10-23 06:14:13 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:14:18 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=62/75 reason=switch
-2025-10-23 06:14:18 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=63/75
-2025-10-23 06:14:18 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:14:23 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=63/75 reason=switch
-2025-10-23 06:14:23 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=64/75
-2025-10-23 06:14:23 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:14:28 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=64/75 reason=switch
-2025-10-23 06:14:28 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=65/75
-2025-10-23 06:14:28 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:14:33 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=65/75 reason=switch
-2025-10-23 06:14:33 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=66/75
-2025-10-23 06:14:33 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:14:38 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=66/75 reason=switch
-2025-10-23 06:14:38 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=67/75
-2025-10-23 06:14:38 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:14:43 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=67/75 reason=switch
-2025-10-23 06:14:43 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=68/75
-2025-10-23 06:14:43 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:14:48 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.00s budget=5.00s slice=68/75 reason=switch
-2025-10-23 06:14:48 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=69/75
-2025-10-23 06:14:48 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:14:53 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.02s budget=5.00s slice=69/75 reason=switch
-2025-10-23 06:14:53 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=70/75
-2025-10-23 06:14:53 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:14:58 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.03s budget=5.00s slice=70/75 reason=switch
-2025-10-23 06:14:58 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=71/75
-2025-10-23 06:14:58 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:15:03 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=71/75 reason=switch
-2025-10-23 06:15:03 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=72/75
-2025-10-23 06:15:03 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:15:08 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=72/75 reason=switch
-2025-10-23 06:15:08 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=73/75
-2025-10-23 06:15:08 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:15:13 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=73/75 reason=switch
-2025-10-23 06:15:13 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=74/75
-2025-10-23 06:15:13 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:15:18 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=74/75 reason=switch
-2025-10-23 06:15:18 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=75/75
-2025-10-23 06:15:18 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:15:23 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=75/75 reason=switch
-2025-10-23 06:15:23 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=76/90
-2025-10-23 06:15:23 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:15:28 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.00s budget=5.00s slice=76/90 reason=switch
-2025-10-23 06:15:28 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=77/90
-2025-10-23 06:15:28 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:15:33 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.00s budget=5.00s slice=77/90 reason=switch
-2025-10-23 06:15:33 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=78/90
-2025-10-23 06:15:33 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:15:38 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=78/90 reason=switch
-2025-10-23 06:15:38 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=79/90
-2025-10-23 06:15:38 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:15:43 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=79/90 reason=switch
-2025-10-23 06:15:43 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=80/90
-2025-10-23 06:15:43 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:15:48 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=80/90 reason=switch
-2025-10-23 06:15:48 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=81/90
-2025-10-23 06:15:48 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:15:53 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=81/90 reason=switch
-2025-10-23 06:15:53 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=82/90
-2025-10-23 06:15:53 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:15:58 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=82/90 reason=switch
-2025-10-23 06:15:58 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=83/90
-2025-10-23 06:15:58 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:16:03 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=83/90 reason=switch
-2025-10-23 06:16:03 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=84/90
-2025-10-23 06:16:03 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:16:08 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=84/90 reason=switch
-2025-10-23 06:16:08 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=85/90
-2025-10-23 06:16:08 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:16:13 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=85/90 reason=switch
-2025-10-23 06:16:13 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=86/90
-2025-10-23 06:16:13 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:16:18 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=86/90 reason=switch
-2025-10-23 06:16:18 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=87/90
-2025-10-23 06:16:18 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:16:23 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=87/90 reason=switch
-2025-10-23 06:16:23 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=88/90
-2025-10-23 06:16:23 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:16:28 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=88/90 reason=switch
-2025-10-23 06:16:28 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=89/90
-2025-10-23 06:16:28 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:16:33 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=89/90 reason=switch
-2025-10-23 06:16:33 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=90/90
-2025-10-23 06:16:33 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:16:38 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=90/90 reason=switch
-2025-10-23 06:16:38 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=91/105
-2025-10-23 06:16:38 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:16:43 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=91/105 reason=switch
-2025-10-23 06:16:43 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=92/105
-2025-10-23 06:16:43 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:16:48 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=92/105 reason=switch
-2025-10-23 06:16:48 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=93/105
-2025-10-23 06:16:48 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:16:53 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=93/105 reason=switch
-2025-10-23 06:16:53 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=94/105
-2025-10-23 06:16:53 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:16:58 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=94/105 reason=switch
-2025-10-23 06:16:58 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=95/105
-2025-10-23 06:16:58 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:17:03 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=95/105 reason=switch
-2025-10-23 06:17:03 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=96/105
-2025-10-23 06:17:03 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:17:08 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=96/105 reason=switch
-2025-10-23 06:17:08 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=97/105
-2025-10-23 06:17:08 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:17:13 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=97/105 reason=switch
-2025-10-23 06:17:13 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=98/105
-2025-10-23 06:17:13 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:17:19 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=98/105 reason=switch
-2025-10-23 06:17:19 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=99/105
-2025-10-23 06:17:19 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:17:24 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=99/105 reason=switch
-2025-10-23 06:17:24 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=100/105
-2025-10-23 06:17:24 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:17:29 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=100/105 reason=switch
-2025-10-23 06:17:29 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=101/105
-2025-10-23 06:17:29 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:17:34 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=101/105 reason=switch
-2025-10-23 06:17:34 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=102/105
-2025-10-23 06:17:34 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:17:39 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=102/105 reason=switch
-2025-10-23 06:17:39 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=103/105
-2025-10-23 06:17:39 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:17:44 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=103/105 reason=switch
-2025-10-23 06:17:44 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=104/105
-2025-10-23 06:17:44 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:17:49 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=104/105 reason=switch
-2025-10-23 06:17:49 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=105/105
-2025-10-23 06:17:49 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:17:54 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=105/105 reason=switch
-2025-10-23 06:17:54 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=106/120
-2025-10-23 06:17:54 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:17:59 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=106/120 reason=switch
-2025-10-23 06:17:59 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=107/120
-2025-10-23 06:17:59 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:18:04 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=107/120 reason=switch
-2025-10-23 06:18:04 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=108/120
-2025-10-23 06:18:04 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:18:09 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=108/120 reason=switch
-2025-10-23 06:18:09 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=109/120
-2025-10-23 06:18:09 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:18:14 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=109/120 reason=switch
-2025-10-23 06:18:14 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=110/120
-2025-10-23 06:18:14 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:18:19 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=110/120 reason=switch
-2025-10-23 06:18:19 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=111/120
-2025-10-23 06:18:19 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:18:24 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=111/120 reason=switch
-2025-10-23 06:18:24 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=112/120
-2025-10-23 06:18:24 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:18:29 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=112/120 reason=switch
-2025-10-23 06:18:29 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=113/120
-2025-10-23 06:18:29 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:18:34 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=113/120 reason=switch
-2025-10-23 06:18:34 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=114/120
-2025-10-23 06:18:34 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:18:39 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=114/120 reason=switch
-2025-10-23 06:18:39 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=115/120
-2025-10-23 06:18:39 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:18:44 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=115/120 reason=switch
-2025-10-23 06:18:44 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=116/120
-2025-10-23 06:18:44 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:18:49 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=116/120 reason=switch
-2025-10-23 06:18:49 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=117/120
-2025-10-23 06:18:49 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:18:54 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=117/120 reason=switch
-2025-10-23 06:18:54 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=118/120
-2025-10-23 06:18:54 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:18:59 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=118/120 reason=switch
-2025-10-23 06:18:59 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=119/120
-2025-10-23 06:18:59 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:19:04 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=119/120 reason=switch
-2025-10-23 06:19:04 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=120/120
-2025-10-23 06:19:04 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:19:09 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=120/120 reason=switch
-2025-10-23 06:19:09 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=121/135
-2025-10-23 06:19:09 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:19:14 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=121/135 reason=switch
-2025-10-23 06:19:14 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=122/135
-2025-10-23 06:19:14 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:19:19 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=122/135 reason=switch
-2025-10-23 06:19:19 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=123/135
-2025-10-23 06:19:19 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:19:24 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=123/135 reason=switch
-2025-10-23 06:19:24 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=124/135
-2025-10-23 06:19:24 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:19:29 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=124/135 reason=switch
-2025-10-23 06:19:29 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=125/135
-2025-10-23 06:19:29 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:19:34 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=125/135 reason=switch
-2025-10-23 06:19:34 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=126/135
-2025-10-23 06:19:34 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:19:39 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.03s budget=5.00s slice=126/135 reason=switch
-2025-10-23 06:19:39 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=127/135
-2025-10-23 06:19:39 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:19:44 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.03s budget=5.00s slice=127/135 reason=switch
-2025-10-23 06:19:44 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=128/135
-2025-10-23 06:19:44 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:19:49 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=128/135 reason=switch
-2025-10-23 06:19:49 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=129/135
-2025-10-23 06:19:49 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:19:54 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=129/135 reason=switch
-2025-10-23 06:19:54 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=130/135
-2025-10-23 06:19:54 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:19:59 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=130/135 reason=switch
-2025-10-23 06:19:59 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=131/135
-2025-10-23 06:19:59 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:20:04 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=131/135 reason=switch
-2025-10-23 06:20:04 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=132/135
-2025-10-23 06:20:04 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:20:09 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=132/135 reason=switch
-2025-10-23 06:20:09 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=133/135
-2025-10-23 06:20:09 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:20:14 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=133/135 reason=switch
-2025-10-23 06:20:14 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=134/135
-2025-10-23 06:20:14 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:20:19 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=134/135 reason=switch
-2025-10-23 06:20:19 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=135/135
-2025-10-23 06:20:19 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
-2025-10-23 06:20:24 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=135/135 reason=switch
-2025-10-23 06:20:24 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=136/150
-2025-10-23 06:20:24 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:20:29 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=136/150 reason=switch
-2025-10-23 06:20:29 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=137/150
-2025-10-23 06:20:29 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
-2025-10-23 06:20:34 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=137/150 reason=switch
-2025-10-23 06:20:34 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=138/150
-2025-10-23 06:20:34 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
-2025-10-23 06:20:39 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=138/150 reason=switch
-2025-10-23 06:20:39 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=139/150
-2025-10-23 06:20:39 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-23 06:20:44 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=139/150 reason=switch
-2025-10-23 06:20:44 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=140/150
-2025-10-23 06:20:44 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-23 06:20:49 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=140/150 reason=switch
-2025-10-23 06:20:49 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=141/150
-2025-10-23 06:20:49 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
-2025-10-23 06:20:54 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=141/150 reason=switch
-2025-10-23 06:20:54 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=142/150
-2025-10-23 06:20:54 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
-2025-10-23 06:20:59 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=142/150 reason=switch
-2025-10-23 06:20:59 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=143/150
-2025-10-23 06:20:59 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-23 06:21:04 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=143/150 reason=switch
-2025-10-23 06:21:04 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=144/150
-2025-10-23 06:21:04 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
-2025-10-23 06:21:09 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=144/150 reason=switch
-2025-10-23 06:21:09 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=145/150
-2025-10-23 06:21:09 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
-2025-10-23 06:21:14 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=145/150 reason=switch
-2025-10-23 06:21:14 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=146/150
-2025-10-23 06:21:14 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-23 06:21:19 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=146/150 reason=switch
-2025-10-23 06:21:19 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=147/150
-2025-10-23 06:21:19 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
-2025-10-23 06:21:24 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=147/150 reason=switch
-2025-10-23 06:21:24 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=148/150
-2025-10-23 06:21:24 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
-2025-10-23 06:21:29 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.02s budget=5.00s slice=148/150 reason=switch
-2025-10-23 06:21:29 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=149/150
-2025-10-23 06:21:29 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
-2025-10-23 06:44:47 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=1398.03s budget=5.00s slice=149/150 reason=phase_change
-2025-10-23 06:44:47 [INFO] Phase finished | phase=D duration=2254.18s
+2025-10-23 13:06:00 [INFO] Phase started | phase=D
+2025-10-23 13:06:00 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=10.0 × 10.0 ft budget=120.00s slice=1/15
+2025-10-23 13:06:00 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:08:00 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=120.01s budget=120.00s slice=1/15 reason=switch
+2025-10-23 13:08:00 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/15
+2025-10-23 13:08:00 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:08:05 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.00s budget=5.00s slice=2/15 reason=switch
+2025-10-23 13:08:05 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=3/15
+2025-10-23 13:08:05 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:08:10 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=3/15 reason=switch
+2025-10-23 13:08:10 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=4/15
+2025-10-23 13:08:10 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:08:15 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=4/15 reason=switch
+2025-10-23 13:08:15 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=5/15
+2025-10-23 13:08:15 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:08:20 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=5/15 reason=switch
+2025-10-23 13:08:20 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=6/15
+2025-10-23 13:08:20 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:08:26 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=6/15 reason=switch
+2025-10-23 13:08:26 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=7/15
+2025-10-23 13:08:26 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:08:31 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=7/15 reason=switch
+2025-10-23 13:08:31 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=8/15
+2025-10-23 13:08:31 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:08:36 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.00s budget=5.00s slice=8/15 reason=switch
+2025-10-23 13:08:36 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=9/15
+2025-10-23 13:08:36 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:08:41 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=9/15 reason=switch
+2025-10-23 13:08:41 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=10/15
+2025-10-23 13:08:41 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:08:46 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=10/15 reason=switch
+2025-10-23 13:08:46 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=11/15
+2025-10-23 13:08:46 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:08:51 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.00s budget=5.00s slice=11/15 reason=switch
+2025-10-23 13:08:51 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=12/15
+2025-10-23 13:08:51 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:08:56 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.00s budget=5.00s slice=12/15 reason=switch
+2025-10-23 13:08:56 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=13/15
+2025-10-23 13:08:56 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:09:01 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=13/15 reason=switch
+2025-10-23 13:09:01 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=14/15
+2025-10-23 13:09:01 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:09:06 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=14/15 reason=switch
+2025-10-23 13:09:06 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=15/15
+2025-10-23 13:09:06 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:09:11 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=15/15 reason=switch
+2025-10-23 13:09:11 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=16/30
+2025-10-23 13:09:11 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:09:16 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=16/30 reason=switch
+2025-10-23 13:09:16 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=17/30
+2025-10-23 13:09:16 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:09:21 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.00s budget=5.00s slice=17/30 reason=switch
+2025-10-23 13:09:21 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=18/30
+2025-10-23 13:09:21 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:09:26 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.00s budget=5.00s slice=18/30 reason=switch
+2025-10-23 13:09:26 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=19/30
+2025-10-23 13:09:26 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:09:31 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=19/30 reason=switch
+2025-10-23 13:09:31 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=20/30
+2025-10-23 13:09:31 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:09:36 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.00s budget=5.00s slice=20/30 reason=switch
+2025-10-23 13:09:36 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=21/30
+2025-10-23 13:09:36 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:09:41 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=21/30 reason=switch
+2025-10-23 13:09:41 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=22/30
+2025-10-23 13:09:41 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:09:46 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=22/30 reason=switch
+2025-10-23 13:09:46 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=23/30
+2025-10-23 13:09:46 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:09:51 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.00s budget=5.00s slice=23/30 reason=switch
+2025-10-23 13:09:51 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=24/30
+2025-10-23 13:09:51 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:09:56 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=24/30 reason=switch
+2025-10-23 13:09:56 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=25/30
+2025-10-23 13:09:56 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:10:01 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=25/30 reason=switch
+2025-10-23 13:10:01 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=26/30
+2025-10-23 13:10:01 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:10:06 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.00s budget=5.00s slice=26/30 reason=switch
+2025-10-23 13:10:06 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=27/30
+2025-10-23 13:10:06 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:10:11 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.00s budget=5.00s slice=27/30 reason=switch
+2025-10-23 13:10:11 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=28/30
+2025-10-23 13:10:11 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:10:16 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=28/30 reason=switch
+2025-10-23 13:10:16 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=29/30
+2025-10-23 13:10:16 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:10:21 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=29/30 reason=switch
+2025-10-23 13:10:21 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=30/30
+2025-10-23 13:10:21 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:10:26 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=30/30 reason=switch
+2025-10-23 13:10:26 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=31/45
+2025-10-23 13:10:26 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:10:31 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=31/45 reason=switch
+2025-10-23 13:10:31 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=32/45
+2025-10-23 13:10:31 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:10:36 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=32/45 reason=switch
+2025-10-23 13:10:36 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=33/45
+2025-10-23 13:10:36 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:10:41 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=33/45 reason=switch
+2025-10-23 13:10:41 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=34/45
+2025-10-23 13:10:41 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:10:46 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.00s budget=5.00s slice=34/45 reason=switch
+2025-10-23 13:10:46 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=35/45
+2025-10-23 13:10:46 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:10:51 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.00s budget=5.00s slice=35/45 reason=switch
+2025-10-23 13:10:51 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=36/45
+2025-10-23 13:10:51 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:10:56 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=36/45 reason=switch
+2025-10-23 13:10:56 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=37/45
+2025-10-23 13:10:56 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:11:01 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=37/45 reason=switch
+2025-10-23 13:11:01 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=38/45
+2025-10-23 13:11:01 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:11:06 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.00s budget=5.00s slice=38/45 reason=switch
+2025-10-23 13:11:06 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=39/45
+2025-10-23 13:11:06 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:11:11 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=39/45 reason=switch
+2025-10-23 13:11:11 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=40/45
+2025-10-23 13:11:11 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:11:16 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=40/45 reason=switch
+2025-10-23 13:11:16 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=41/45
+2025-10-23 13:11:16 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:11:21 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=41/45 reason=switch
+2025-10-23 13:11:21 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=42/45
+2025-10-23 13:11:21 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:11:26 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=42/45 reason=switch
+2025-10-23 13:11:26 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=43/45
+2025-10-23 13:11:26 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:11:31 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=43/45 reason=switch
+2025-10-23 13:11:31 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=44/45
+2025-10-23 13:11:31 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:11:36 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=44/45 reason=switch
+2025-10-23 13:11:36 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=45/45
+2025-10-23 13:11:36 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:11:41 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=45/45 reason=switch
+2025-10-23 13:11:41 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=46/60
+2025-10-23 13:11:41 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:11:46 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.00s budget=5.00s slice=46/60 reason=switch
+2025-10-23 13:11:46 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=47/60
+2025-10-23 13:11:46 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:11:51 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.00s budget=5.00s slice=47/60 reason=switch
+2025-10-23 13:11:51 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=48/60
+2025-10-23 13:11:51 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:11:56 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.00s budget=5.00s slice=48/60 reason=switch
+2025-10-23 13:11:56 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=49/60
+2025-10-23 13:11:56 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:12:01 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=49/60 reason=switch
+2025-10-23 13:12:01 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=50/60
+2025-10-23 13:12:01 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:12:06 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.00s budget=5.00s slice=50/60 reason=switch
+2025-10-23 13:12:06 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=51/60
+2025-10-23 13:12:06 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:12:11 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=51/60 reason=switch
+2025-10-23 13:12:11 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=52/60
+2025-10-23 13:12:11 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:12:16 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=52/60 reason=switch
+2025-10-23 13:12:16 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=53/60
+2025-10-23 13:12:16 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:12:21 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=53/60 reason=switch
+2025-10-23 13:12:21 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=54/60
+2025-10-23 13:12:21 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:12:26 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=54/60 reason=switch
+2025-10-23 13:12:26 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=55/60
+2025-10-23 13:12:26 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:12:31 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=55/60 reason=switch
+2025-10-23 13:12:31 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=56/60
+2025-10-23 13:12:31 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:12:36 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.00s budget=5.00s slice=56/60 reason=switch
+2025-10-23 13:12:36 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=57/60
+2025-10-23 13:12:36 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:12:41 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.00s budget=5.00s slice=57/60 reason=switch
+2025-10-23 13:12:41 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=58/60
+2025-10-23 13:12:41 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:12:46 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=58/60 reason=switch
+2025-10-23 13:12:46 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=59/60
+2025-10-23 13:12:46 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:12:51 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=59/60 reason=switch
+2025-10-23 13:12:51 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=60/60
+2025-10-23 13:12:51 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:12:56 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=60/60 reason=switch
+2025-10-23 13:12:56 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=61/75
+2025-10-23 13:12:56 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:13:01 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=61/75 reason=switch
+2025-10-23 13:13:01 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=62/75
+2025-10-23 13:13:01 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:13:06 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=62/75 reason=switch
+2025-10-23 13:13:06 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=63/75
+2025-10-23 13:13:06 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:13:11 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.00s budget=5.00s slice=63/75 reason=switch
+2025-10-23 13:13:11 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=64/75
+2025-10-23 13:13:11 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:13:16 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=64/75 reason=switch
+2025-10-23 13:13:16 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=65/75
+2025-10-23 13:13:16 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:13:21 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=65/75 reason=switch
+2025-10-23 13:13:21 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=66/75
+2025-10-23 13:13:21 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:13:26 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=66/75 reason=switch
+2025-10-23 13:13:26 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=67/75
+2025-10-23 13:13:26 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:13:31 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=67/75 reason=switch
+2025-10-23 13:13:31 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=68/75
+2025-10-23 13:13:31 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:13:36 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=68/75 reason=switch
+2025-10-23 13:13:36 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=69/75
+2025-10-23 13:13:36 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:13:41 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=69/75 reason=switch
+2025-10-23 13:13:41 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=70/75
+2025-10-23 13:13:41 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:13:46 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=70/75 reason=switch
+2025-10-23 13:13:46 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=71/75
+2025-10-23 13:13:46 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:13:51 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=71/75 reason=switch
+2025-10-23 13:13:51 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=72/75
+2025-10-23 13:13:51 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:13:56 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.00s budget=5.00s slice=72/75 reason=switch
+2025-10-23 13:13:56 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=73/75
+2025-10-23 13:13:56 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:14:01 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=73/75 reason=switch
+2025-10-23 13:14:01 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=74/75
+2025-10-23 13:14:01 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:14:06 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=74/75 reason=switch
+2025-10-23 13:14:06 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=75/75
+2025-10-23 13:14:06 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:14:11 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=75/75 reason=switch
+2025-10-23 13:14:11 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=76/90
+2025-10-23 13:14:11 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:14:16 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=76/90 reason=switch
+2025-10-23 13:14:16 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=77/90
+2025-10-23 13:14:16 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:14:21 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.00s budget=5.00s slice=77/90 reason=switch
+2025-10-23 13:14:21 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=78/90
+2025-10-23 13:14:21 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:14:26 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=78/90 reason=switch
+2025-10-23 13:14:26 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=79/90
+2025-10-23 13:14:26 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:14:31 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.00s budget=5.00s slice=79/90 reason=switch
+2025-10-23 13:14:31 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=80/90
+2025-10-23 13:14:31 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:14:36 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.00s budget=5.00s slice=80/90 reason=switch
+2025-10-23 13:14:36 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=81/90
+2025-10-23 13:14:36 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:14:41 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=81/90 reason=switch
+2025-10-23 13:14:41 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=82/90
+2025-10-23 13:14:41 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:14:46 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=82/90 reason=switch
+2025-10-23 13:14:46 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=83/90
+2025-10-23 13:14:46 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:14:51 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=83/90 reason=switch
+2025-10-23 13:14:51 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=84/90
+2025-10-23 13:14:51 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:14:56 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=84/90 reason=switch
+2025-10-23 13:14:56 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=85/90
+2025-10-23 13:14:56 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:15:01 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=85/90 reason=switch
+2025-10-23 13:15:01 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=86/90
+2025-10-23 13:15:01 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:15:06 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.04s budget=5.00s slice=86/90 reason=switch
+2025-10-23 13:15:06 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=87/90
+2025-10-23 13:15:06 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:15:11 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=87/90 reason=switch
+2025-10-23 13:15:11 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=88/90
+2025-10-23 13:15:11 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:15:16 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=88/90 reason=switch
+2025-10-23 13:15:16 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=89/90
+2025-10-23 13:15:16 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:15:21 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=89/90 reason=switch
+2025-10-23 13:15:21 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=90/90
+2025-10-23 13:15:21 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:15:26 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=90/90 reason=switch
+2025-10-23 13:15:26 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=91/105
+2025-10-23 13:15:26 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:15:31 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=91/105 reason=switch
+2025-10-23 13:15:31 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=92/105
+2025-10-23 13:15:31 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:15:36 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=92/105 reason=switch
+2025-10-23 13:15:36 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=93/105
+2025-10-23 13:15:36 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:15:41 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=93/105 reason=switch
+2025-10-23 13:15:41 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=94/105
+2025-10-23 13:15:41 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:15:46 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.00s budget=5.00s slice=94/105 reason=switch
+2025-10-23 13:15:46 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=95/105
+2025-10-23 13:15:46 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:15:51 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=95/105 reason=switch
+2025-10-23 13:15:51 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=96/105
+2025-10-23 13:15:51 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:15:56 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=96/105 reason=switch
+2025-10-23 13:15:56 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=97/105
+2025-10-23 13:15:56 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:16:01 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=97/105 reason=switch
+2025-10-23 13:16:01 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=98/105
+2025-10-23 13:16:01 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:16:06 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.02s budget=5.00s slice=98/105 reason=switch
+2025-10-23 13:16:06 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=99/105
+2025-10-23 13:16:06 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:16:11 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.02s budget=5.00s slice=99/105 reason=switch
+2025-10-23 13:16:11 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=100/105
+2025-10-23 13:16:11 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:16:16 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=100/105 reason=switch
+2025-10-23 13:16:16 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=101/105
+2025-10-23 13:16:16 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:16:21 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=101/105 reason=switch
+2025-10-23 13:16:21 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=102/105
+2025-10-23 13:16:21 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:16:26 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=102/105 reason=switch
+2025-10-23 13:16:26 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=103/105
+2025-10-23 13:16:26 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:16:31 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=103/105 reason=switch
+2025-10-23 13:16:31 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=104/105
+2025-10-23 13:16:31 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:16:36 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.04s budget=5.00s slice=104/105 reason=switch
+2025-10-23 13:16:36 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=105/105
+2025-10-23 13:16:36 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:16:41 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=105/105 reason=switch
+2025-10-23 13:16:41 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=106/120
+2025-10-23 13:16:41 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:16:46 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=106/120 reason=switch
+2025-10-23 13:16:46 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=107/120
+2025-10-23 13:16:46 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:16:51 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=107/120 reason=switch
+2025-10-23 13:16:51 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=108/120
+2025-10-23 13:16:51 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:16:56 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=108/120 reason=switch
+2025-10-23 13:16:56 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=109/120
+2025-10-23 13:16:56 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:17:01 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=109/120 reason=switch
+2025-10-23 13:17:01 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=110/120
+2025-10-23 13:17:01 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:17:06 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=110/120 reason=switch
+2025-10-23 13:17:06 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=111/120
+2025-10-23 13:17:06 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:17:11 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=111/120 reason=switch
+2025-10-23 13:17:11 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=112/120
+2025-10-23 13:17:11 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:17:16 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=112/120 reason=switch
+2025-10-23 13:17:16 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=113/120
+2025-10-23 13:17:16 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:17:21 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=113/120 reason=switch
+2025-10-23 13:17:21 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=114/120
+2025-10-23 13:17:21 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:17:26 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=114/120 reason=switch
+2025-10-23 13:17:26 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=115/120
+2025-10-23 13:17:26 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:17:31 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=115/120 reason=switch
+2025-10-23 13:17:31 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=116/120
+2025-10-23 13:17:31 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:17:36 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.11s budget=5.00s slice=116/120 reason=switch
+2025-10-23 13:17:36 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=117/120
+2025-10-23 13:17:36 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:17:41 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=117/120 reason=switch
+2025-10-23 13:17:41 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=118/120
+2025-10-23 13:17:41 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:17:46 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=118/120 reason=switch
+2025-10-23 13:17:46 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=119/120
+2025-10-23 13:17:46 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:17:51 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=119/120 reason=switch
+2025-10-23 13:17:51 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=120/120
+2025-10-23 13:17:51 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:17:56 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=120/120 reason=switch
+2025-10-23 13:17:56 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=121/135
+2025-10-23 13:17:56 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:18:01 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=121/135 reason=switch
+2025-10-23 13:18:01 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=122/135
+2025-10-23 13:18:01 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:18:07 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=122/135 reason=switch
+2025-10-23 13:18:07 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=123/135
+2025-10-23 13:18:07 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:18:12 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=123/135 reason=switch
+2025-10-23 13:18:12 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=124/135
+2025-10-23 13:18:12 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:18:17 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=124/135 reason=switch
+2025-10-23 13:18:17 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=125/135
+2025-10-23 13:18:17 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:18:22 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=125/135 reason=switch
+2025-10-23 13:18:22 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=126/135
+2025-10-23 13:18:22 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:18:27 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=126/135 reason=switch
+2025-10-23 13:18:27 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=127/135
+2025-10-23 13:18:27 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:18:32 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=127/135 reason=switch
+2025-10-23 13:18:32 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=128/135
+2025-10-23 13:18:32 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:18:37 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=128/135 reason=switch
+2025-10-23 13:18:37 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=129/135
+2025-10-23 13:18:37 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:18:42 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=129/135 reason=switch
+2025-10-23 13:18:42 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=130/135
+2025-10-23 13:18:42 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:18:47 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=130/135 reason=switch
+2025-10-23 13:18:47 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=131/135
+2025-10-23 13:18:47 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:18:52 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=131/135 reason=switch
+2025-10-23 13:18:52 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=132/135
+2025-10-23 13:18:52 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:18:57 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=132/135 reason=switch
+2025-10-23 13:18:57 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=133/135
+2025-10-23 13:18:57 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:19:02 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=133/135 reason=switch
+2025-10-23 13:19:02 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=134/135
+2025-10-23 13:19:02 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:19:07 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=134/135 reason=switch
+2025-10-23 13:19:07 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=135/135
+2025-10-23 13:19:07 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:19:12 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=135/135 reason=switch
+2025-10-23 13:19:12 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=136/150
+2025-10-23 13:19:12 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:19:17 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=136/150 reason=switch
+2025-10-23 13:19:17 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=137/150
+2025-10-23 13:19:17 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:19:22 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.04s budget=5.00s slice=137/150 reason=switch
+2025-10-23 13:19:22 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=138/150
+2025-10-23 13:19:22 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:19:27 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=138/150 reason=switch
+2025-10-23 13:19:27 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=139/150
+2025-10-23 13:19:27 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:19:32 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=139/150 reason=switch
+2025-10-23 13:19:32 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=140/150
+2025-10-23 13:19:32 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:19:37 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=140/150 reason=switch
+2025-10-23 13:19:37 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=141/150
+2025-10-23 13:19:37 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:19:42 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=141/150 reason=switch
+2025-10-23 13:19:42 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=142/150
+2025-10-23 13:19:42 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:19:47 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=142/150 reason=switch
+2025-10-23 13:19:47 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=143/150
+2025-10-23 13:19:47 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:19:52 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.05s budget=5.00s slice=143/150 reason=switch
+2025-10-23 13:19:52 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=144/150
+2025-10-23 13:19:52 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:19:57 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=144/150 reason=switch
+2025-10-23 13:19:57 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=145/150
+2025-10-23 13:19:57 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:20:02 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=145/150 reason=switch
+2025-10-23 13:20:02 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=146/150
+2025-10-23 13:20:02 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:20:07 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=146/150 reason=switch
+2025-10-23 13:20:07 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=147/150
+2025-10-23 13:20:07 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:20:12 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=147/150 reason=switch
+2025-10-23 13:20:12 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=148/150
+2025-10-23 13:20:12 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:20:17 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=148/150 reason=switch
+2025-10-23 13:20:17 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=149/150
+2025-10-23 13:20:17 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:20:22 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=149/150 reason=switch
+2025-10-23 13:20:22 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=150/150
+2025-10-23 13:20:22 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:20:27 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=150/150 reason=switch
+2025-10-23 13:20:27 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=151/165
+2025-10-23 13:20:27 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:20:32 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=151/165 reason=switch
+2025-10-23 13:20:32 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=152/165
+2025-10-23 13:20:32 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:20:37 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.04s budget=5.00s slice=152/165 reason=switch
+2025-10-23 13:20:37 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=153/165
+2025-10-23 13:20:37 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:20:42 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.02s budget=5.00s slice=153/165 reason=switch
+2025-10-23 13:20:42 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=154/165
+2025-10-23 13:20:42 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:20:47 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=154/165 reason=switch
+2025-10-23 13:20:47 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=155/165
+2025-10-23 13:20:47 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:20:52 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=155/165 reason=switch
+2025-10-23 13:20:52 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=156/165
+2025-10-23 13:20:52 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:20:57 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=156/165 reason=switch
+2025-10-23 13:20:57 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=157/165
+2025-10-23 13:20:57 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:21:02 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=157/165 reason=switch
+2025-10-23 13:21:02 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=158/165
+2025-10-23 13:21:02 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:21:07 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=158/165 reason=switch
+2025-10-23 13:21:07 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=159/165
+2025-10-23 13:21:07 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:21:12 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=159/165 reason=switch
+2025-10-23 13:21:12 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=160/165
+2025-10-23 13:21:12 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:21:17 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=160/165 reason=switch
+2025-10-23 13:21:17 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=161/165
+2025-10-23 13:21:17 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:21:22 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=161/165 reason=switch
+2025-10-23 13:21:22 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=162/165
+2025-10-23 13:21:22 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:21:27 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=162/165 reason=switch
+2025-10-23 13:21:27 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=163/165
+2025-10-23 13:21:27 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:21:32 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=163/165 reason=switch
+2025-10-23 13:21:32 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=164/165
+2025-10-23 13:21:32 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:21:37 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.07s budget=5.00s slice=164/165 reason=switch
+2025-10-23 13:21:37 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=165/165
+2025-10-23 13:21:37 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:21:42 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.02s budget=5.00s slice=165/165 reason=switch
+2025-10-23 13:21:42 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=166/180
+2025-10-23 13:21:42 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:21:47 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=166/180 reason=switch
+2025-10-23 13:21:47 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=167/180
+2025-10-23 13:21:47 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:21:52 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=167/180 reason=switch
+2025-10-23 13:21:52 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=168/180
+2025-10-23 13:21:52 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:21:57 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=168/180 reason=switch
+2025-10-23 13:21:57 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=169/180
+2025-10-23 13:21:57 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:22:02 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=169/180 reason=switch
+2025-10-23 13:22:02 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=170/180
+2025-10-23 13:22:02 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:22:07 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=170/180 reason=switch
+2025-10-23 13:22:07 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=171/180
+2025-10-23 13:22:07 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:22:12 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=171/180 reason=switch
+2025-10-23 13:22:12 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=172/180
+2025-10-23 13:22:12 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:22:17 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=172/180 reason=switch
+2025-10-23 13:22:17 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=173/180
+2025-10-23 13:22:17 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:22:22 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=173/180 reason=switch
+2025-10-23 13:22:22 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=174/180
+2025-10-23 13:22:22 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:22:27 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=174/180 reason=switch
+2025-10-23 13:22:27 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=175/180
+2025-10-23 13:22:27 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:22:32 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=175/180 reason=switch
+2025-10-23 13:22:32 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=176/180
+2025-10-23 13:22:32 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:22:37 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.02s budget=5.00s slice=176/180 reason=switch
+2025-10-23 13:22:37 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=177/180
+2025-10-23 13:22:37 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:22:42 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=177/180 reason=switch
+2025-10-23 13:22:42 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=178/180
+2025-10-23 13:22:42 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:22:47 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=178/180 reason=switch
+2025-10-23 13:22:47 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=179/180
+2025-10-23 13:22:47 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:22:52 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=179/180 reason=switch
+2025-10-23 13:22:52 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=180/180
+2025-10-23 13:22:52 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:22:57 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=180/180 reason=switch
+2025-10-23 13:22:57 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=181/195
+2025-10-23 13:22:57 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:23:02 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=181/195 reason=switch
+2025-10-23 13:23:02 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=182/195
+2025-10-23 13:23:02 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:23:07 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.04s budget=5.00s slice=182/195 reason=switch
+2025-10-23 13:23:07 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=183/195
+2025-10-23 13:23:07 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:23:12 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=183/195 reason=switch
+2025-10-23 13:23:12 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=184/195
+2025-10-23 13:23:12 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:23:17 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=184/195 reason=switch
+2025-10-23 13:23:17 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=185/195
+2025-10-23 13:23:17 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:23:22 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=185/195 reason=switch
+2025-10-23 13:23:22 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=186/195
+2025-10-23 13:23:22 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:23:27 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=186/195 reason=switch
+2025-10-23 13:23:27 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=187/195
+2025-10-23 13:23:27 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:23:32 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=187/195 reason=switch
+2025-10-23 13:23:32 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=188/195
+2025-10-23 13:23:32 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:23:37 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.04s budget=5.00s slice=188/195 reason=switch
+2025-10-23 13:23:37 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=189/195
+2025-10-23 13:23:37 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:23:42 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=189/195 reason=switch
+2025-10-23 13:23:42 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=190/195
+2025-10-23 13:23:42 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:23:47 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=190/195 reason=switch
+2025-10-23 13:23:47 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=191/195
+2025-10-23 13:23:47 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:23:52 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=191/195 reason=switch
+2025-10-23 13:23:52 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=192/195
+2025-10-23 13:23:52 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:23:57 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=192/195 reason=switch
+2025-10-23 13:23:57 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=193/195
+2025-10-23 13:23:57 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:24:02 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=193/195 reason=switch
+2025-10-23 13:24:02 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=194/195
+2025-10-23 13:24:02 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:24:07 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.04s budget=5.00s slice=194/195 reason=switch
+2025-10-23 13:24:07 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=195/195
+2025-10-23 13:24:07 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:24:12 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=195/195 reason=switch
+2025-10-23 13:24:12 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=196/210
+2025-10-23 13:24:12 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:24:17 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=196/210 reason=switch
+2025-10-23 13:24:17 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=197/210
+2025-10-23 13:24:17 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:24:22 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=197/210 reason=switch
+2025-10-23 13:24:22 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=198/210
+2025-10-23 13:24:22 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:24:27 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=198/210 reason=switch
+2025-10-23 13:24:27 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=199/210
+2025-10-23 13:24:27 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:24:32 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=199/210 reason=switch
+2025-10-23 13:24:32 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=200/210
+2025-10-23 13:24:32 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:24:37 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.03s budget=5.00s slice=200/210 reason=switch
+2025-10-23 13:24:37 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=201/210
+2025-10-23 13:24:37 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:24:42 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=201/210 reason=switch
+2025-10-23 13:24:42 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=202/210
+2025-10-23 13:24:42 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:24:47 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=202/210 reason=switch
+2025-10-23 13:24:47 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=203/210
+2025-10-23 13:24:47 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:24:52 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=203/210 reason=switch
+2025-10-23 13:24:52 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=204/210
+2025-10-23 13:24:53 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:24:58 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=204/210 reason=switch
+2025-10-23 13:24:58 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=205/210
+2025-10-23 13:24:58 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:25:03 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=205/210 reason=switch
+2025-10-23 13:25:03 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=206/210
+2025-10-23 13:25:03 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:25:08 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.05s budget=5.00s slice=206/210 reason=switch
+2025-10-23 13:25:08 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=207/210
+2025-10-23 13:25:08 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:25:13 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=207/210 reason=switch
+2025-10-23 13:25:13 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=208/210
+2025-10-23 13:25:13 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:25:18 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=208/210 reason=switch
+2025-10-23 13:25:18 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=209/210
+2025-10-23 13:25:18 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:25:23 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=209/210 reason=switch
+2025-10-23 13:25:23 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=210/210
+2025-10-23 13:25:23 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:25:28 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=210/210 reason=switch
+2025-10-23 13:25:28 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=211/225
+2025-10-23 13:25:28 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:25:33 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=211/225 reason=switch
+2025-10-23 13:25:33 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=212/225
+2025-10-23 13:25:33 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:25:38 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=212/225 reason=switch
+2025-10-23 13:25:38 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=213/225
+2025-10-23 13:25:38 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:25:43 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=213/225 reason=switch
+2025-10-23 13:25:43 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=214/225
+2025-10-23 13:25:43 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:25:48 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=214/225 reason=switch
+2025-10-23 13:25:48 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=215/225
+2025-10-23 13:25:48 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:25:53 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=215/225 reason=switch
+2025-10-23 13:25:53 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=216/225
+2025-10-23 13:25:53 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:25:58 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=216/225 reason=switch
+2025-10-23 13:25:58 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=217/225
+2025-10-23 13:25:58 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:26:03 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=217/225 reason=switch
+2025-10-23 13:26:03 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=218/225
+2025-10-23 13:26:03 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:26:08 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.04s budget=5.00s slice=218/225 reason=switch
+2025-10-23 13:26:08 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=219/225
+2025-10-23 13:26:08 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:26:13 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=219/225 reason=switch
+2025-10-23 13:26:13 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=220/225
+2025-10-23 13:26:13 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:26:18 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=220/225 reason=switch
+2025-10-23 13:26:18 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=221/225
+2025-10-23 13:26:18 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:26:23 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=221/225 reason=switch
+2025-10-23 13:26:23 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=222/225
+2025-10-23 13:26:23 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:26:28 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=222/225 reason=switch
+2025-10-23 13:26:28 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=223/225
+2025-10-23 13:26:28 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:26:33 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=223/225 reason=switch
+2025-10-23 13:26:33 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=224/225
+2025-10-23 13:26:33 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:26:38 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=224/225 reason=switch
+2025-10-23 13:26:38 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=225/225
+2025-10-23 13:26:38 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:26:43 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.02s budget=5.00s slice=225/225 reason=switch
+2025-10-23 13:26:43 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=226/240
+2025-10-23 13:26:43 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:26:48 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=226/240 reason=switch
+2025-10-23 13:26:48 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=227/240
+2025-10-23 13:26:48 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:26:53 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=227/240 reason=switch
+2025-10-23 13:26:53 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=228/240
+2025-10-23 13:26:53 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:26:58 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=228/240 reason=switch
+2025-10-23 13:26:58 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=229/240
+2025-10-23 13:26:58 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:27:03 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=229/240 reason=switch
+2025-10-23 13:27:03 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=230/240
+2025-10-23 13:27:03 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:27:08 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.04s budget=5.00s slice=230/240 reason=switch
+2025-10-23 13:27:08 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=231/240
+2025-10-23 13:27:08 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:27:13 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=231/240 reason=switch
+2025-10-23 13:27:13 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=232/240
+2025-10-23 13:27:13 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:27:18 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=232/240 reason=switch
+2025-10-23 13:27:18 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=233/240
+2025-10-23 13:27:18 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:27:23 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=233/240 reason=switch
+2025-10-23 13:27:23 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=234/240
+2025-10-23 13:27:23 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:27:28 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=234/240 reason=switch
+2025-10-23 13:27:28 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=235/240
+2025-10-23 13:27:28 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:27:33 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=235/240 reason=switch
+2025-10-23 13:27:33 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=236/240
+2025-10-23 13:27:33 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:27:38 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.05s budget=5.00s slice=236/240 reason=switch
+2025-10-23 13:27:38 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=237/240
+2025-10-23 13:27:38 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:27:43 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=237/240 reason=switch
+2025-10-23 13:27:43 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=238/240
+2025-10-23 13:27:43 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:27:48 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=238/240 reason=switch
+2025-10-23 13:27:48 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=239/240
+2025-10-23 13:27:48 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:27:53 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=239/240 reason=switch
+2025-10-23 13:27:53 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=240/240
+2025-10-23 13:27:53 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:27:58 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=240/240 reason=switch
+2025-10-23 13:27:58 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=241/255
+2025-10-23 13:27:58 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:28:03 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=241/255 reason=switch
+2025-10-23 13:28:03 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=242/255
+2025-10-23 13:28:03 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:28:08 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.06s budget=5.00s slice=242/255 reason=switch
+2025-10-23 13:28:08 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=243/255
+2025-10-23 13:28:08 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:28:13 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=243/255 reason=switch
+2025-10-23 13:28:13 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=244/255
+2025-10-23 13:28:13 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:28:18 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=244/255 reason=switch
+2025-10-23 13:28:18 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=245/255
+2025-10-23 13:28:18 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:28:23 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=245/255 reason=switch
+2025-10-23 13:28:23 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=246/255
+2025-10-23 13:28:23 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:28:28 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=246/255 reason=switch
+2025-10-23 13:28:28 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=247/255
+2025-10-23 13:28:28 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:28:33 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.00s budget=5.00s slice=247/255 reason=switch
+2025-10-23 13:28:33 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=248/255
+2025-10-23 13:28:33 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:28:38 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=248/255 reason=switch
+2025-10-23 13:28:38 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=249/255
+2025-10-23 13:28:38 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:28:43 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.00s budget=5.00s slice=249/255 reason=switch
+2025-10-23 13:28:43 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=250/255
+2025-10-23 13:28:43 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:28:48 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=250/255 reason=switch
+2025-10-23 13:28:48 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=251/255
+2025-10-23 13:28:48 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:28:53 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.00s budget=5.00s slice=251/255 reason=switch
+2025-10-23 13:28:53 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=252/255
+2025-10-23 13:28:53 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:28:58 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=252/255 reason=switch
+2025-10-23 13:28:58 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=253/255
+2025-10-23 13:28:58 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:29:03 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=253/255 reason=switch
+2025-10-23 13:29:03 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=254/255
+2025-10-23 13:29:03 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:29:08 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=254/255 reason=switch
+2025-10-23 13:29:08 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=255/255
+2025-10-23 13:29:08 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:29:13 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=255/255 reason=switch
+2025-10-23 13:29:13 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=256/270
+2025-10-23 13:29:13 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:29:18 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.00s budget=5.00s slice=256/270 reason=switch
+2025-10-23 13:29:18 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=257/270
+2025-10-23 13:29:18 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:29:23 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=257/270 reason=switch
+2025-10-23 13:29:23 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=258/270
+2025-10-23 13:29:23 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:29:28 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=258/270 reason=switch
+2025-10-23 13:29:28 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=259/270
+2025-10-23 13:29:28 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:29:33 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=259/270 reason=switch
+2025-10-23 13:29:33 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=260/270
+2025-10-23 13:29:33 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:29:38 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=260/270 reason=switch
+2025-10-23 13:29:38 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=261/270
+2025-10-23 13:29:38 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:29:43 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=261/270 reason=switch
+2025-10-23 13:29:43 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=262/270
+2025-10-23 13:29:43 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:29:48 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.02s budget=5.00s slice=262/270 reason=switch
+2025-10-23 13:29:48 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=263/270
+2025-10-23 13:29:48 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:29:53 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=263/270 reason=switch
+2025-10-23 13:29:53 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=264/270
+2025-10-23 13:29:53 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:29:58 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=264/270 reason=switch
+2025-10-23 13:29:58 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=265/270
+2025-10-23 13:29:58 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:30:03 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=265/270 reason=switch
+2025-10-23 13:30:03 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=266/270
+2025-10-23 13:30:03 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:30:08 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.06s budget=5.00s slice=266/270 reason=switch
+2025-10-23 13:30:08 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=267/270
+2025-10-23 13:30:08 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:30:13 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=267/270 reason=switch
+2025-10-23 13:30:13 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=268/270
+2025-10-23 13:30:13 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:30:18 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=268/270 reason=switch
+2025-10-23 13:30:18 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=269/270
+2025-10-23 13:30:18 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:30:23 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=269/270 reason=switch
+2025-10-23 13:30:23 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=270/270
+2025-10-23 13:30:23 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:30:28 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=270/270 reason=switch
+2025-10-23 13:30:28 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=271/285
+2025-10-23 13:30:28 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:30:33 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=271/285 reason=switch
+2025-10-23 13:30:33 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=272/285
+2025-10-23 13:30:33 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:30:38 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.05s budget=5.00s slice=272/285 reason=switch
+2025-10-23 13:30:38 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=273/285
+2025-10-23 13:30:38 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:30:43 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=273/285 reason=switch
+2025-10-23 13:30:43 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=274/285
+2025-10-23 13:30:43 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:30:48 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=274/285 reason=switch
+2025-10-23 13:30:48 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=275/285
+2025-10-23 13:30:48 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:30:53 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.02s budget=5.00s slice=275/285 reason=switch
+2025-10-23 13:30:53 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=276/285
+2025-10-23 13:30:53 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:30:58 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=276/285 reason=switch
+2025-10-23 13:30:58 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=277/285
+2025-10-23 13:30:58 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:31:03 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=277/285 reason=switch
+2025-10-23 13:31:03 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=278/285
+2025-10-23 13:31:03 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:31:08 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.09s budget=5.00s slice=278/285 reason=switch
+2025-10-23 13:31:08 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=279/285
+2025-10-23 13:31:08 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:31:13 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=279/285 reason=switch
+2025-10-23 13:31:13 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=280/285
+2025-10-23 13:31:13 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:31:19 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.02s budget=5.00s slice=280/285 reason=switch
+2025-10-23 13:31:19 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=281/285
+2025-10-23 13:31:19 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:31:24 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=281/285 reason=switch
+2025-10-23 13:31:24 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=282/285
+2025-10-23 13:31:24 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:31:29 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=282/285 reason=switch
+2025-10-23 13:31:29 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=283/285
+2025-10-23 13:31:29 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:31:34 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=283/285 reason=switch
+2025-10-23 13:31:34 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=284/285
+2025-10-23 13:31:34 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:31:39 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=284/285 reason=switch
+2025-10-23 13:31:39 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=285/285
+2025-10-23 13:31:39 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:31:44 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=285/285 reason=switch
+2025-10-23 13:31:44 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=286/300
+2025-10-23 13:31:44 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:31:49 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=286/300 reason=switch
+2025-10-23 13:31:49 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=287/300
+2025-10-23 13:31:49 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:31:54 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=287/300 reason=switch
+2025-10-23 13:31:54 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=288/300
+2025-10-23 13:31:54 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:31:59 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=288/300 reason=switch
+2025-10-23 13:31:59 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=289/300
+2025-10-23 13:31:59 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:32:04 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=289/300 reason=switch
+2025-10-23 13:32:04 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=290/300
+2025-10-23 13:32:04 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:32:09 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.13s budget=5.00s slice=290/300 reason=switch
+2025-10-23 13:32:09 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=291/300
+2025-10-23 13:32:09 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:32:14 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=291/300 reason=switch
+2025-10-23 13:32:14 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=292/300
+2025-10-23 13:32:14 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:32:19 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=292/300 reason=switch
+2025-10-23 13:32:19 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=293/300
+2025-10-23 13:32:19 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:32:24 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=293/300 reason=switch
+2025-10-23 13:32:24 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=294/300
+2025-10-23 13:32:24 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:32:29 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.02s budget=5.00s slice=294/300 reason=switch
+2025-10-23 13:32:29 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=295/300
+2025-10-23 13:32:29 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:32:34 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.02s budget=5.00s slice=295/300 reason=switch
+2025-10-23 13:32:34 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=296/300
+2025-10-23 13:32:34 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:32:39 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=296/300 reason=switch
+2025-10-23 13:32:39 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=297/300
+2025-10-23 13:32:39 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:32:44 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=297/300 reason=switch
+2025-10-23 13:32:44 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=298/300
+2025-10-23 13:32:44 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:32:49 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=298/300 reason=switch
+2025-10-23 13:32:49 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=299/300
+2025-10-23 13:32:49 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:32:54 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=299/300 reason=switch
+2025-10-23 13:32:54 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=300/300
+2025-10-23 13:32:54 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:32:59 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=300/300 reason=switch
+2025-10-23 13:32:59 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=301/315
+2025-10-23 13:32:59 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:33:04 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=301/315 reason=switch
+2025-10-23 13:33:04 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=302/315
+2025-10-23 13:33:04 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:33:09 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.02s budget=5.00s slice=302/315 reason=switch
+2025-10-23 13:33:09 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=303/315
+2025-10-23 13:33:09 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:33:14 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=303/315 reason=switch
+2025-10-23 13:33:14 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=304/315
+2025-10-23 13:33:14 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:33:19 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=304/315 reason=switch
+2025-10-23 13:33:19 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=305/315
+2025-10-23 13:33:19 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:33:24 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=305/315 reason=switch
+2025-10-23 13:33:24 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=306/315
+2025-10-23 13:33:24 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:33:29 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=306/315 reason=switch
+2025-10-23 13:33:29 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=307/315
+2025-10-23 13:33:29 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:33:34 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=307/315 reason=switch
+2025-10-23 13:33:34 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=308/315
+2025-10-23 13:33:34 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:33:39 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.02s budget=5.00s slice=308/315 reason=switch
+2025-10-23 13:33:39 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=309/315
+2025-10-23 13:33:39 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:33:44 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=309/315 reason=switch
+2025-10-23 13:33:44 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=310/315
+2025-10-23 13:33:44 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:33:49 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.01s budget=5.00s slice=310/315 reason=switch
+2025-10-23 13:33:49 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=311/315
+2025-10-23 13:33:49 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:33:54 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=311/315 reason=switch
+2025-10-23 13:33:54 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=312/315
+2025-10-23 13:33:54 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:33:59 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=312/315 reason=switch
+2025-10-23 13:33:59 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=313/315
+2025-10-23 13:33:59 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:34:04 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.01s budget=5.00s slice=313/315 reason=switch
+2025-10-23 13:34:04 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=314/315
+2025-10-23 13:34:04 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:34:09 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.01s budget=5.00s slice=314/315 reason=switch
+2025-10-23 13:34:09 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=315/315
+2025-10-23 13:34:09 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:34:14 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.01s budget=5.00s slice=315/315 reason=switch
+2025-10-23 13:34:14 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=316/330
+2025-10-23 13:34:14 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:34:19 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=316/330 reason=switch
+2025-10-23 13:34:19 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=317/330
+2025-10-23 13:34:19 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:34:24 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=317/330 reason=switch
+2025-10-23 13:34:24 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=318/330
+2025-10-23 13:34:24 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:34:29 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=318/330 reason=switch
+2025-10-23 13:34:29 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=319/330
+2025-10-23 13:34:29 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:34:34 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=319/330 reason=switch
+2025-10-23 13:34:34 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=320/330
+2025-10-23 13:34:34 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:34:39 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.03s budget=5.00s slice=320/330 reason=switch
+2025-10-23 13:34:39 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=321/330
+2025-10-23 13:34:39 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:34:44 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.01s budget=5.00s slice=321/330 reason=switch
+2025-10-23 13:34:44 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=5.00s slice=322/330
+2025-10-23 13:34:44 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:34:49 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=5.01s budget=5.00s slice=322/330 reason=switch
+2025-10-23 13:34:49 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=8.0 × 12.0 ft budget=5.00s slice=323/330
+2025-10-23 13:34:49 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-23 13:34:54 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=323/330 reason=switch
+2025-10-23 13:34:54 [INFO] Attempt started | phase=D attempt=10.0 × 9.0 ft grid=9.0 × 10.0 ft budget=5.00s slice=324/330
+2025-10-23 13:34:54 [INFO] Grid updated | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft
+2025-10-23 13:34:59 [INFO] Attempt finished | phase=D attempt=10.0 × 9.0 ft grid=10.0 × 9.0 ft duration=5.01s budget=5.00s slice=324/330 reason=switch
+2025-10-23 13:34:59 [INFO] Attempt started | phase=D attempt=8.0 × 11.0 ft grid=10.0 × 9.0 ft budget=5.00s slice=325/330
+2025-10-23 13:34:59 [INFO] Grid updated | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft
+2025-10-23 13:35:04 [INFO] Attempt finished | phase=D attempt=8.0 × 11.0 ft grid=8.0 × 11.0 ft duration=5.00s budget=5.00s slice=325/330 reason=switch
+2025-10-23 13:35:04 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=8.0 × 11.0 ft budget=5.00s slice=326/330
+2025-10-23 13:35:04 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-23 13:35:09 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=326/330 reason=switch
+2025-10-23 13:35:09 [INFO] Attempt started | phase=D attempt=8.0 × 10.0 ft grid=9.0 × 9.0 ft budget=5.00s slice=327/330
+2025-10-23 13:35:09 [INFO] Grid updated | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft
+2025-10-23 13:35:14 [INFO] Attempt finished | phase=D attempt=8.0 × 10.0 ft grid=8.0 × 10.0 ft duration=5.01s budget=5.00s slice=327/330 reason=switch
+2025-10-23 13:35:14 [INFO] Attempt started | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 10.0 ft budget=5.00s slice=328/330
+2025-10-23 13:35:14 [INFO] Grid updated | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft
+2025-10-23 13:35:19 [INFO] Attempt finished | phase=D attempt=8.0 × 9.0 ft grid=8.0 × 9.0 ft duration=5.00s budget=5.00s slice=328/330 reason=switch
+2025-10-23 13:35:19 [INFO] Attempt started | phase=D attempt=9.0 × 8.0 ft grid=8.0 × 9.0 ft budget=5.00s slice=329/330
+2025-10-23 13:35:19 [INFO] Grid updated | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft
+2025-10-23 13:35:24 [INFO] Attempt finished | phase=D attempt=9.0 × 8.0 ft grid=9.0 × 8.0 ft duration=5.00s budget=5.00s slice=329/330 reason=switch
+2025-10-23 13:35:24 [INFO] Attempt started | phase=D attempt=8.0 × 8.0 ft grid=9.0 × 8.0 ft budget=5.00s slice=330/330
+2025-10-23 13:35:24 [INFO] Grid updated | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft
+2025-10-23 13:35:29 [INFO] Attempt finished | phase=D attempt=8.0 × 8.0 ft grid=8.0 × 8.0 ft duration=5.00s budget=5.00s slice=330/330 reason=switch
+2025-10-23 13:35:29 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=8.0 × 8.0 ft budget=5.00s slice=331/345
+2025-10-23 13:35:29 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:35:34 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=5.01s budget=5.00s slice=331/345 reason=switch
+2025-10-23 13:35:34 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=332/345
+2025-10-23 13:35:34 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-23 13:35:39 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=5.01s budget=5.00s slice=332/345 reason=switch
+2025-10-23 13:35:39 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=5.00s slice=333/345
+2025-10-23 13:35:39 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-23 13:35:44 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=5.01s budget=5.00s slice=333/345 reason=switch
+2025-10-23 13:35:44 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=11.0 × 10.0 ft budget=5.00s slice=334/345
+2025-10-23 13:35:44 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-23 13:35:49 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=334/345 reason=switch
+2025-10-23 13:35:49 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.0 × 10.0 ft budget=5.00s slice=335/345
+2025-10-23 13:35:49 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-23 13:35:54 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.00s budget=5.00s slice=335/345 reason=switch
+2025-10-23 13:35:54 [INFO] Attempt started | phase=D attempt=11.0 × 9.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=336/345
+2025-10-23 13:35:54 [INFO] Grid updated | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft
+2025-10-23 13:35:59 [INFO] Attempt finished | phase=D attempt=11.0 × 9.0 ft grid=11.0 × 9.0 ft duration=5.00s budget=5.00s slice=336/345 reason=switch
+2025-10-23 13:35:59 [INFO] Attempt started | phase=D attempt=8.0 × 12.0 ft grid=11.0 × 9.0 ft budget=1.34s slice=337/345
+2025-10-23 13:35:59 [INFO] Grid updated | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft
+2025-10-23 13:36:00 [INFO] Attempt finished | phase=D attempt=8.0 × 12.0 ft grid=8.0 × 12.0 ft duration=1.34s budget=1.34s slice=337/345 reason=phase_change
+2025-10-23 13:36:00 [INFO] Phase finished | phase=D duration=1800.01s
 
-2025-10-23 06:44:47 [INFO] Phase started | phase=E
-2025-10-23 06:44:47 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=9.0 × 8.0 ft budget=150.00s slice=1/6
-2025-10-23 06:44:47 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:44:50 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=3.30s budget=150.00s slice=1/6 reason=switch
-2025-10-23 06:44:50 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/6
-2025-10-23 06:44:50 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-23 06:44:52 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=1.15s budget=5.00s slice=2/6 reason=switch
-2025-10-23 06:44:52 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.0 × 12.0 ft budget=5.00s slice=3/6
-2025-10-23 06:44:52 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-23 06:49:28 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=276.47s budget=5.00s slice=3/6 reason=switch
-2025-10-23 06:49:28 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.0 × 13.0 ft budget=206.36s slice=5/7
-2025-10-23 06:49:28 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-23 06:49:29 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=1.20s budget=206.36s slice=5/7 reason=switch
-2025-10-23 06:49:29 [INFO] Attempt started | phase=E attempt=15.0 × 15.0 ft grid=14.0 × 14.0 ft budget=308.94s slice=6/7
-2025-10-23 06:49:29 [INFO] Grid updated | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
-2025-10-23 06:49:30 [INFO] Attempt finished | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.94s budget=308.94s slice=6/7 reason=switch
-2025-10-23 06:49:30 [INFO] Attempt started | phase=E attempt=16.0 × 16.0 ft grid=15.0 × 15.0 ft budget=5.00s slice=7/7
-2025-10-23 06:49:30 [INFO] Grid updated | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
-2025-10-23 06:49:31 [INFO] Attempt finished | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.89s budget=5.00s slice=7/7 reason=phase_change
-2025-10-23 06:49:31 [INFO] Phase finished | phase=E duration=283.99s
+2025-10-23 13:36:00 [INFO] Phase started | phase=E
+2025-10-23 13:36:00 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=8.0 × 12.0 ft budget=150.00s slice=1/6
+2025-10-23 13:36:00 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:36:01 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.59s budget=150.00s slice=1/6 reason=switch
+2025-10-23 13:36:01 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/6
+2025-10-23 13:36:01 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-23 13:36:02 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.63s budget=5.00s slice=2/6 reason=switch
+2025-10-23 13:36:02 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.0 × 12.0 ft budget=5.00s slice=3/6
+2025-10-23 13:36:02 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-23 13:36:02 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.63s budget=5.00s slice=3/6 reason=switch
+2025-10-23 13:36:02 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.0 × 13.0 ft budget=5.00s slice=4/6
+2025-10-23 13:36:02 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-23 13:36:03 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.62s budget=5.00s slice=4/6 reason=switch
+2025-10-23 13:36:03 [INFO] Attempt started | phase=E attempt=15.0 × 15.0 ft grid=14.0 × 14.0 ft budget=5.00s slice=5/6
+2025-10-23 13:36:03 [INFO] Grid updated | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-23 13:36:04 [INFO] Attempt finished | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.60s budget=5.00s slice=5/6 reason=switch
+2025-10-23 13:36:04 [INFO] Attempt started | phase=E attempt=16.0 × 16.0 ft grid=15.0 × 15.0 ft budget=5.00s slice=6/6
+2025-10-23 13:36:04 [INFO] Grid updated | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-23 13:36:04 [INFO] Attempt finished | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.67s budget=5.00s slice=6/6 reason=phase_change
+2025-10-23 13:36:04 [INFO] Phase finished | phase=E duration=3.75s
 
-2025-10-23 06:49:31 [INFO] Phase started | phase=F
-2025-10-23 06:49:31 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=16.0 × 16.0 ft budget=150.00s slice=1/6
-2025-10-23 06:49:31 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-23 06:49:32 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.89s budget=150.00s slice=1/6 reason=switch
-2025-10-23 06:49:32 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/6
-2025-10-23 06:49:32 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-23 06:49:33 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.82s budget=5.00s slice=2/6 reason=switch
-2025-10-23 06:49:33 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.0 × 12.0 ft budget=5.00s slice=3/6
-2025-10-23 06:49:33 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-23 06:49:34 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.86s budget=5.00s slice=3/6 reason=switch
-2025-10-23 06:49:34 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.0 × 13.0 ft budget=5.00s slice=4/6
-2025-10-23 06:49:34 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-23 06:49:35 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.99s budget=5.00s slice=4/6 reason=switch
-2025-10-23 06:49:35 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.0 × 14.0 ft budget=5.00s slice=5/6
-2025-10-23 06:49:35 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
-2025-10-23 06:49:36 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=1.11s budget=5.00s slice=5/6 reason=switch
-2025-10-23 06:49:36 [INFO] Attempt started | phase=F attempt=16.0 × 16.0 ft grid=15.0 × 15.0 ft budget=5.00s slice=6/6
-2025-10-23 06:49:36 [INFO] Grid updated | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
-2025-10-23 06:49:37 [INFO] Attempt finished | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.92s budget=5.00s slice=6/6 reason=run_complete
-2025-10-23 06:49:37 [INFO] Run finished | status=Solved ok=True duration=2843.78s 
-best_used=0 coverage=0.00% message=error
+2025-10-23 13:36:04 [INFO] Phase started | phase=F
+2025-10-23 13:36:04 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=16.0 × 16.0 ft budget=150.00s slice=1/6
+2025-10-23 13:36:04 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-23 13:36:05 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.59s budget=150.00s slice=1/6 reason=switch
+2025-10-23 13:36:05 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.0 × 11.0 ft budget=5.00s slice=2/6
+2025-10-23 13:36:05 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-23 13:36:05 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.60s budget=5.00s slice=2/6 reason=switch
+2025-10-23 13:36:05 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.0 × 12.0 ft budget=5.00s slice=3/6
+2025-10-23 13:36:05 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-23 13:36:06 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.59s budget=5.00s slice=3/6 reason=switch
+2025-10-23 13:36:06 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.0 × 13.0 ft budget=5.00s slice=4/6
+2025-10-23 13:36:06 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-23 13:36:07 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.64s budget=5.00s slice=4/6 reason=switch
+2025-10-23 13:36:07 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.0 × 14.0 ft budget=5.00s slice=5/6
+2025-10-23 13:36:07 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-23 13:36:07 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.61s budget=5.00s slice=5/6 reason=switch
+2025-10-23 13:36:07 [INFO] Attempt started | phase=F attempt=16.0 × 16.0 ft grid=15.0 × 15.0 ft budget=5.00s slice=6/6
+2025-10-23 13:36:07 [INFO] Grid updated | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-23 13:36:08 [INFO] Attempt finished | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.64s budget=5.00s slice=6/6 reason=run_complete
+2025-10-23 13:36:08 [INFO] Run finished | status=Solved ok=True duration=2107.46s best_used=0 coverage=0.00% message=error
