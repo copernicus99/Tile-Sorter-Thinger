@@ -97,7 +97,20 @@ def _resolve_guard_backoffs(
     )
 
     infeasible = reason == "Proven infeasible under current constraints"
-    if ok or not infeasible:
+    guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
+    inconclusive_reason = reason in (
+        None,
+        "Stopped before solution (timebox)",
+        "Stopped before solution (timebox / crash?)",
+    )
+
+    if ok:
+        return ok, placed, reason
+
+    if not guard_active:
+        return ok, placed, reason
+
+    if not (infeasible or (not placed and inconclusive_reason)):
         return ok, placed, reason
 
     retry_plan = []
@@ -116,7 +129,11 @@ def _resolve_guard_backoffs(
         retry_ok, retry_placed, retry_reason = attempt(**overrides)
         if retry_ok:
             return True, retry_placed, None
-        if retry_reason != "Proven infeasible under current constraints":
+        if retry_reason not in (
+            "Proven infeasible under current constraints",
+            "Stopped before solution (timebox)",
+            "Stopped before solution (timebox / crash?)",
+        ):
             return retry_ok, retry_placed, retry_reason
 
     return ok, placed, reason
