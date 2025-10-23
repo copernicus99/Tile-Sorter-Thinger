@@ -52,6 +52,76 @@ _RNG: Optional[random.Random] = None
 _PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
 
 
+def _no_plus_guard_enabled(cfg) -> bool:
+    """Return ``True`` when the plus-intersection guard should be active."""
+
+    try:
+        if not bool(getattr(cfg, "NO_PLUS", False)):
+            return False
+    except Exception:
+        return False
+
+    try:
+        if bool(getattr(cfg, "TEST_MODE", False)):
+            return False
+    except Exception:
+        pass
+
+    return True
+
+
+def _resolve_guard_backoffs(
+    attempt,
+    *,
+    edge_guard_cells: Optional[int],
+    plus_guard_enabled: bool,
+):
+    """Retry helper that disables guards when they block feasibility.
+
+    ``attempt`` is expected to be a callable accepting ``edge_guard_cells`` and
+    ``plus_guard_enabled`` keyword arguments, returning ``(ok, placed, reason)``.
+
+    The helper retries in two stages:
+
+    #. Drop the seam guard (``edge_guard_cells``) when present.
+    #. Drop the plus-intersection guard when it was active.
+
+    Retries stop early if a run returns a reason other than
+    ``"Proven infeasible under current constraints"`` so callers preserve the
+    most informative message from CP-SAT.
+    """
+
+    ok, placed, reason = attempt(
+        edge_guard_cells=edge_guard_cells,
+        plus_guard_enabled=plus_guard_enabled,
+    )
+
+    infeasible = reason == "Proven infeasible under current constraints"
+    if ok or not infeasible:
+        return ok, placed, reason
+
+    retry_plan = []
+    if edge_guard_cells is not None:
+        retry_plan.append({
+            "edge_guard_cells": None,
+            "plus_guard_enabled": plus_guard_enabled,
+        })
+    if plus_guard_enabled:
+        retry_plan.append({
+            "edge_guard_cells": edge_guard_cells,
+            "plus_guard_enabled": False,
+        })
+
+    for overrides in retry_plan:
+        retry_ok, retry_placed, retry_reason = attempt(**overrides)
+        if retry_ok:
+            return True, retry_placed, None
+        if retry_reason != "Proven infeasible under current constraints":
+            return retry_ok, retry_placed, retry_reason
+
+    return ok, placed, reason
+
+
 def _compute_edge_guard_cells(
     max_edge_ft: Optional[float],
     *,
@@ -347,7 +417,7 @@ def try_pack_exact_cover(
             f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
         )
 
-    def _solve_with_limit(limit_value, seconds, *, edge_guard_cells):
+    def _solve_with_limit(limit_value, seconds, *, edge_guard_cells, plus_guard_enabled):
         m = _cp.CpModel()
         n = len(tiles)
 
@@ -484,7 +554,7 @@ def try_pack_exact_cover(
                 for x0 in range(0, W - (L + 1) + 1):
                     m.Add(sum(seam_row[xx] for xx in range(x0, x0 + L + 1)) <= L)
 
-        if bool(getattr(CFG, "NO_PLUS", False)):
+        if plus_guard_enabled:
             for nx in range(1, W):
                 for ny in range(1, H):
                     corners = corner_to_vars.get((nx, ny))
@@ -680,24 +750,21 @@ def try_pack_exact_cover(
         board_max=max(W, H),
         test_mode=test_mode_flag,
     )
-    guard_applies = edge_guard_cells is not None
+    plus_guard_enabled = _no_plus_guard_enabled(CFG)
 
-    ok, placed, reason = _solve_with_limit(
-        same_shape_cfg,
-        max_seconds,
-        edge_guard_cells=edge_guard_cells,
-    )
-
-    if (not ok) and guard_applies and reason == "Proven infeasible under current constraints":
-        relaxed_ok, relaxed_placed, relaxed_reason = _solve_with_limit(
+    def _attempt(edge_guard_cells_param, plus_guard_enabled_param):
+        return _solve_with_limit(
             same_shape_cfg,
             max_seconds,
-            edge_guard_cells=None,
+            edge_guard_cells=edge_guard_cells_param,
+            plus_guard_enabled=plus_guard_enabled_param,
         )
-        if relaxed_ok:
-            return True, relaxed_placed, None
-        if relaxed_reason != "Proven infeasible under current constraints":
-            return relaxed_ok, relaxed_placed, relaxed_reason
+
+    ok, placed, reason = _resolve_guard_backoffs(
+        _attempt,
+        edge_guard_cells=edge_guard_cells,
+        plus_guard_enabled=plus_guard_enabled,
+    )
 
     if ok or reason != "Proven infeasible under current constraints":
         return ok, placed, reason
@@ -717,6 +784,7 @@ def try_pack_exact_cover(
         None,
         diag_seconds,
         edge_guard_cells=edge_guard_cells,
+        plus_guard_enabled=plus_guard_enabled,
     )
     if diag_ok and diag_placed:
         msg = (
