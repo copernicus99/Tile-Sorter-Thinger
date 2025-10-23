@@ -158,3 +158,52 @@ def test_guard_backoff_preserves_non_infeasible_reason(cp_sat_module):
     assert not ok
     assert placed == []
     assert reason == "Model invalid (configuration error)"
+
+
+def test_backtracking_exact_cover_solves_small_board(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [
+        Rect(2, 2, "A"),
+        Rect(2, 2, "B"),
+        Rect(2, 2, "C"),
+        Rect(2, 2, "D"),
+    ]
+    options = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
+
+    placements = cp_sat_module._backtracking_exact_cover(4, 4, tiles, options)
+
+    assert placements is not None
+    assert len(placements) == len(tiles)
+    covered = {(p.x + dx, p.y + dy) for p in placements for dx in range(p.rect.w) for dy in range(p.rect.h)}
+    assert len(covered) == 16
+
+
+def test_backtracking_handles_medium_board(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [
+        Rect(20, 10, "A"),
+        Rect(20, 10, "B"),
+    ]
+    options = cp_sat_module.build_options(20, 20, tiles, stride=1, randomize=False)
+
+    placements = cp_sat_module._backtracking_exact_cover(20, 20, tiles, options)
+
+    assert placements is not None
+    assert len(placements) == len(tiles)
+    covered = {
+        (p.x + dx, p.y + dy)
+        for p in placements
+        for dx in range(p.rect.w)
+        for dy in range(p.rect.h)
+    }
+    assert len(covered) == 400
+
+
+def test_backtracking_respects_limits(monkeypatch, cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [Rect(1, 1, f"t{i}") for i in range(10)]
+    options = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
+
+    monkeypatch.setattr(cp_sat_module.CFG, "BACKTRACK_MAX_TILES", 4, raising=False)
+
+    assert cp_sat_module._backtracking_exact_cover(4, 4, tiles, options) is None

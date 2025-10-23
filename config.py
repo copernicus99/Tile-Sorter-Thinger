@@ -12,6 +12,11 @@ MAX_MEMORY_MB        = int(os.getenv("TS_MAX_MEMORY_MB", "2048"))
 # ======= Solver heuristics =======
 RANDOMIZE_PLACEMENTS = int(os.getenv("TS_RANDOMIZE_PLACEMENTS", "1")) != 0
 
+# ======= Backtracking fallback guards =======
+BACKTRACK_MAX_CELLS = int(os.getenv("TS_BACKTRACK_MAX_CELLS", "900"))
+BACKTRACK_MAX_TILES = int(os.getenv("TS_BACKTRACK_MAX_TILES", "16"))
+BACKTRACK_NODE_LIMIT = int(os.getenv("TS_BACKTRACK_NODE_LIMIT", "300000"))
+
 # ======= Candidate generation knobs =======
 CAND_WIDTHS          = os.getenv("TS_CAND_WIDTHS", "auto")
 CAND_NEIGHBOR_DELTAS = os.getenv("TS_CAND_NEIGHBOR_DELTAS", "auto")
@@ -114,6 +119,10 @@ class CFG:
 
     TEST_MODE = TEST_MODE
     RANDOMIZE_PLACEMENTS = RANDOMIZE_PLACEMENTS
+
+    BACKTRACK_MAX_CELLS = BACKTRACK_MAX_CELLS
+    BACKTRACK_MAX_TILES = BACKTRACK_MAX_TILES
+    BACKTRACK_NODE_LIMIT = BACKTRACK_NODE_LIMIT
 
 # legacy convenience
 CELL      = CFG.CELL

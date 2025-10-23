@@ -206,6 +206,133 @@ def _system_rng() -> random.Random:
     return _RNG
 
 
+def _backtracking_exact_cover(
+    W: int,
+    H: int,
+    tiles: Sequence[Rect],
+    options: Sequence[Sequence[Tuple[int, int, int, int, int]]],
+) -> Optional[List[Placed]]:
+    """Deterministic exact-cover search used as a last-resort fallback.
+
+    The helper targets small boards where CP-SAT either times out or is
+    unavailable.  It respects the current tile ordering and only supports the
+    pure exact-cover case (no discards, guards disabled).  When the search space
+    exceeds conservative thresholds we bail out early to avoid explosive
+    backtracking.
+    """
+
+    try:
+        W = int(W)
+        H = int(H)
+    except Exception:
+        return None
+
+    if W <= 0 or H <= 0:
+        return None
+
+    n = len(tiles)
+    if n == 0:
+        return []
+
+    try:
+        max_cells_cfg = int(getattr(CFG, "BACKTRACK_MAX_CELLS", 900))
+    except Exception:
+        max_cells_cfg = 900
+    try:
+        max_tiles_cfg = int(getattr(CFG, "BACKTRACK_MAX_TILES", 16))
+    except Exception:
+        max_tiles_cfg = 16
+    try:
+        node_limit_cfg = int(getattr(CFG, "BACKTRACK_NODE_LIMIT", 300000))
+    except Exception:
+        node_limit_cfg = 300000
+
+    max_cells_cfg = max(1, max_cells_cfg)
+    max_tiles_cfg = max(1, max_tiles_cfg)
+    node_limit_cfg = max(1, node_limit_cfg)
+
+    if (W * H) > max_cells_cfg:
+        return None
+    if n > max_tiles_cfg:
+        return None
+
+    if len(options) != n:
+        return None
+
+    order = list(range(n))
+    order.sort(key=lambda i: (len(options[i]) or 0, -(tiles[i].w * tiles[i].h)))
+
+    if any(not options[i] for i in order):
+        return None
+
+    branch_cap = max(1, node_limit_cfg)
+    branch_estimate = 1
+    for idx in order:
+        opts_count = len(options[idx])
+        if opts_count <= 0:
+            return None
+        branch_estimate *= opts_count
+        if branch_estimate > branch_cap:
+            return None
+
+    board = [False] * (W * H)
+    placements: List[Optional[Tuple[int, int, int, int, int]]] = [None] * n
+    nodes_searched = 0
+
+    def _fits(opt: Tuple[int, int, int, int, int]) -> bool:
+        px, py, _rot, w, h = opt
+        if px < 0 or py < 0:
+            return False
+        if px + w > W or py + h > H:
+            return False
+        for dy in range(h):
+            row_offset = (py + dy) * W
+            for dx in range(w):
+                idx = row_offset + px + dx
+                if board[idx]:
+                    return False
+        return True
+
+    def _mark(opt: Tuple[int, int, int, int, int], value: bool) -> None:
+        px, py, _rot, w, h = opt
+        for dy in range(h):
+            row_offset = (py + dy) * W
+            for dx in range(w):
+                idx = row_offset + px + dx
+                board[idx] = value
+
+    def _search(pos: int) -> bool:
+        nonlocal nodes_searched
+        if pos >= len(order):
+            return True
+        if nodes_searched >= node_limit_cfg:
+            return False
+        nodes_searched += 1
+
+        tile_idx = order[pos]
+        for opt in options[tile_idx]:
+            if not _fits(opt):
+                continue
+            placements[tile_idx] = opt
+            _mark(opt, True)
+            if _search(pos + 1):
+                return True
+            _mark(opt, False)
+            placements[tile_idx] = None
+        return False
+
+    if not _search(0):
+        return None
+
+    out: List[Placed] = []
+    for idx, opt in enumerate(placements):
+        if opt is None:
+            return None
+        px, py, _rot, w, h = opt
+        out.append(Placed(px, py, Rect(w, h, tiles[idx].name)))
+    return out
+
+
 def _placement_key(W: int, H: int, w: int, h: int, stride: int) -> Tuple[int, int, int, int, int]:
     return (int(W), int(H), int(w), int(h), max(1, int(stride)))
 
@@ -796,6 +923,48 @@ def try_pack_exact_cover(
         edge_guard_cells=edge_guard_cells,
         plus_guard_enabled=plus_guard_enabled,
     )
+
+    def _coverage_cells(placements: List[Placed]) -> int:
+        return sum(p.rect.w * p.rect.h for p in placements) if placements else 0
+
+    target_cells = W * H
+    best_ok, best_placed, best_reason = ok, placed, reason
+    best_coverage = _coverage_cells(placed)
+
+    guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
+
+    if allow_discard and guard_active and target_cells > 0 and best_coverage < target_cells:
+        fallback_plan: List[Tuple[Optional[int], bool]] = []
+        if edge_guard_cells is not None:
+            fallback_plan.append((None, plus_guard_enabled))
+        if plus_guard_enabled:
+            fallback_plan.append((edge_guard_cells, False))
+        if edge_guard_cells is not None and plus_guard_enabled:
+            fallback_plan.append((None, False))
+
+        for guard_edge, guard_plus in fallback_plan:
+            relax_ok, relax_placed, relax_reason = _attempt(guard_edge, guard_plus)
+            relax_cov = _coverage_cells(relax_placed)
+            improved = relax_ok and relax_cov > best_coverage
+            if not improved and not relax_ok and not best_ok:
+                improved = relax_cov > best_coverage
+            if improved:
+                best_ok = relax_ok
+                best_placed = relax_placed
+                best_reason = relax_reason
+                best_coverage = relax_cov
+                if best_coverage >= target_cells:
+                    break
+
+        ok, placed, reason = best_ok, best_placed, best_reason
+
+    guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
+
+    if not ok and not allow_discard and not guard_active:
+        fallback = _backtracking_exact_cover(W, H, tiles, options)
+        if fallback is not None:
+            fallback.extend(forced)
+            return True, fallback, None
 
     if ok or reason != "Proven infeasible under current constraints":
         return ok, placed, reason
