@@ -417,6 +417,20 @@ def try_pack_exact_cover(
             f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
         )
 
+    # Reorder tiles so the most constrained shapes appear first.  CP-SAT spends
+    # far less time exploring symmetric assignments when the tiles with the
+    # fewest legal placements lead the search.  Retain a shuffled tie-breaker
+    # when randomization is enabled so we keep the stochastic flavour while
+    # still prioritizing constrained pieces.
+    ordering = list(range(len(tiles)))
+    if ordering:
+        if randomize and rng is not None:
+            rng.shuffle(ordering)
+        ordering.sort(key=lambda i: (len(options[i]) or 0, -(tiles[i].w * tiles[i].h)))
+        if any(idx != i for i, idx in enumerate(ordering)):
+            tiles = [tiles[i] for i in ordering]
+            options = [options[i] for i in ordering]
+
     def _solve_with_limit(limit_value, seconds, *, edge_guard_cells, plus_guard_enabled):
         m = _cp.CpModel()
         n = len(tiles)
