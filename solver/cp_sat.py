@@ -215,10 +215,10 @@ def _backtracking_exact_cover(
     """Deterministic exact-cover search used as a last-resort fallback.
 
     The helper targets small boards where CP-SAT either times out or is
-    unavailable.  It respects the current tile ordering and only supports the
-    pure exact-cover case (no discards, guards disabled).  When the search space
-    exceeds conservative thresholds we bail out early to avoid explosive
-    backtracking.
+    unavailable.  It only supports the pure exact-cover case (no discards,
+    guards disabled).  A lightweight Algorithm X style search is used and the
+    exploration stops once a configurable node limit is reached to avoid
+    explosive backtracking.
     """
 
     try:
@@ -251,86 +251,127 @@ def _backtracking_exact_cover(
     max_tiles_cfg = max(1, max_tiles_cfg)
     node_limit_cfg = max(1, node_limit_cfg)
 
-    if (W * H) > max_cells_cfg:
+    area_cells = W * H
+    if area_cells > max_cells_cfg:
         return None
-    if n > max_tiles_cfg:
+
+    # Permit modestly larger tile counts on small boards before giving up.
+    if n > max_tiles_cfg and not (area_cells <= max_cells_cfg and n <= max_tiles_cfg + 8):
         return None
 
     if len(options) != n:
         return None
 
-    order = list(range(n))
-    order.sort(key=lambda i: (len(options[i]) or 0, -(tiles[i].w * tiles[i].h)))
+    # Build an exact-cover matrix that treats each grid cell and tile instance
+    # as a column.  Rows represent a specific placement of a specific tile.
+    total_cells = area_cells
+    tile_offset = total_cells
+    row_columns: List[Tuple[int, ...]] = []
+    row_info: List[Tuple[int, Tuple[int, int, int, int, int]]] = []
+    column_to_rows: Dict[int, List[int]] = defaultdict(list)
 
-    if any(not options[i] for i in order):
+    for tile_idx, placements in enumerate(options):
+        if not placements:
+            return None
+        for opt in placements:
+            px, py, _rot, w, h = opt
+            columns: List[int] = [tile_offset + tile_idx]
+            for dy in range(h):
+                row_offset = (py + dy) * W
+                for dx in range(w):
+                    columns.append(row_offset + px + dx)
+            row_idx = len(row_columns)
+            cols_tuple = tuple(columns)
+            row_columns.append(cols_tuple)
+            row_info.append((tile_idx, opt))
+            for col in cols_tuple:
+                column_to_rows[col].append(row_idx)
+
+    total_columns = tile_offset + n
+    if any(col not in column_to_rows for col in range(total_columns)):
         return None
 
-    branch_cap = max(1, node_limit_cfg)
-    branch_estimate = 1
-    for idx in order:
-        opts_count = len(options[idx])
-        if opts_count <= 0:
-            return None
-        branch_estimate *= opts_count
-        if branch_estimate > branch_cap:
-            return None
-
-    board = [False] * (W * H)
-    placements: List[Optional[Tuple[int, int, int, int, int]]] = [None] * n
+    active_cols: set[int] = set(range(total_columns))
+    active_rows: set[int] = set(range(len(row_columns)))
+    solution_rows: List[int] = []
     nodes_searched = 0
+    limit_hit = False
 
-    def _fits(opt: Tuple[int, int, int, int, int]) -> bool:
-        px, py, _rot, w, h = opt
-        if px < 0 or py < 0:
-            return False
-        if px + w > W or py + h > H:
-            return False
-        for dy in range(h):
-            row_offset = (py + dy) * W
-            for dx in range(w):
-                idx = row_offset + px + dx
-                if board[idx]:
-                    return False
-        return True
+    def _choose_column() -> Optional[int]:
+        best_col = None
+        best_count = None
+        for col in active_cols:
+            candidates = 0
+            for row_idx in column_to_rows[col]:
+                if row_idx in active_rows:
+                    candidates += 1
+                    if best_count is not None and candidates >= best_count:
+                        break
+            if candidates == 0:
+                return None
+            if best_col is None or candidates < best_count:
+                best_col = col
+                best_count = candidates
+                if best_count == 1:
+                    break
+        return best_col
 
-    def _mark(opt: Tuple[int, int, int, int, int], value: bool) -> None:
-        px, py, _rot, w, h = opt
-        for dy in range(h):
-            row_offset = (py + dy) * W
-            for dx in range(w):
-                idx = row_offset + px + dx
-                board[idx] = value
-
-    def _search(pos: int) -> bool:
-        nonlocal nodes_searched
-        if pos >= len(order):
+    def _search() -> bool:
+        nonlocal nodes_searched, limit_hit
+        if not active_cols:
             return True
-        if nodes_searched >= node_limit_cfg:
+        col = _choose_column()
+        if col is None:
             return False
-        nodes_searched += 1
 
-        tile_idx = order[pos]
-        for opt in options[tile_idx]:
-            if not _fits(opt):
-                continue
-            placements[tile_idx] = opt
-            _mark(opt, True)
-            if _search(pos + 1):
+        candidates = [r for r in column_to_rows[col] if r in active_rows]
+        if not candidates:
+            return False
+
+        for row_idx in candidates:
+            if nodes_searched >= node_limit_cfg:
+                limit_hit = True
+                return False
+            nodes_searched += 1
+            solution_rows.append(row_idx)
+
+            removed_cols: List[int] = []
+            removed_rows: List[int] = []
+            for c in row_columns[row_idx]:
+                if c in active_cols:
+                    active_cols.remove(c)
+                    removed_cols.append(c)
+                    for r in column_to_rows[c]:
+                        if r in active_rows:
+                            active_rows.remove(r)
+                            removed_rows.append(r)
+
+            if _search():
                 return True
-            _mark(opt, False)
-            placements[tile_idx] = None
+
+            for r in reversed(removed_rows):
+                active_rows.add(r)
+            for c in reversed(removed_cols):
+                active_cols.add(c)
+            solution_rows.pop()
+
         return False
 
-    if not _search(0):
+    if not _search():
+        if limit_hit:
+            return None
         return None
 
-    out: List[Placed] = []
-    for idx, opt in enumerate(placements):
-        if opt is None:
-            return None
+    placed_by_tile: List[Optional[Placed]] = [None] * n
+    for row_idx in solution_rows:
+        tile_idx, opt = row_info[row_idx]
         px, py, _rot, w, h = opt
-        out.append(Placed(px, py, Rect(w, h, tiles[idx].name)))
-    return out
+        placed_by_tile[tile_idx] = Placed(px, py, Rect(w, h, tiles[tile_idx].name))
+
+    if any(p is None for p in placed_by_tile):
+        return None
+
+    return [p for p in placed_by_tile if p is not None]
 
 
 def _placement_key(W: int, H: int, w: int, h: int, stride: int) -> Tuple[int, int, int, int, int]:
