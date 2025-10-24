@@ -237,6 +237,13 @@ def _call_orchestrator_forgiving(
     raise RuntimeError("No valid orchestrator call pattern found.")
 
 
+def _finalize_solver_progress(ok_flag: bool, strategy_text: str) -> None:
+    """Write the terminal solver status without clobbering failure states."""
+
+    set_status("Solved" if ok_flag else "error")
+    set_done(ok_flag, reason=strategy_text)
+
+
 def _start_overlay_spinner(t0: float) -> threading.Event:
     stop_evt = threading.Event()
 
@@ -398,8 +405,9 @@ def solve():
 
     strategy_text = result.get("strategy") or result.get("reason") or "No solution (unspecified)."
     ok_flag = bool(result.get("ok"))
-    set_status("Solved" if ok_flag else "error")
-    set_done(True, reason=strategy_text)
+    if ok_flag and result.get("note"):
+        strategy_text = str(result["note"])
+    _finalize_solver_progress(ok_flag, strategy_text)
     set_elapsed(time.time() - t0)
     spinner_stop.set()
 
