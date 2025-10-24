@@ -53,6 +53,159 @@ _RNG: Optional[random.Random] = None
 _PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
 
 
+def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[List[Placed]]:
+    """Fast DFS tiler that anchors every placement at the next uncovered cell.
+
+    The routine is intentionally conservative: it only attempts a fill when the
+    board dimensions are positive and every rectangle has positive area.  The
+    branching factor stays tiny by grouping identical tiles together and by
+    always selecting the lowest/top-left empty cell as the next anchor point.
+    This mirrors Algorithm X's "choose column with minimum candidates" heuristic
+    but is dramatically cheaper to evaluate for racks containing only a handful
+    of distinct shapes.  All tiles must be placed, yet the board may contain
+    slack area; any uncovered cells simply remain empty once every tile has been
+    positioned.
+    """
+
+    try:
+        W = int(W)
+        H = int(H)
+    except Exception:
+        return None
+
+    if W <= 0 or H <= 0:
+        return None
+
+    total_area = W * H
+    tile_area = 0
+    groups: Dict[Tuple[int, int], Dict[str, object]] = {}
+    for rect in tiles:
+        try:
+            rw = abs(int(rect.w))
+            rh = abs(int(rect.h))
+        except Exception:
+            return None
+        if rw <= 0 or rh <= 0:
+            return None
+        tile_area += rw * rh
+        key = (min(rw, rh), max(rw, rh))
+        entry = groups.setdefault(key, {"count": 0, "names": []})
+        entry["count"] = int(entry.get("count", 0)) + 1
+        entry["names"].append(rect.name)
+
+    if tile_area > total_area:
+        return None
+
+    if not groups:
+        return []
+
+    tile_types: List[Dict[str, object]] = []
+    for (min_side, max_side), entry in groups.items():
+        count = int(entry.get("count", 0))
+        if count <= 0:
+            continue
+        names_list: List[Optional[str]] = list(entry.get("names", []))  # type: ignore[arg-type]
+        if len(names_list) < count:
+            names_list.extend([None] * (count - len(names_list)))
+        tile_types.append(
+            {
+                "min": min_side,
+                "max": max_side,
+                "count": count,
+                "used": 0,
+                "names": names_list,
+                "area": min_side * max_side,
+            }
+        )
+
+    if not tile_types:
+        return []
+
+    tile_types.sort(
+        key=lambda t: (
+            int(t["area"]),
+            int(t["max"]),
+            int(t["min"]),
+        ),
+        reverse=True,
+    )
+
+    offset_cache: Dict[Tuple[int, int, int], Tuple[int, ...]] = {}
+
+    def _offsets_for(width: int, height: int) -> Tuple[int, ...]:
+        key = (width, height, W)
+        cached = offset_cache.get(key)
+        if cached is not None:
+            return cached
+        offsets = tuple(dy * W + dx for dy in range(height) for dx in range(width))
+        offset_cache[key] = offsets
+        return offsets
+
+    for tile in tile_types:
+        min_side = int(tile["min"])
+        max_side = int(tile["max"])
+        orientations: List[Tuple[int, int, Tuple[int, ...]]] = []
+        dims = [(min_side, max_side)]
+        if min_side != max_side:
+            dims.append((max_side, min_side))
+        dims.sort(key=lambda wh: (-wh[1], -wh[0]))
+        for w, h in dims:
+            offsets = _offsets_for(w, h)
+            orientations.append((w, h, offsets))
+        tile["orientations"] = orientations
+
+    tiles_total = sum(int(tile["count"]) for tile in tile_types)
+    grid = bytearray(W * H)
+    placements: List[Placed] = []
+    placed_tiles = 0
+
+    def _search(filled_cells: int) -> bool:
+        nonlocal placed_tiles
+        if placed_tiles == tiles_total:
+            return True
+        next_idx = grid.find(0)
+        if next_idx == -1:
+            return False
+        y, x = divmod(next_idx, W)
+        for tile in tile_types:
+            if tile["used"] >= tile["count"]:
+                continue
+            for w, h, offsets in tile["orientations"]:
+                if x + w > W or y + h > H:
+                    continue
+                base = next_idx
+                fits = True
+                for off in offsets:
+                    if grid[base + off]:
+                        fits = False
+                        break
+                if not fits:
+                    continue
+                tile["used"] += 1
+                placed_tiles += 1
+                name_idx = tile["used"] - 1
+                names_list = tile["names"]
+                name = None
+                if isinstance(names_list, list) and 0 <= name_idx < len(names_list):
+                    name = names_list[name_idx]
+                placements.append(Placed(x, y, Rect(w, h, name)))
+                for off in offsets:
+                    grid[base + off] = 1
+                if _search(filled_cells + w * h):
+                    return True
+                for off in offsets:
+                    grid[base + off] = 0
+                placements.pop()
+                placed_tiles -= 1
+                tile["used"] -= 1
+        return False
+
+    solved = _search(0)
+    if solved:
+        return placements
+    return None
+
+
 def _no_plus_guard_enabled(cfg) -> bool:
     """Return ``True`` when the plus-intersection guard should be active."""
 
@@ -239,9 +392,15 @@ def _backtracking_exact_cover(
 
     The helper targets small boards where CP-SAT either times out or is
     unavailable.  It only supports the pure exact-cover case (no discards,
-    guards disabled).  A lightweight Algorithm X style search is used and the
-    exploration stops once a configurable node limit is reached to avoid
-    explosive backtracking.
+    guards disabled).  Two search strategies are attempted:
+
+    #.  A greedy tile-filling DFS that walks the grid cell-by-cell.  This is
+        extremely effective for well-behaved racks (e.g. the crash regression
+        puzzle) because the branching factor stays tiny when always anchoring
+        placements at the next uncovered cell.
+    #.  The existing Algorithm X style exact-cover search which acts as a
+        general-purpose safety net when the greedy search fails or encounters
+        one of the configurable guard limits.
     """
 
     try:
@@ -292,7 +451,7 @@ def _backtracking_exact_cover(
         return None
 
     # Permit modestly larger tile counts on small boards before giving up.
-    if n > max_tiles_cfg and not (area_cells <= max_cells_cfg and n <= max_tiles_cfg + 8):
+    if n > max_tiles_cfg:
         stats.update({"reason": "max_tiles_exceeded"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
@@ -301,6 +460,17 @@ def _backtracking_exact_cover(
         stats.update({"reason": "options_mismatch"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
+
+    greedy = _grid_fill_exact_cover(W, H, tiles)
+    if greedy is not None:
+        stats.update({
+            "method": "grid_fill",
+            "result": "solved",
+            "nodes": n,
+            "limit_hit": False,
+        })
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return greedy
 
     # Build an exact-cover matrix that treats each grid cell and tile instance
     # as a column.  Rows represent a specific placement of a specific tile.

@@ -56,6 +56,7 @@ from solver.orchestrator import (
     _should_retry_phase,
 )
 from models import ft_to_cells
+from tests.data import CRASH_DEMAND_BAG_FT
 
 # Remove the temporary stubs so other tests that rely on pytest.importorskip
 # still see the absence of the optional dependency and skip accordingly.
@@ -296,3 +297,185 @@ def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
     required_height = max(ft_to_cells(h_ft) for _w_ft, h_ft in bag_ft.keys())
     assert any(H >= required_height for _W, H, _discard in calls)
     assert H_ft >= max(h_ft for _w_ft, h_ft in bag_ft.keys())
+
+def test_phase_e_pipe_crash_triggers_rescue(monkeypatch):
+    import solver.orchestrator as orchestrator
+    from models import Rect, Placed
+
+    candidate = CandidateBoard(22, 22, "22 × 22 ft")
+
+    def fake_square_candidates(min_side, max_side, *, descending, multiple_of=1):
+        return [candidate]
+
+    call_state = {"count": 0}
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        call_state["count"] += 1
+        return (
+            False,
+            [],
+            "Subprocess ended early (pipe closed)",
+            {
+                "isolation": {
+                    "exitcode": -11,
+                    "payload_received": False,
+                    "payload_kind": None,
+                    "payload_raw_type": None,
+                    "placement_count": 0,
+                    "stderr_tail": "Segmentation fault",
+                }
+            },
+        )
+
+    rescue_calls = []
+
+    def fake_run_backtracking_rescue(W, H, bag, *, hint=None, seconds=None):
+        rescue_calls.append((W, H, seconds))
+        rect = Rect(W, H, "rescue")
+        placed = [Placed(0, 0, rect)]
+        return True, placed, "Deterministic rescue", {"solved_via": "rescue"}
+
+    monkeypatch.setattr(orchestrator, "_square_candidates", fake_square_candidates)
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator, "_run_backtracking_rescue", fake_run_backtracking_rescue)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 12)
+    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 1, raising=False)
+
+    ok, placed, W_ft, H_ft, strategy, reason, meta = orchestrator.solve_orchestrator(
+        bag_ft=CRASH_DEMAND_BAG_FT
+    )
+
+    assert call_state["count"] == 1
+    assert rescue_calls, "Deterministic rescue was not invoked"
+    assert ok
+    assert strategy == "E"
+    assert placed
+
+
+def test_phase_e_crash_with_partial_results_discards_and_rescues(monkeypatch):
+    import solver.orchestrator as orchestrator
+    from models import Rect, Placed
+
+    candidate = CandidateBoard(24, 24, "24 × 24 ft")
+
+    def fake_square_candidates(min_side, max_side, *, descending, multiple_of=1):
+        return [candidate]
+
+    call_state = {"count": 0}
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        call_state["count"] += 1
+        rect = Rect(2, 2, "partial")
+        placed = [Placed(0, 0, rect)]
+        return (
+            False,
+            placed,
+            "Subprocess ended early (pipe closed)",
+            {
+                "isolation": {
+                    "exitcode": -11,
+                    "payload_received": True,
+                    "payload_kind": "result",
+                    "payload_raw_type": "tuple",
+                    "placement_count": len(placed),
+                    "stderr_tail": "Segmentation fault",
+                }
+            },
+        )
+
+    rescue_calls = []
+
+    def fake_run_backtracking_rescue(W, H, bag, *, hint=None, seconds=None):
+        rescue_calls.append((W, H, seconds, hint))
+        rect = Rect(W, H, "rescue")
+        placed = [Placed(0, 0, rect)]
+        return True, placed, "Deterministic rescue", {"solved_via": "rescue"}
+
+    monkeypatch.setattr(orchestrator, "_square_candidates", fake_square_candidates)
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator, "_run_backtracking_rescue", fake_run_backtracking_rescue)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 12)
+    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 3, raising=False)
+
+    ok, placed, W_ft, H_ft, strategy, reason, meta = orchestrator.solve_orchestrator(
+        bag_ft=CRASH_DEMAND_BAG_FT
+    )
+
+    assert call_state["count"] == 1
+    assert rescue_calls, "Deterministic rescue was not invoked"
+    W, H, seconds, hint = rescue_calls[0]
+    assert hint is None
+    assert ok
+    assert strategy == "E"
+    assert placed
+
+
+def test_phase_f_crash_triggers_rescue_even_with_allow_discard(monkeypatch):
+    import solver.orchestrator as orchestrator
+    from models import Rect, Placed
+
+    candidate = CandidateBoard(26, 26, "26 × 26 ft")
+
+    def fake_square_candidates(min_side, max_side, *, descending, multiple_of=1):
+        return [candidate]
+
+    call_state = {"count": 0, "allow_flags": []}
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        call_state["count"] += 1
+        call_state["allow_flags"].append(allow_discard)
+        return (
+            False,
+            [],
+            "Subprocess ended early (pipe closed)",
+            {
+                "isolation": {
+                    "exitcode": -11,
+                    "payload_received": False,
+                    "payload_kind": None,
+                    "payload_raw_type": None,
+                    "placement_count": 0,
+                    "stderr_tail": "Segmentation fault",
+                }
+            },
+        )
+
+    rescue_calls = []
+
+    def fake_run_backtracking_rescue(W, H, bag, *, hint=None, seconds=None):
+        rescue_calls.append((W, H, seconds, hint))
+        rect = Rect(W, H, "rescue")
+        placed = [Placed(0, 0, rect)]
+        return True, placed, "Deterministic rescue", {"solved_via": "rescue"}
+
+    monkeypatch.setattr(orchestrator, "_square_candidates", fake_square_candidates)
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator, "_run_backtracking_rescue", fake_run_backtracking_rescue)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 12)
+    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 1, raising=False)
+
+    ok, placed, W_ft, H_ft, strategy, reason, meta = orchestrator.solve_orchestrator(
+        bag_ft=CRASH_DEMAND_BAG_FT
+    )
+
+    assert call_state["count"] == 1
+    assert call_state["allow_flags"] == [True]
+    assert rescue_calls, "Deterministic rescue was not invoked"
+    W, H, seconds, hint = rescue_calls[0]
+    assert W == candidate.W and H == candidate.H
+    assert hint is None
+    assert ok
+    assert strategy == "F"
+    assert placed
