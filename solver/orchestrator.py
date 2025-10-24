@@ -193,6 +193,22 @@ def _should_retry_phase(reason: Optional[str]) -> bool:
     return any(token in text for token in retry_tokens)
 
 
+def _is_crash_reason(reason: Optional[str]) -> bool:
+    if not reason:
+        return False
+    text = str(reason).strip().lower()
+    if not text:
+        return False
+    crash_tokens = (
+        "subprocess ended early",
+        "parent recv exception",
+        "native solver crash",
+        "timebox / crash",
+        "child exit",
+    )
+    return any(token in text for token in crash_tokens)
+
+
 def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoard]:
     """Return the single Phase C base board candidate."""
 
@@ -475,6 +491,36 @@ def _run_cp_sat_isolated(
     return ok, placed, reason, meta
 
 
+def _run_backtracking_rescue(
+    W: int,
+    H: int,
+    bag: Dict[Tuple[int, int], int],
+    *,
+    hint: Optional[List[Placed]] = None,
+    seconds: Optional[float] = None,
+):
+    try:
+        ok, placed, reason = try_pack_exact_cover(
+            W=W,
+            H=H,
+            multiset=bag,
+            allow_discard=False,
+            max_seconds=float(seconds) if seconds is not None else float(getattr(CFG, "TIME_F", 900.0)),
+            initial_hint=hint,
+            force_backtracking=True,
+        )
+    except Exception as exc:
+        return (
+            False,
+            [],
+            f"Backtracking rescue exception: {type(exc).__name__}: {exc}",
+            None,
+        )
+
+    meta = getattr(try_pack_exact_cover, "last_meta", None)
+    return ok, placed, reason, meta
+
+
 # ---------- public entrypoint ----------
 
 def solve_orchestrator(*args, **kwargs):
@@ -701,6 +747,59 @@ def solve_orchestrator(*args, **kwargs):
                         allow_discard=allow_discard,
                         hint=hint,
                     )
+                    retries = retry_counts.get(key, 0)
+
+                    if (
+                        not ok
+                        and not allow_discard
+                        and not placed
+                        and retries >= max_retries
+                        and _is_crash_reason(reason)
+                    ):
+                        log_attempt_detail(
+                            "Fallback started",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            reason=reason or "",
+                            retries=retries,
+                            max_retries=max_retries,
+                        )
+                        set_message(
+                            f"Phase {label} CP-SAT failed for {cb.label}; running deterministic rescue"
+                        )
+                        fb_start = time.time()
+                        fb_ok, fb_placed, fb_reason, fb_meta = _run_backtracking_rescue(
+                            cb.W,
+                            cb.H,
+                            bag_cells,
+                            hint=hint,
+                            seconds=max(per_attempt, 5.0),
+                        )
+                        fb_elapsed = time.time() - fb_start
+                        if fb_ok and fb_placed:
+                            ok = True
+                            placed = fb_placed
+                            reason = fb_reason
+                            solve_meta = fb_meta or solve_meta
+                            log_attempt_detail(
+                                "Fallback solved",
+                                phase=label,
+                                board=f"{cb.W}×{cb.H}",
+                                elapsed=round(fb_elapsed, 2),
+                                placements=len(fb_placed),
+                                solved_via=(fb_meta or {}).get("solved_via"),
+                            )
+                        else:
+                            reason = fb_reason or reason
+                            solve_meta = fb_meta or solve_meta
+                            log_attempt_detail(
+                                "Fallback failed",
+                                phase=label,
+                                board=f"{cb.W}×{cb.H}",
+                                elapsed=round(fb_elapsed, 2),
+                                reason=reason or "",
+                            )
+
                     attempt_elapsed = time.time() - attempt_started
                     recent_attempts.append(attempt_elapsed)
                     if len(recent_attempts) > 10:
@@ -709,25 +808,25 @@ def solve_orchestrator(*args, **kwargs):
                         f"Phase {label} attempt {attempt_idx}/{max(total, attempt_idx + len(queue))} ran {attempt_elapsed:.1f}s (budget ≤{per_attempt:.1f}s)"
                     )
 
-                    if reason:
-                        last_reason = str(reason)
+                    last_reason = str(reason) if reason else None
 
-                    if solve_meta:
+                    meta_payload = solve_meta if isinstance(solve_meta, dict) else None
+                    if meta_payload:
                         log_attempt_detail(
                             "Solver detail",
                             phase=label,
                             board=f"{cb.W}×{cb.H}",
                             ok=ok,
                             reason=reason or "",
-                            solved_via=solve_meta.get("solved_via"),
-                            placements=solve_meta.get("placed"),
-                            coverage_cells=solve_meta.get("cp_sat_coverage_cells"),
+                            solved_via=meta_payload.get("solved_via"),
+                            placements=meta_payload.get("placed"),
+                            coverage_cells=meta_payload.get("cp_sat_coverage_cells"),
                             allow_discard=allow_discard,
-                            guard_edge=solve_meta.get("cp_sat", {}).get("edge_guard")
-                            if isinstance(solve_meta.get("cp_sat"), dict)
+                            guard_edge=meta_payload.get("cp_sat", {}).get("edge_guard")
+                            if isinstance(meta_payload.get("cp_sat"), dict)
                             else None,
-                            guard_plus=solve_meta.get("cp_sat", {}).get("plus_guard")
-                            if isinstance(solve_meta.get("cp_sat"), dict)
+                            guard_plus=meta_payload.get("cp_sat", {}).get("plus_guard")
+                            if isinstance(meta_payload.get("cp_sat"), dict)
                             else None,
                         )
 

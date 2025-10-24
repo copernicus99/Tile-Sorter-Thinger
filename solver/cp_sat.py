@@ -525,6 +525,7 @@ def try_pack_exact_cover(
     max_seconds: float = 30.0,
     *,
     initial_hint: Optional[List[Placed]] = None,
+    force_backtracking: bool = False,
 ) -> Tuple[bool, List[Placed], str]:
     """Exact-cover model; if allow_discard=True, coverage model (no callbacks)."""
 
@@ -574,12 +575,18 @@ def try_pack_exact_cover(
             meta["error"] = "demand_empty"
             return _finish(False, [], "Bad demand: nothing parsed from request")
 
+        meta["force_backtracking"] = bool(force_backtracking)
+
         randomize = bool(getattr(CFG, "RANDOMIZE_PLACEMENTS", False))
         rng = _system_rng() if randomize else None
 
         tiles = list(tiles)
         tiles_requested = len(tiles)
         meta["tiles_requested"] = tiles_requested
+
+        if force_backtracking and allow_discard:
+            meta["error"] = "backtracking_force_discard"
+            return _finish(False, [], "Backtracking rescue unavailable when discards are allowed")
 
         if randomize and rng is not None and len(tiles) > 1:
             rng.shuffle(tiles)
@@ -755,9 +762,36 @@ def try_pack_exact_cover(
         if not allow_discard and backtracking_pref:
             pref_solution = _run_backtracking("prefilter")
             if pref_solution is not None:
+                if force_backtracking:
+                    meta["cp_sat"] = {"skipped": True}
                 meta["solved_via"] = "backtracking_prefilter"
                 return _finish(True, pref_solution, None)
             backtracking_pref_failed = True
+
+        if force_backtracking:
+            meta["forced_backtracking"] = True
+            rescue = _run_backtracking("forced_rescue")
+            if rescue is not None:
+                meta["solved_via"] = "backtracking_forced"
+                meta["cp_sat"] = {"skipped": True}
+                return _finish(True, rescue, None)
+
+            meta["backtracking_rescue_failed"] = True
+            msg = "Backtracking rescue failed"
+            if backtracking_attempts:
+                last_attempt = backtracking_attempts[-1]
+                details: List[str] = []
+                if isinstance(last_attempt, dict):
+                    reason_tag = last_attempt.get("reason")
+                    if reason_tag:
+                        details.append(str(reason_tag))
+                    if last_attempt.get("limit_hit"):
+                        details.append("limit hit")
+                if details:
+                    msg = f"{msg} ({', '.join(details)})"
+            meta["error"] = "backtracking_rescue_failed"
+            meta["cp_sat"] = {"skipped": True}
+            return _finish(False, [], msg)
 
         def _solve_with_limit(limit_value, seconds, *, edge_guard_cells, plus_guard_enabled):
             m = _cp.CpModel()
