@@ -53,7 +53,13 @@ _RNG: Optional[random.Random] = None
 _PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
 
 
-def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[List[Placed]]:
+def _grid_fill_exact_cover(
+    W: int,
+    H: int,
+    tiles: Sequence[Rect],
+    *,
+    deadline: Optional[float] = None,
+) -> Optional[List[Placed]]:
     """Fast DFS tiler that anchors every placement at the next uncovered cell.
 
     The routine is intentionally conservative: it only attempts a fill when the
@@ -71,9 +77,11 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
         W = int(W)
         H = int(H)
     except Exception:
+        setattr(_grid_fill_exact_cover, "timed_out", False)
         return None
 
     if W <= 0 or H <= 0:
+        setattr(_grid_fill_exact_cover, "timed_out", False)
         return None
 
     total_area = W * H
@@ -84,8 +92,10 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
             rw = abs(int(rect.w))
             rh = abs(int(rect.h))
         except Exception:
+            setattr(_grid_fill_exact_cover, "timed_out", False)
             return None
         if rw <= 0 or rh <= 0:
+            setattr(_grid_fill_exact_cover, "timed_out", False)
             return None
         tile_area += rw * rh
         key = (min(rw, rh), max(rw, rh))
@@ -94,12 +104,25 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
         entry["names"].append(rect.name)
 
     if tile_area > total_area:
+        setattr(_grid_fill_exact_cover, "timed_out", False)
         return None
 
     if not groups:
+        setattr(_grid_fill_exact_cover, "timed_out", False)
         return []
 
     tile_types: List[Dict[str, object]] = []
+    timed_out = False
+
+    def _deadline_exceeded() -> bool:
+        nonlocal timed_out
+        if deadline is None:
+            return False
+        if time.time() >= deadline:
+            timed_out = True
+            return True
+        return False
+
     for (min_side, max_side), entry in groups.items():
         count = int(entry.get("count", 0))
         if count <= 0:
@@ -142,6 +165,8 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
         return offsets
 
     for tile in tile_types:
+        if _deadline_exceeded():
+            break
         min_side = int(tile["min"])
         max_side = int(tile["max"])
         orientations: List[Tuple[int, int, Tuple[int, ...]]] = []
@@ -161,6 +186,8 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
 
     def _search(filled_cells: int) -> bool:
         nonlocal placed_tiles
+        if _deadline_exceeded():
+            return False
         if placed_tiles == tiles_total:
             return True
         next_idx = grid.find(0)
@@ -170,6 +197,8 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
         for tile in tile_types:
             if tile["used"] >= tile["count"]:
                 continue
+            if _deadline_exceeded():
+                return False
             for w, h, offsets in tile["orientations"]:
                 if x + w > W or y + h > H:
                     continue
@@ -201,8 +230,11 @@ def _grid_fill_exact_cover(W: int, H: int, tiles: Sequence[Rect]) -> Optional[Li
         return False
 
     solved = _search(0)
+    setattr(_grid_fill_exact_cover, "timed_out", timed_out)
     if solved:
         return placements
+    if timed_out:
+        return None
     return None
 
 
@@ -387,6 +419,8 @@ def _backtracking_exact_cover(
     H: int,
     tiles: Sequence[Rect],
     options: Sequence[Sequence[Tuple[int, int, int, int, int]]],
+    *,
+    max_seconds: Optional[float] = None,
 ) -> Optional[List[Placed]]:
     """Deterministic exact-cover search used as a last-resort fallback.
 
@@ -429,6 +463,15 @@ def _backtracking_exact_cover(
     except Exception:
         node_limit_cfg = 300000
 
+    try:
+        time_limit = float(max_seconds) if max_seconds is not None else None
+    except Exception:
+        time_limit = None
+    if time_limit is not None and time_limit <= 0:
+        time_limit = None
+
+    deadline = time.time() + time_limit if time_limit is not None else None
+
     stats = {
         "board": (W, H),
         "tiles": n,
@@ -437,6 +480,8 @@ def _backtracking_exact_cover(
         "node_limit": node_limit_cfg,
         "nodes": 0,
         "limit_hit": False,
+        "time_limit": time_limit,
+        "timed_out": False,
     }
     setattr(_backtracking_exact_cover, "last_stats", dict(stats))
 
@@ -445,6 +490,20 @@ def _backtracking_exact_cover(
     node_limit_cfg = max(1, node_limit_cfg)
 
     area_cells = W * H
+    tile_area = 0
+    try:
+        for rect in tiles:
+            tile_area += abs(int(rect.w)) * abs(int(rect.h))
+    except Exception:
+        stats.update({"reason": "tile_dims_invalid"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return None
+
+    if tile_area > area_cells:
+        stats.update({"reason": "tile_area_exceeds_board"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return None
+
     if area_cells > max_cells_cfg:
         stats.update({"reason": "max_cells_exceeded"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
@@ -461,16 +520,22 @@ def _backtracking_exact_cover(
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    greedy = _grid_fill_exact_cover(W, H, tiles)
+    greedy = _grid_fill_exact_cover(W, H, tiles, deadline=deadline)
+    greedy_timed_out = bool(getattr(_grid_fill_exact_cover, "timed_out", False))
     if greedy is not None:
         stats.update({
             "method": "grid_fill",
             "result": "solved",
             "nodes": n,
             "limit_hit": False,
+            "timed_out": False,
         })
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return greedy
+    if greedy_timed_out:
+        stats.update({"reason": "time_limit", "timed_out": True})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return None
 
     # Build an exact-cover matrix that treats each grid cell and tile instance
     # as a column.  Rows represent a specific placement of a specific tile.
@@ -511,9 +576,22 @@ def _backtracking_exact_cover(
     nodes_searched = 0
     limit_hit = False
 
+    timed_out = False
+
+    def _deadline_exceeded() -> bool:
+        nonlocal timed_out
+        if deadline is None:
+            return False
+        if time.time() >= deadline:
+            timed_out = True
+            return True
+        return False
+
     def _choose_column() -> Optional[int]:
         best_col = None
         best_count = None
+        if _deadline_exceeded():
+            return None
         for col in active_cols:
             candidates = 0
             for row_idx in column_to_rows[col]:
@@ -532,6 +610,8 @@ def _backtracking_exact_cover(
 
     def _search() -> bool:
         nonlocal nodes_searched, limit_hit
+        if _deadline_exceeded():
+            return False
         if not active_cols:
             return True
         col = _choose_column()
@@ -547,6 +627,8 @@ def _backtracking_exact_cover(
             return False
 
         for row_idx in candidates:
+            if _deadline_exceeded():
+                return False
             if nodes_searched >= node_limit_cfg:
                 limit_hit = True
                 stats.update({"limit_hit": True})
@@ -578,8 +660,10 @@ def _backtracking_exact_cover(
         return False
 
     if not _search():
-        stats.update({"nodes": nodes_searched, "limit_hit": limit_hit})
-        if limit_hit:
+        stats.update({"nodes": nodes_searched, "limit_hit": limit_hit, "timed_out": timed_out})
+        if timed_out:
+            stats.update({"reason": "time_limit"})
+        elif limit_hit:
             stats.update({"reason": "node_limit"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
@@ -601,6 +685,7 @@ def _backtracking_exact_cover(
         "limit_hit": limit_hit,
         "placed": len(solution),
         "result": "solved",
+        "timed_out": timed_out,
     })
     setattr(_backtracking_exact_cover, "last_stats", dict(stats))
 
@@ -906,7 +991,13 @@ def try_pack_exact_cover(
         def _run_backtracking(stage: str) -> Optional[List[Placed]]:
             attempt: Dict[str, object] = {"stage": stage}
             start_bt = time.time()
-            placements = _backtracking_exact_cover(W, H, tiles, options)
+            placements = _backtracking_exact_cover(
+                W,
+                H,
+                tiles,
+                options,
+                max_seconds=max_seconds,
+            )
             elapsed_bt = time.time() - start_bt
             attempt["elapsed"] = elapsed_bt
             stats = getattr(_backtracking_exact_cover, "last_stats", None)
