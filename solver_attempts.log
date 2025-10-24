@@ -1,179 +1,179 @@
-2025-10-24 11:49:14 [INFO] Run timer started
-2025-10-24 11:49:26 [INFO] Progress reset
-2025-10-24 11:49:26 [INFO] Run timer started
-2025-10-24 11:49:26 [INFO] Phase started | phase=1
-2025-10-24 11:49:26 [INFO] Run setup | demand_count=47 area_sqft=109.75 grid_step=1 max_tile_side=6 base_side_cells=20 sqrt_cells=21
-2025-10-24 11:49:26 [INFO] Phase finished | phase=1 duration=0.02s
-2025-10-24 11:49:26 [INFO] Phase started | phase=S0
-2025-10-24 11:49:26 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
-2025-10-24 11:49:26 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
-2025-10-24 11:49:26 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.00s reason=phase_change
-2025-10-24 11:49:26 [INFO] Phase finished | phase=S0 duration=0.01s
-2025-10-24 11:49:26 [INFO] Phase started | phase=C
-2025-10-24 11:49:26 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=300.00s slice=1/1
-2025-10-24 11:49:26 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-24 11:49:26 [INFO] Attempt dispatched | phase=C board=20×20 queue_size=0 remaining_round=300.0 adaptive_slice=300.0 budget=300.0
-2025-10-24 11:54:26 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=300.01s budget=300.00s slice=1/1 reason=phase_change
-2025-10-24 11:54:26 [INFO] Phase finished | phase=C duration=300.01s
-2025-10-24 11:54:26 [INFO] Phase started | phase=D
-2025-10-24 11:54:26 [INFO] Attempt started | phase=D attempt=10.5 × 10.5 ft grid=10.0 × 10.0 ft budget=120.00s slice=1/15
-2025-10-24 11:54:26 [INFO] Grid updated | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-24 11:54:26 [INFO] Attempt dispatched | phase=D board=21×21 queue_size=14 remaining_round=1800.0 adaptive_slice=120.0 budget=120.0
-2025-10-24 11:56:26 [INFO] Attempt finished | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=120.01s budget=120.00s slice=1/15 reason=switch
-2025-10-24 11:56:26 [INFO] Attempt started | phase=D attempt=10.0 × 10.5 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/15
-2025-10-24 11:56:26 [INFO] Grid updated | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft
-2025-10-24 11:56:26 [INFO] Attempt dispatched | phase=D board=20×21 queue_size=13 remaining_round=1679.99 adaptive_slice=0.89 budget=5.0
-2025-10-24 11:56:31 [INFO] Attempt finished | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft duration=5.01s budget=5.00s slice=2/15 reason=switch
-2025-10-24 11:56:31 [INFO] Attempt started | phase=D attempt=10.5 × 10.0 ft grid=10.0 × 10.5 ft budget=5.00s slice=3/15
-2025-10-24 11:56:31 [INFO] Grid updated | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft
-2025-10-24 11:56:31 [INFO] Attempt dispatched | phase=D board=21×20 queue_size=12 remaining_round=1674.99 adaptive_slice=0.93 budget=5.0
-2025-10-24 11:56:36 [INFO] Attempt finished | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft duration=5.01s budget=5.00s slice=3/15 reason=switch
-2025-10-24 11:56:36 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=10.5 × 10.0 ft budget=5.00s slice=4/15
-2025-10-24 11:56:36 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-24 11:56:36 [INFO] Attempt dispatched | phase=D board=20×20 queue_size=11 remaining_round=1669.98 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:56:41 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=4/15 reason=switch
-2025-10-24 11:56:41 [INFO] Attempt started | phase=D attempt=9.5 × 10.5 ft grid=10.0 × 10.0 ft budget=5.00s slice=5/15
-2025-10-24 11:56:41 [INFO] Grid updated | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft
-2025-10-24 11:56:41 [INFO] Attempt dispatched | phase=D board=19×21 queue_size=10 remaining_round=1664.97 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:56:46 [INFO] Attempt finished | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft duration=5.01s budget=5.00s slice=5/15 reason=switch
-2025-10-24 11:56:46 [INFO] Attempt started | phase=D attempt=10.5 × 9.5 ft grid=9.5 × 10.5 ft budget=5.00s slice=6/15
-2025-10-24 11:56:46 [INFO] Grid updated | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft
-2025-10-24 11:56:46 [INFO] Attempt dispatched | phase=D board=21×19 queue_size=9 remaining_round=1659.96 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:56:51 [INFO] Attempt finished | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft duration=5.01s budget=5.00s slice=6/15 reason=switch
-2025-10-24 11:56:51 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.5 × 9.5 ft budget=5.00s slice=7/15
-2025-10-24 11:56:51 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-24 11:56:51 [INFO] Attempt dispatched | phase=D board=18×22 queue_size=8 remaining_round=1654.96 adaptive_slice=1.13 budget=5.0
-2025-10-24 11:56:56 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=7/15 reason=switch
-2025-10-24 11:56:56 [INFO] Attempt started | phase=D attempt=9.5 × 10.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=8/15
-2025-10-24 11:56:56 [INFO] Grid updated | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft
-2025-10-24 11:56:56 [INFO] Attempt dispatched | phase=D board=19×20 queue_size=7 remaining_round=1649.95 adaptive_slice=1.13 budget=5.0
-2025-10-24 11:57:01 [INFO] Attempt finished | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft duration=5.01s budget=5.00s slice=8/15 reason=switch
-2025-10-24 11:57:01 [INFO] Attempt started | phase=D attempt=10.0 × 9.5 ft grid=9.5 × 10.0 ft budget=5.00s slice=9/15
-2025-10-24 11:57:01 [INFO] Grid updated | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft
-2025-10-24 11:57:01 [INFO] Attempt dispatched | phase=D board=20×19 queue_size=6 remaining_round=1644.94 adaptive_slice=1.13 budget=5.0
-2025-10-24 11:57:06 [INFO] Attempt finished | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft duration=5.01s budget=5.00s slice=9/15 reason=switch
-2025-10-24 11:57:06 [INFO] Attempt started | phase=D attempt=9.0 × 10.5 ft grid=10.0 × 9.5 ft budget=5.00s slice=10/15
-2025-10-24 11:57:06 [INFO] Grid updated | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft
-2025-10-24 11:57:06 [INFO] Attempt dispatched | phase=D board=18×21 queue_size=5 remaining_round=1639.94 adaptive_slice=1.34 budget=5.0
-2025-10-24 11:57:11 [INFO] Attempt finished | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft duration=5.00s budget=5.00s slice=10/15 reason=switch
-2025-10-24 11:57:11 [INFO] Attempt started | phase=D attempt=9.5 × 9.5 ft grid=9.0 × 10.5 ft budget=5.00s slice=11/15
-2025-10-24 11:57:11 [INFO] Grid updated | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft
-2025-10-24 11:57:11 [INFO] Attempt dispatched | phase=D board=19×19 queue_size=4 remaining_round=1634.93 adaptive_slice=1.34 budget=5.0
-2025-10-24 11:57:16 [INFO] Attempt finished | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft duration=5.01s budget=5.00s slice=11/15 reason=switch
-2025-10-24 11:57:16 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=9.5 × 9.5 ft budget=5.00s slice=12/15
-2025-10-24 11:57:16 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-24 11:57:16 [INFO] Attempt dispatched | phase=D board=18×20 queue_size=3 remaining_round=1629.93 adaptive_slice=1.34 budget=5.0
-2025-10-24 11:57:21 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=12/15 reason=switch
-2025-10-24 11:57:21 [INFO] Attempt started | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 10.0 ft budget=5.00s slice=13/15
-2025-10-24 11:57:21 [INFO] Grid updated | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft
-2025-10-24 11:57:21 [INFO] Attempt dispatched | phase=D board=18×19 queue_size=2 remaining_round=1624.92 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:57:26 [INFO] Attempt finished | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft duration=5.01s budget=5.00s slice=13/15 reason=switch
-2025-10-24 11:57:26 [INFO] Attempt started | phase=D attempt=9.5 × 9.0 ft grid=9.0 × 9.5 ft budget=5.00s slice=14/15
-2025-10-24 11:57:26 [INFO] Grid updated | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft
-2025-10-24 11:57:26 [INFO] Attempt dispatched | phase=D board=19×18 queue_size=1 remaining_round=1619.91 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:57:31 [INFO] Attempt finished | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft duration=5.01s budget=5.00s slice=14/15 reason=switch
-2025-10-24 11:57:31 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=9.5 × 9.0 ft budget=5.00s slice=15/15
-2025-10-24 11:57:31 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-24 11:57:31 [INFO] Attempt dispatched | phase=D board=18×18 queue_size=0 remaining_round=1614.9 adaptive_slice=1.24 budget=5.0
-2025-10-24 11:57:36 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=5.01s budget=5.00s slice=15/15 reason=phase_change
-2025-10-24 11:57:36 [INFO] Phase finished | phase=D duration=190.11s
-2025-10-24 11:57:36 [INFO] Phase started | phase=E
-2025-10-24 11:57:36 [INFO] Attempt started | phase=E attempt=10.5 × 10.5 ft grid=9.0 × 9.0 ft budget=75.00s slice=1/12
-2025-10-24 11:57:36 [INFO] Grid updated | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-24 11:57:36 [INFO] Attempt dispatched | phase=E board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
-2025-10-24 11:57:36 [INFO] Attempt finished | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=0.68s budget=75.00s slice=1/12 reason=switch
-2025-10-24 11:57:36 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/12
-2025-10-24 11:57:36 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-24 11:57:36 [INFO] Attempt dispatched | phase=E board=22×22 queue_size=10 remaining_round=899.32 adaptive_slice=0.85 budget=5.0
-2025-10-24 11:57:37 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.60s budget=5.00s slice=2/12 reason=switch
-2025-10-24 11:57:37 [INFO] Attempt started | phase=E attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=5.00s slice=3/12
-2025-10-24 11:57:37 [INFO] Grid updated | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
-2025-10-24 11:57:37 [INFO] Attempt dispatched | phase=E board=23×23 queue_size=9 remaining_round=898.72 adaptive_slice=0.85 budget=5.0
-2025-10-24 11:57:38 [INFO] Attempt finished | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=0.69s budget=5.00s slice=3/12 reason=switch
-2025-10-24 11:57:38 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=5.00s slice=4/12
-2025-10-24 11:57:38 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-24 11:57:38 [INFO] Attempt dispatched | phase=E board=24×24 queue_size=8 remaining_round=898.03 adaptive_slice=0.86 budget=5.0
-2025-10-24 11:57:38 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.64s budget=5.00s slice=4/12 reason=switch
-2025-10-24 11:57:38 [INFO] Attempt started | phase=E attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=5.00s slice=5/12
-2025-10-24 11:57:38 [INFO] Grid updated | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
-2025-10-24 11:57:38 [INFO] Attempt dispatched | phase=E board=25×25 queue_size=7 remaining_round=897.39 adaptive_slice=0.86 budget=5.0
-2025-10-24 11:57:39 [INFO] Attempt finished | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=0.62s budget=5.00s slice=5/12 reason=switch
-2025-10-24 11:57:39 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=5.00s slice=6/12
-2025-10-24 11:57:39 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-24 11:57:39 [INFO] Attempt dispatched | phase=E board=26×26 queue_size=6 remaining_round=896.78 adaptive_slice=0.86 budget=5.0
-2025-10-24 11:57:40 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.58s budget=5.00s slice=6/12 reason=switch
-2025-10-24 11:57:40 [INFO] Attempt started | phase=E attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=5.00s slice=7/12
-2025-10-24 11:57:40 [INFO] Grid updated | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
-2025-10-24 11:57:40 [INFO] Attempt dispatched | phase=E board=27×27 queue_size=5 remaining_round=896.2 adaptive_slice=0.79 budget=5.0
-2025-10-24 11:57:40 [INFO] Attempt finished | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=0.61s budget=5.00s slice=7/12 reason=switch
-2025-10-24 11:57:40 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=5.00s slice=8/12
-2025-10-24 11:57:40 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-24 11:57:40 [INFO] Attempt dispatched | phase=E board=28×28 queue_size=4 remaining_round=895.59 adaptive_slice=0.77 budget=5.0
-2025-10-24 11:57:41 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.59s budget=5.00s slice=8/12 reason=switch
-2025-10-24 11:57:41 [INFO] Attempt started | phase=E attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=5.00s slice=9/12
-2025-10-24 11:57:41 [INFO] Grid updated | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
-2025-10-24 11:57:41 [INFO] Attempt dispatched | phase=E board=29×29 queue_size=3 remaining_round=895.0 adaptive_slice=0.75 budget=5.0
-2025-10-24 11:57:41 [INFO] Attempt finished | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=0.62s budget=5.00s slice=9/12 reason=switch
-2025-10-24 11:57:41 [INFO] Attempt started | phase=E attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=5.00s slice=10/12
-2025-10-24 11:57:41 [INFO] Grid updated | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
-2025-10-24 11:57:41 [INFO] Attempt dispatched | phase=E board=30×30 queue_size=2 remaining_round=894.38 adaptive_slice=0.77 budget=5.0
-2025-10-24 11:57:42 [INFO] Attempt finished | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.62s budget=5.00s slice=10/12 reason=switch
-2025-10-24 11:57:42 [INFO] Attempt started | phase=E attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=5.00s slice=11/12
-2025-10-24 11:57:42 [INFO] Grid updated | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
-2025-10-24 11:57:42 [INFO] Attempt dispatched | phase=E board=31×31 queue_size=1 remaining_round=893.76 adaptive_slice=0.77 budget=5.0
-2025-10-24 11:57:43 [INFO] Attempt finished | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=0.65s budget=5.00s slice=11/12 reason=switch
-2025-10-24 11:57:43 [INFO] Attempt started | phase=E attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.00s slice=12/12
-2025-10-24 11:57:43 [INFO] Grid updated | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
-2025-10-24 11:57:43 [INFO] Attempt dispatched | phase=E board=32×32 queue_size=0 remaining_round=893.11 adaptive_slice=0.81 budget=5.0
-2025-10-24 11:57:43 [INFO] Attempt finished | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.70s budget=5.00s slice=12/12 reason=phase_change
-2025-10-24 11:57:43 [INFO] Phase finished | phase=E duration=7.60s
-2025-10-24 11:57:43 [INFO] Phase started | phase=F
-2025-10-24 11:57:43 [INFO] Attempt started | phase=F attempt=10.5 × 10.5 ft grid=16.0 × 16.0 ft budget=75.00s slice=1/12
-2025-10-24 11:57:43 [INFO] Grid updated | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-24 11:57:43 [INFO] Attempt dispatched | phase=F board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
-2025-10-24 11:57:44 [INFO] Attempt finished | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=0.60s budget=75.00s slice=1/12 reason=switch
-2025-10-24 11:57:44 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/12
-2025-10-24 11:57:44 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-24 11:57:44 [INFO] Attempt dispatched | phase=F board=22×22 queue_size=10 remaining_round=899.4 adaptive_slice=0.74 budget=5.0
-2025-10-24 11:57:44 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.57s budget=5.00s slice=2/12 reason=switch
-2025-10-24 11:57:44 [INFO] Attempt started | phase=F attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=5.00s slice=3/12
-2025-10-24 11:57:44 [INFO] Grid updated | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
-2025-10-24 11:57:44 [INFO] Attempt dispatched | phase=F board=23×23 queue_size=9 remaining_round=898.84 adaptive_slice=0.74 budget=5.0
-2025-10-24 11:57:45 [INFO] Attempt finished | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=0.59s budget=5.00s slice=3/12 reason=switch
-2025-10-24 11:57:45 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=5.00s slice=4/12
-2025-10-24 11:57:45 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-24 11:57:45 [INFO] Attempt dispatched | phase=F board=24×24 queue_size=8 remaining_round=898.24 adaptive_slice=0.74 budget=5.0
-2025-10-24 11:57:46 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.66s budget=5.00s slice=4/12 reason=switch
-2025-10-24 11:57:46 [INFO] Attempt started | phase=F attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=5.00s slice=5/12
-2025-10-24 11:57:46 [INFO] Grid updated | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
-2025-10-24 11:57:46 [INFO] Attempt dispatched | phase=F board=25×25 queue_size=7 remaining_round=897.59 adaptive_slice=0.82 budget=5.0
-2025-10-24 11:57:46 [INFO] Attempt finished | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=0.60s budget=5.00s slice=5/12 reason=switch
-2025-10-24 11:57:46 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=5.00s slice=6/12
-2025-10-24 11:57:46 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-24 11:57:46 [INFO] Attempt dispatched | phase=F board=26×26 queue_size=6 remaining_round=896.99 adaptive_slice=0.82 budget=5.0
-2025-10-24 11:57:47 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.84s budget=5.00s slice=6/12 reason=switch
-2025-10-24 11:57:47 [INFO] Attempt started | phase=F attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=5.00s slice=7/12
-2025-10-24 11:57:47 [INFO] Grid updated | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
-2025-10-24 11:57:47 [INFO] Attempt dispatched | phase=F board=27×27 queue_size=5 remaining_round=896.15 adaptive_slice=1.05 budget=5.0
-2025-10-24 11:57:48 [INFO] Attempt finished | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=0.61s budget=5.00s slice=7/12 reason=switch
-2025-10-24 11:57:48 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=5.00s slice=8/12
-2025-10-24 11:57:48 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-24 11:57:48 [INFO] Attempt dispatched | phase=F board=28×28 queue_size=4 remaining_round=895.54 adaptive_slice=1.05 budget=5.0
-2025-10-24 11:57:48 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.62s budget=5.00s slice=8/12 reason=switch
-2025-10-24 11:57:48 [INFO] Attempt started | phase=F attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=5.00s slice=9/12
-2025-10-24 11:57:48 [INFO] Grid updated | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
-2025-10-24 11:57:48 [INFO] Attempt dispatched | phase=F board=29×29 queue_size=3 remaining_round=894.92 adaptive_slice=1.05 budget=5.0
-2025-10-24 11:57:49 [INFO] Attempt finished | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=0.66s budget=5.00s slice=9/12 reason=switch
-2025-10-24 11:57:49 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=5.00s slice=10/12
-2025-10-24 11:57:49 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
-2025-10-24 11:57:49 [INFO] Attempt dispatched | phase=F board=30×30 queue_size=2 remaining_round=894.26 adaptive_slice=0.82 budget=5.0
-2025-10-24 11:57:50 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.83s budget=5.00s slice=10/12 reason=switch
-2025-10-24 11:57:50 [INFO] Attempt started | phase=F attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=5.00s slice=11/12
-2025-10-24 11:57:50 [INFO] Grid updated | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
-2025-10-24 11:57:50 [INFO] Attempt dispatched | phase=F board=31×31 queue_size=1 remaining_round=893.44 adaptive_slice=1.03 budget=5.0
-2025-10-24 11:57:51 [INFO] Attempt finished | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=0.78s budget=5.00s slice=11/12 reason=switch
-2025-10-24 11:57:51 [INFO] Attempt started | phase=F attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.00s slice=12/12
-2025-10-24 11:57:51 [INFO] Grid updated | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
-2025-10-24 11:57:51 [INFO] Attempt dispatched | phase=F board=32×32 queue_size=0 remaining_round=892.66 adaptive_slice=1.03 budget=5.0
-2025-10-24 11:57:51 [INFO] Attempt finished | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=0.63s budget=5.00s slice=12/12 reason=run_complete
-2025-10-24 11:57:51 [INFO] Run finished | status=Error ok=False duration=505.72s best_used=0 coverage=0.00% message=cp-sat exception: NameError: name 'n' is not defined
+2025-10-24 12:15:03 [INFO] Run timer started
+2025-10-24 12:15:17 [INFO] Progress reset
+2025-10-24 12:15:17 [INFO] Run timer started
+2025-10-24 12:15:17 [INFO] Phase started | phase=1
+2025-10-24 12:15:17 [INFO] Run setup | demand_count=47 area_sqft=109.75 grid_step=1 max_tile_side=6 base_side_cells=20 sqrt_cells=21
+2025-10-24 12:15:17 [INFO] Phase finished | phase=1 duration=0.01s
+2025-10-24 12:15:17 [INFO] Phase started | phase=S0
+2025-10-24 12:15:17 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
+2025-10-24 12:15:17 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
+2025-10-24 12:15:17 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.01s reason=phase_change
+2025-10-24 12:15:17 [INFO] Phase finished | phase=S0 duration=0.01s
+2025-10-24 12:15:17 [INFO] Phase started | phase=C
+2025-10-24 12:15:17 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=300.00s slice=1/1
+2025-10-24 12:15:17 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-24 12:15:17 [INFO] Attempt dispatched | phase=C board=20×20 queue_size=0 remaining_round=300.0 adaptive_slice=300.0 budget=300.0
+2025-10-24 12:20:17 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=300.00s budget=300.00s slice=1/1 reason=phase_change
+2025-10-24 12:20:17 [INFO] Phase finished | phase=C duration=300.01s
+2025-10-24 12:20:17 [INFO] Phase started | phase=D
+2025-10-24 12:20:17 [INFO] Attempt started | phase=D attempt=10.5 × 10.5 ft grid=10.0 × 10.0 ft budget=120.00s slice=1/15
+2025-10-24 12:20:17 [INFO] Grid updated | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
+2025-10-24 12:20:17 [INFO] Attempt dispatched | phase=D board=21×21 queue_size=14 remaining_round=1800.0 adaptive_slice=120.0 budget=120.0
+2025-10-24 12:22:17 [INFO] Attempt finished | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=120.00s budget=120.00s slice=1/15 reason=switch
+2025-10-24 12:22:17 [INFO] Attempt started | phase=D attempt=10.0 × 10.5 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/15
+2025-10-24 12:22:17 [INFO] Grid updated | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft
+2025-10-24 12:22:17 [INFO] Attempt dispatched | phase=D board=20×21 queue_size=13 remaining_round=1679.99 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:22:22 [INFO] Attempt finished | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft duration=5.01s budget=5.00s slice=2/15 reason=switch
+2025-10-24 12:22:22 [INFO] Attempt started | phase=D attempt=10.5 × 10.0 ft grid=10.0 × 10.5 ft budget=5.00s slice=3/15
+2025-10-24 12:22:22 [INFO] Grid updated | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft
+2025-10-24 12:22:22 [INFO] Attempt dispatched | phase=D board=21×20 queue_size=12 remaining_round=1674.99 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:22:27 [INFO] Attempt finished | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft duration=5.01s budget=5.00s slice=3/15 reason=switch
+2025-10-24 12:22:27 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=10.5 × 10.0 ft budget=5.00s slice=4/15
+2025-10-24 12:22:27 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-24 12:22:27 [INFO] Attempt dispatched | phase=D board=20×20 queue_size=11 remaining_round=1669.98 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:22:32 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=5.01s budget=5.00s slice=4/15 reason=switch
+2025-10-24 12:22:32 [INFO] Attempt started | phase=D attempt=9.5 × 10.5 ft grid=10.0 × 10.0 ft budget=5.00s slice=5/15
+2025-10-24 12:22:32 [INFO] Grid updated | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft
+2025-10-24 12:22:32 [INFO] Attempt dispatched | phase=D board=19×21 queue_size=10 remaining_round=1664.98 adaptive_slice=1.01 budget=5.0
+2025-10-24 12:22:37 [INFO] Attempt finished | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft duration=5.01s budget=5.00s slice=5/15 reason=switch
+2025-10-24 12:22:37 [INFO] Attempt started | phase=D attempt=10.5 × 9.5 ft grid=9.5 × 10.5 ft budget=5.00s slice=6/15
+2025-10-24 12:22:37 [INFO] Grid updated | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft
+2025-10-24 12:22:37 [INFO] Attempt dispatched | phase=D board=21×19 queue_size=9 remaining_round=1659.97 adaptive_slice=1.01 budget=5.0
+2025-10-24 12:22:42 [INFO] Attempt finished | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft duration=5.01s budget=5.00s slice=6/15 reason=switch
+2025-10-24 12:22:42 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.5 × 9.5 ft budget=5.00s slice=7/15
+2025-10-24 12:22:42 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
+2025-10-24 12:22:42 [INFO] Attempt dispatched | phase=D board=18×22 queue_size=8 remaining_round=1654.96 adaptive_slice=0.97 budget=5.0
+2025-10-24 12:22:47 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=5.01s budget=5.00s slice=7/15 reason=switch
+2025-10-24 12:22:47 [INFO] Attempt started | phase=D attempt=9.5 × 10.0 ft grid=9.0 × 11.0 ft budget=5.00s slice=8/15
+2025-10-24 12:22:47 [INFO] Grid updated | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft
+2025-10-24 12:22:47 [INFO] Attempt dispatched | phase=D board=19×20 queue_size=7 remaining_round=1649.95 adaptive_slice=0.97 budget=5.0
+2025-10-24 12:22:52 [INFO] Attempt finished | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft duration=5.01s budget=5.00s slice=8/15 reason=switch
+2025-10-24 12:22:52 [INFO] Attempt started | phase=D attempt=10.0 × 9.5 ft grid=9.5 × 10.0 ft budget=5.00s slice=9/15
+2025-10-24 12:22:52 [INFO] Grid updated | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft
+2025-10-24 12:22:52 [INFO] Attempt dispatched | phase=D board=20×19 queue_size=6 remaining_round=1644.95 adaptive_slice=0.97 budget=5.0
+2025-10-24 12:22:57 [INFO] Attempt finished | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft duration=5.01s budget=5.00s slice=9/15 reason=switch
+2025-10-24 12:22:57 [INFO] Attempt started | phase=D attempt=9.0 × 10.5 ft grid=10.0 × 9.5 ft budget=5.00s slice=10/15
+2025-10-24 12:22:57 [INFO] Grid updated | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft
+2025-10-24 12:22:57 [INFO] Attempt dispatched | phase=D board=18×21 queue_size=5 remaining_round=1639.94 adaptive_slice=0.98 budget=5.0
+2025-10-24 12:23:02 [INFO] Attempt finished | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft duration=5.01s budget=5.00s slice=10/15 reason=switch
+2025-10-24 12:23:02 [INFO] Attempt started | phase=D attempt=9.5 × 9.5 ft grid=9.0 × 10.5 ft budget=5.00s slice=11/15
+2025-10-24 12:23:02 [INFO] Grid updated | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft
+2025-10-24 12:23:02 [INFO] Attempt dispatched | phase=D board=19×19 queue_size=4 remaining_round=1634.93 adaptive_slice=0.98 budget=5.0
+2025-10-24 12:23:07 [INFO] Attempt finished | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft duration=5.01s budget=5.00s slice=11/15 reason=switch
+2025-10-24 12:23:07 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=9.5 × 9.5 ft budget=5.00s slice=12/15
+2025-10-24 12:23:07 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
+2025-10-24 12:23:07 [INFO] Attempt dispatched | phase=D board=18×20 queue_size=3 remaining_round=1629.93 adaptive_slice=0.98 budget=5.0
+2025-10-24 12:23:12 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=5.01s budget=5.00s slice=12/15 reason=switch
+2025-10-24 12:23:12 [INFO] Attempt started | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 10.0 ft budget=5.00s slice=13/15
+2025-10-24 12:23:12 [INFO] Grid updated | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft
+2025-10-24 12:23:12 [INFO] Attempt dispatched | phase=D board=18×19 queue_size=2 remaining_round=1624.92 adaptive_slice=1.0 budget=5.0
+2025-10-24 12:23:17 [INFO] Attempt finished | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft duration=5.01s budget=5.00s slice=13/15 reason=switch
+2025-10-24 12:23:17 [INFO] Attempt started | phase=D attempt=9.5 × 9.0 ft grid=9.0 × 9.5 ft budget=5.00s slice=14/15
+2025-10-24 12:23:17 [INFO] Grid updated | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft
+2025-10-24 12:23:17 [INFO] Attempt dispatched | phase=D board=19×18 queue_size=1 remaining_round=1619.91 adaptive_slice=1.0 budget=5.0
+2025-10-24 12:28:34 [INFO] Attempt finished | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft duration=316.97s budget=5.00s slice=14/15 reason=switch
+2025-10-24 12:28:34 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=9.5 × 9.0 ft budget=396.18s slice=15/15
+2025-10-24 12:28:34 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
+2025-10-24 12:28:34 [INFO] Attempt dispatched | phase=D board=18×18 queue_size=0 remaining_round=1302.95 adaptive_slice=396.18 budget=396.18
+2025-10-24 12:35:10 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=396.20s budget=396.18s slice=15/15 reason=phase_change
+2025-10-24 12:35:10 [INFO] Phase finished | phase=D duration=893.25s
+2025-10-24 12:35:10 [INFO] Phase started | phase=E
+2025-10-24 12:35:10 [INFO] Attempt started | phase=E attempt=10.5 × 10.5 ft grid=9.0 × 9.0 ft budget=75.00s slice=1/12
+2025-10-24 12:35:10 [INFO] Grid updated | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
+2025-10-24 12:35:10 [INFO] Attempt dispatched | phase=E board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
+2025-10-24 12:35:11 [INFO] Attempt finished | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=0.88s budget=75.00s slice=1/12 reason=switch
+2025-10-24 12:35:11 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/12
+2025-10-24 12:35:11 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-24 12:35:11 [INFO] Attempt dispatched | phase=E board=22×22 queue_size=10 remaining_round=899.12 adaptive_slice=1.09 budget=5.0
+2025-10-24 12:35:12 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.74s budget=5.00s slice=2/12 reason=switch
+2025-10-24 12:35:12 [INFO] Attempt started | phase=E attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=5.00s slice=3/12
+2025-10-24 12:35:12 [INFO] Grid updated | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
+2025-10-24 12:35:12 [INFO] Attempt dispatched | phase=E board=23×23 queue_size=9 remaining_round=898.38 adaptive_slice=1.09 budget=5.0
+2025-10-24 12:35:13 [INFO] Attempt finished | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=0.92s budget=5.00s slice=3/12 reason=switch
+2025-10-24 12:35:13 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=5.00s slice=4/12
+2025-10-24 12:35:13 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-24 12:35:13 [INFO] Attempt dispatched | phase=E board=24×24 queue_size=8 remaining_round=897.46 adaptive_slice=1.15 budget=5.0
+2025-10-24 12:35:14 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.89s budget=5.00s slice=4/12 reason=switch
+2025-10-24 12:35:14 [INFO] Attempt started | phase=E attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=5.00s slice=5/12
+2025-10-24 12:35:14 [INFO] Grid updated | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
+2025-10-24 12:35:14 [INFO] Attempt dispatched | phase=E board=25×25 queue_size=7 remaining_round=896.57 adaptive_slice=1.15 budget=5.0
+2025-10-24 12:35:15 [INFO] Attempt finished | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=0.94s budget=5.00s slice=5/12 reason=switch
+2025-10-24 12:35:15 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=5.00s slice=6/12
+2025-10-24 12:35:15 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-24 12:35:15 [INFO] Attempt dispatched | phase=E board=26×26 queue_size=6 remaining_round=895.63 adaptive_slice=1.18 budget=5.0
+2025-10-24 12:35:15 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.93s budget=5.00s slice=6/12 reason=switch
+2025-10-24 12:35:15 [INFO] Attempt started | phase=E attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=5.00s slice=7/12
+2025-10-24 12:35:15 [INFO] Grid updated | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
+2025-10-24 12:35:15 [INFO] Attempt dispatched | phase=E board=27×27 queue_size=5 remaining_round=894.7 adaptive_slice=1.18 budget=5.0
+2025-10-24 12:35:16 [INFO] Attempt finished | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=0.78s budget=5.00s slice=7/12 reason=switch
+2025-10-24 12:35:16 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=5.00s slice=8/12
+2025-10-24 12:35:16 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-24 12:35:16 [INFO] Attempt dispatched | phase=E board=28×28 queue_size=4 remaining_round=893.92 adaptive_slice=1.18 budget=5.0
+2025-10-24 12:35:17 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.65s budget=5.00s slice=8/12 reason=switch
+2025-10-24 12:35:17 [INFO] Attempt started | phase=E attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=5.00s slice=9/12
+2025-10-24 12:35:17 [INFO] Grid updated | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
+2025-10-24 12:35:17 [INFO] Attempt dispatched | phase=E board=29×29 queue_size=3 remaining_round=893.26 adaptive_slice=1.16 budget=5.0
+2025-10-24 12:35:18 [INFO] Attempt finished | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=0.76s budget=5.00s slice=9/12 reason=switch
+2025-10-24 12:35:18 [INFO] Attempt started | phase=E attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=5.00s slice=10/12
+2025-10-24 12:35:18 [INFO] Grid updated | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-24 12:35:18 [INFO] Attempt dispatched | phase=E board=30×30 queue_size=2 remaining_round=892.5 adaptive_slice=0.97 budget=5.0
+2025-10-24 12:35:19 [INFO] Attempt finished | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.88s budget=5.00s slice=10/12 reason=switch
+2025-10-24 12:35:19 [INFO] Attempt started | phase=E attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=5.00s slice=11/12
+2025-10-24 12:35:19 [INFO] Grid updated | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
+2025-10-24 12:35:19 [INFO] Attempt dispatched | phase=E board=31×31 queue_size=1 remaining_round=891.62 adaptive_slice=1.09 budget=5.0
+2025-10-24 12:35:19 [INFO] Attempt finished | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=0.90s budget=5.00s slice=11/12 reason=switch
+2025-10-24 12:35:19 [INFO] Attempt started | phase=E attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.00s slice=12/12
+2025-10-24 12:35:19 [INFO] Grid updated | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-24 12:35:19 [INFO] Attempt dispatched | phase=E board=32×32 queue_size=0 remaining_round=890.72 adaptive_slice=1.12 budget=5.0
+2025-10-24 12:35:20 [INFO] Attempt finished | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=1.05s budget=5.00s slice=12/12 reason=phase_change
+2025-10-24 12:35:20 [INFO] Phase finished | phase=E duration=10.33s
+2025-10-24 12:35:20 [INFO] Phase started | phase=F
+2025-10-24 12:35:20 [INFO] Attempt started | phase=F attempt=10.5 × 10.5 ft grid=16.0 × 16.0 ft budget=75.00s slice=1/12
+2025-10-24 12:35:20 [INFO] Grid updated | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
+2025-10-24 12:35:20 [INFO] Attempt dispatched | phase=F board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
+2025-10-24 12:35:21 [INFO] Attempt finished | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=0.88s budget=75.00s slice=1/12 reason=switch
+2025-10-24 12:35:21 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=5.00s slice=2/12
+2025-10-24 12:35:21 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-24 12:35:21 [INFO] Attempt dispatched | phase=F board=22×22 queue_size=10 remaining_round=899.12 adaptive_slice=1.09 budget=5.0
+2025-10-24 12:35:22 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=0.89s budget=5.00s slice=2/12 reason=switch
+2025-10-24 12:35:22 [INFO] Attempt started | phase=F attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=5.00s slice=3/12
+2025-10-24 12:35:22 [INFO] Grid updated | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
+2025-10-24 12:35:22 [INFO] Attempt dispatched | phase=F board=23×23 queue_size=9 remaining_round=898.22 adaptive_slice=1.11 budget=5.0
+2025-10-24 12:35:23 [INFO] Attempt finished | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=0.86s budget=5.00s slice=3/12 reason=switch
+2025-10-24 12:35:23 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=5.00s slice=4/12
+2025-10-24 12:35:23 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-24 12:35:23 [INFO] Attempt dispatched | phase=F board=24×24 queue_size=8 remaining_round=897.36 adaptive_slice=1.11 budget=5.0
+2025-10-24 12:35:24 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=0.83s budget=5.00s slice=4/12 reason=switch
+2025-10-24 12:35:24 [INFO] Attempt started | phase=F attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=5.00s slice=5/12
+2025-10-24 12:35:24 [INFO] Grid updated | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
+2025-10-24 12:35:24 [INFO] Attempt dispatched | phase=F board=25×25 queue_size=7 remaining_round=896.53 adaptive_slice=1.11 budget=5.0
+2025-10-24 12:35:25 [INFO] Attempt finished | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=0.96s budget=5.00s slice=5/12 reason=switch
+2025-10-24 12:35:25 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=5.00s slice=6/12
+2025-10-24 12:35:25 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-24 12:35:25 [INFO] Attempt dispatched | phase=F board=26×26 queue_size=6 remaining_round=895.57 adaptive_slice=1.19 budget=5.0
+2025-10-24 12:35:26 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=0.91s budget=5.00s slice=6/12 reason=switch
+2025-10-24 12:35:26 [INFO] Attempt started | phase=F attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=5.00s slice=7/12
+2025-10-24 12:35:26 [INFO] Grid updated | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
+2025-10-24 12:35:26 [INFO] Attempt dispatched | phase=F board=27×27 queue_size=5 remaining_round=894.66 adaptive_slice=1.19 budget=5.0
+2025-10-24 12:35:27 [INFO] Attempt finished | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=0.91s budget=5.00s slice=7/12 reason=switch
+2025-10-24 12:35:27 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=5.00s slice=8/12
+2025-10-24 12:35:27 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-24 12:35:27 [INFO] Attempt dispatched | phase=F board=28×28 queue_size=4 remaining_round=893.75 adaptive_slice=1.19 budget=5.0
+2025-10-24 12:35:28 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=0.79s budget=5.00s slice=8/12 reason=switch
+2025-10-24 12:35:28 [INFO] Attempt started | phase=F attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=5.00s slice=9/12
+2025-10-24 12:35:28 [INFO] Grid updated | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
+2025-10-24 12:35:28 [INFO] Attempt dispatched | phase=F board=29×29 queue_size=3 remaining_round=892.96 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:35:28 [INFO] Attempt finished | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=0.77s budget=5.00s slice=9/12 reason=switch
+2025-10-24 12:35:28 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=5.00s slice=10/12
+2025-10-24 12:35:28 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-24 12:35:28 [INFO] Attempt dispatched | phase=F board=30×30 queue_size=2 remaining_round=892.19 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:35:29 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=0.91s budget=5.00s slice=10/12 reason=switch
+2025-10-24 12:35:29 [INFO] Attempt started | phase=F attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=5.00s slice=11/12
+2025-10-24 12:35:29 [INFO] Grid updated | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
+2025-10-24 12:35:29 [INFO] Attempt dispatched | phase=F board=31×31 queue_size=1 remaining_round=891.28 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:35:30 [INFO] Attempt finished | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=0.88s budget=5.00s slice=11/12 reason=switch
+2025-10-24 12:35:30 [INFO] Attempt started | phase=F attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.00s slice=12/12
+2025-10-24 12:35:30 [INFO] Grid updated | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-24 12:35:30 [INFO] Attempt dispatched | phase=F board=32×32 queue_size=0 remaining_round=890.4 adaptive_slice=1.13 budget=5.0
+2025-10-24 12:35:31 [INFO] Attempt finished | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=1.06s budget=5.00s slice=12/12 reason=run_complete
+2025-10-24 12:35:31 [INFO] Run finished | status=Error ok=False duration=1214.28s best_used=0 coverage=0.00% message=cp-sat exception: TypeError: try_pack_exact_cover.<locals>._attempt() got an unexpected keyword argument 'edge_guard_cells'. Did you mean 'edge_guard_cells_param'?
