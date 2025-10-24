@@ -17,7 +17,8 @@ from tiles import parse_demand
 from config import CFG, CELL
 from progress import (
     set_phase, set_phase_total, set_attempt, set_grid, set_progress_pct,
-    set_best_used, set_coverage_pct, set_elapsed, set_status, set_message
+    set_best_used, set_coverage_pct, set_elapsed, set_status, set_message,
+    log_attempt_detail,
 )
 from solver.cp_sat import try_pack_exact_cover
 
@@ -334,10 +335,11 @@ def _cp_worker(conn, W, H, bag, seconds, allow_discard, hint):
         out = []
         for p in placed:
             out.append((p.x, p.y, (p.rect.w, p.rect.h, getattr(p.rect, "name", None))))
-        conn.send((ok, out, reason))
+        meta = getattr(try_pack_exact_cover, "last_meta", None)
+        conn.send((ok, out, reason, meta))
     except Exception as e:
         try:
-            conn.send((False, [], f"cp-sat exception: {type(e).__name__}: {e}"))
+            conn.send((False, [], f"cp-sat exception: {type(e).__name__}: {e}", None))
         except Exception:
             pass
     finally:
@@ -414,6 +416,7 @@ def _run_cp_sat_isolated(
     ok = False
     placed: List[Placed] = []
     reason = None
+    meta: Optional[Dict[str, object]] = None
     got_message = False
 
     try:
@@ -434,13 +437,20 @@ def _run_cp_sat_isolated(
     try:
         if parent.poll(0):
             got_message = True
-            ok_msg, placed_msg, reason_msg = parent.recv()
+            payload = parent.recv()
+            if isinstance(payload, tuple) and len(payload) == 4:
+                ok_msg, placed_msg, reason_msg, meta_msg = payload
+            else:
+                ok_msg, placed_msg, reason_msg = payload
+                meta_msg = None
             ok = bool(ok_msg)
             out: List[Placed] = []
             for x, y, (w, h, nm) in placed_msg:
                 out.append(Placed(x, y, Rect(w, h, nm)))
             placed = out
             reason = reason_msg
+            if isinstance(meta_msg, dict):
+                meta = meta_msg
         else:
             reason = "Stopped before solution (timebox / crash?)"
     except (EOFError, BrokenPipeError):
@@ -462,7 +472,7 @@ def _run_cp_sat_isolated(
         if not got_message or not reason:
             reason = "Native solver crash (0xC0000005) – isolated; server is fine"
 
-    return ok, placed, reason
+    return ok, placed, reason, meta
 
 
 # ---------- public entrypoint ----------
@@ -643,7 +653,7 @@ def solve_orchestrator(*args, **kwargs):
                     set_grid(cb.label)
                     attempt_started = time.time()
                     hint = hint_cache.get((cb.W, cb.H))
-                    ok, placed, reason = _run_cp_sat_isolated(
+                    ok, placed, reason, solve_meta = _run_cp_sat_isolated(
                         W=cb.W,
                         H=cb.H,
                         bag=bag_cells,
@@ -661,6 +671,25 @@ def solve_orchestrator(*args, **kwargs):
 
                     if reason:
                         last_reason = str(reason)
+
+                    if solve_meta:
+                        log_attempt_detail(
+                            "Solver detail",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            ok=ok,
+                            reason=reason or "",
+                            solved_via=solve_meta.get("solved_via"),
+                            placements=solve_meta.get("placed"),
+                            coverage_cells=solve_meta.get("cp_sat_coverage_cells"),
+                            allow_discard=allow_discard,
+                            guard_edge=solve_meta.get("cp_sat", {}).get("edge_guard")
+                            if isinstance(solve_meta.get("cp_sat"), dict)
+                            else None,
+                            guard_plus=solve_meta.get("cp_sat", {}).get("plus_guard")
+                            if isinstance(solve_meta.get("cp_sat"), dict)
+                            else None,
+                        )
 
                     if placed:
                         hint_cache[(cb.W, cb.H)] = list(placed)

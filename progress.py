@@ -452,6 +452,23 @@ def set_message(msg: Any) -> None:
         PROGRESS["message"] = "" if msg is None else str(msg)
         _persist_locked()
 
+def log_attempt_detail(event: str, **fields: Any) -> None:
+    clean: Dict[str, Any] = {}
+    for key, value in fields.items():
+        if value is None:
+            continue
+        if isinstance(value, (str, int, float, bool)):
+            clean[key] = value
+        else:
+            try:
+                clean[key] = json.dumps(value, sort_keys=True)
+            except Exception:
+                clean[key] = str(value)
+    if not clean:
+        clean = {"note": "(no details)"}
+    with PROGRESS_LOCK:
+        _emit_log(event, **clean)
+
 def set_result_url(url: Any) -> None:
     with PROGRESS_LOCK:
         PROGRESS["result_url"] = "" if url is None else str(url)
