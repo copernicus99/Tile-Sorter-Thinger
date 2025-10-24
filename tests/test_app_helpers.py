@@ -86,3 +86,23 @@ def test_finalize_solver_progress_respects_ok_flag(monkeypatch):
     app._finalize_solver_progress(False, "error happened")
     assert calls["status"][-1] == "error"
     assert calls["done"][-1] == (False, "error happened", None)
+
+
+def test_normalize_result_prefers_failure_reason_over_error(monkeypatch):
+    _install_flask_stub(monkeypatch)
+    app = importlib.import_module("app")
+
+    payload = (
+        False,
+        [],
+        0.0,
+        0.0,
+        "error",
+        "No solution available",
+        {"reason": "No solution available"},
+    )
+
+    normalized = app._normalize_result(payload)
+    assert normalized["ok"] is False
+    assert normalized["strategy"] == "No solution available"
+    assert normalized["reason"] == "No solution available"
