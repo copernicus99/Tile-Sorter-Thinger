@@ -490,6 +490,20 @@ def _backtracking_exact_cover(
     node_limit_cfg = max(1, node_limit_cfg)
 
     area_cells = W * H
+    tile_area = 0
+    try:
+        for rect in tiles:
+            tile_area += abs(int(rect.w)) * abs(int(rect.h))
+    except Exception:
+        stats.update({"reason": "tile_dims_invalid"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return None
+
+    if tile_area > area_cells:
+        stats.update({"reason": "tile_area_exceeds_board"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+        return None
+
     if area_cells > max_cells_cfg:
         stats.update({"reason": "max_cells_exceeded"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
