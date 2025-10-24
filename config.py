@@ -16,8 +16,8 @@ RANDOMIZE_PLACEMENTS = int(os.getenv("TS_RANDOMIZE_PLACEMENTS", "1")) != 0
 # Defaults are tuned so the deterministic fallback can cover a 10 ft × 10 ft
 # grid stocked with the common 10-packs of 2×3 and 2×2 tiles without requiring
 # extra environment overrides.
-BACKTRACK_MAX_CELLS = int(os.getenv("TS_BACKTRACK_MAX_CELLS", "900"))
-BACKTRACK_MAX_TILES = int(os.getenv("TS_BACKTRACK_MAX_TILES", "32"))
+BACKTRACK_MAX_CELLS = int(os.getenv("TS_BACKTRACK_MAX_CELLS", "1600"))
+BACKTRACK_MAX_TILES = int(os.getenv("TS_BACKTRACK_MAX_TILES", "64"))
 BACKTRACK_NODE_LIMIT = int(os.getenv("TS_BACKTRACK_NODE_LIMIT", "5000000"))
 BACKTRACK_PROBE_FIRST = int(os.getenv("TS_BACKTRACK_PROBE_FIRST", "1")) != 0
 

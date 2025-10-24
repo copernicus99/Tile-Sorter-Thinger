@@ -205,6 +205,49 @@ def test_backtracking_handles_medium_board(cp_sat_module):
     assert len(covered) == 400
 
 
+def test_force_backtracking_solves_board(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [
+        Rect(2, 2, "A"),
+        Rect(2, 2, "B"),
+        Rect(2, 2, "C"),
+        Rect(2, 2, "D"),
+    ]
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(
+        4,
+        4,
+        tiles,
+        force_backtracking=True,
+    )
+
+    assert ok
+    assert reason is None
+    assert len(placed) == len(tiles)
+    meta = getattr(cp_sat_module.try_pack_exact_cover, "last_meta", {})
+    solved_via = meta.get("solved_via")
+    assert solved_via in {"backtracking_forced", "backtracking_prefilter"}
+    cp_sat_meta = meta.get("cp_sat") if isinstance(meta, dict) else None
+    assert isinstance(cp_sat_meta, dict) and cp_sat_meta.get("skipped") is True
+
+
+def test_force_backtracking_requires_strict_mode(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [Rect(2, 2, "A"), Rect(2, 2, "B")]
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(
+        4,
+        4,
+        tiles,
+        allow_discard=True,
+        force_backtracking=True,
+    )
+
+    assert not ok
+    assert placed == []
+    assert "Backtracking rescue" in (reason or "")
+
+
 def test_backtracking_respects_limits(monkeypatch, cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [Rect(1, 1, f"t{i}") for i in range(10)]
