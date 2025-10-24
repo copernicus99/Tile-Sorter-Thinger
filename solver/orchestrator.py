@@ -1238,15 +1238,33 @@ def solve_orchestrator(*args, **kwargs):
                     }
         else:
             base_candidate = _phase_c_candidates(base_side_cells, grid_step=grid_step)[0]
-            res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
-                "C",
-                [base_candidate],
-                float(getattr(CFG, "TIME_C", 300.0)),
-                False,
-                prefer_large=False,
-                continue_on_partial=True,
-                require_full_duration=True,
-            )
+            base_area_cells = base_candidate.W * base_candidate.H
+            if area_cells > base_area_cells:
+                log_attempt_detail(
+                    "Phase C skipped",
+                    reason="Demand exceeds base board",
+                    demand_cells=area_cells,
+                    board_cells=base_area_cells,
+                    demand_sqft=round(area_sqft, 2),
+                    board_sqft=round(_area_sqft(base_area_cells), 2),
+                )
+                set_message("Demand exceeds 10.0 × 10.0 ft grid; expanding search")
+                res_ok = False
+                res_board = None
+                res_placed = []
+                res_cov = 0.0
+                res_used = 0
+                res_reason = "Demand exceeds base Phase C board"
+            else:
+                res_ok, res_board, res_placed, res_cov, res_used, res_reason = _run_phase(
+                    "C",
+                    [base_candidate],
+                    float(getattr(CFG, "TIME_C", 300.0)),
+                    False,
+                    prefer_large=False,
+                    continue_on_partial=True,
+                    require_full_duration=True,
+                )
             if res_reason:
                 final_reason = res_reason
             if res_ok and res_board:
