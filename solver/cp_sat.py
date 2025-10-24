@@ -1,5 +1,6 @@
 import math
 import random
+import time
 from collections import defaultdict
 from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence
 from ortools.sat.python import cp_model as _cp
@@ -89,12 +90,19 @@ def _resolve_guard_backoffs(
     Retries stop early if a run returns a reason other than
     ``"Proven infeasible under current constraints"`` so callers preserve the
     most informative message from CP-SAT.
+
+    The tuple returned includes the guard configuration that produced the final
+    ``(ok, placed, reason)`` triple so callers can detect when guards were fully
+    disabled and trigger deterministic fallbacks accordingly.
     """
 
     ok, placed, reason = attempt(
         edge_guard_cells=edge_guard_cells,
         plus_guard_enabled=plus_guard_enabled,
     )
+
+    result_edge = edge_guard_cells
+    result_plus = plus_guard_enabled
 
     infeasible = reason == "Proven infeasible under current constraints"
     guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
@@ -105,13 +113,13 @@ def _resolve_guard_backoffs(
     )
 
     if ok:
-        return ok, placed, reason
+        return ok, placed, reason, result_edge, result_plus
 
     if not guard_active:
-        return ok, placed, reason
+        return ok, placed, reason, result_edge, result_plus
 
     if not (infeasible or (not placed and inconclusive_reason)):
-        return ok, placed, reason
+        return ok, placed, reason, result_edge, result_plus
 
     retry_plan = []
     if edge_guard_cells is not None:
@@ -126,17 +134,22 @@ def _resolve_guard_backoffs(
         })
 
     for overrides in retry_plan:
+        override_edge = overrides.get("edge_guard_cells", edge_guard_cells)
+        override_plus = overrides.get("plus_guard_enabled", plus_guard_enabled)
         retry_ok, retry_placed, retry_reason = attempt(**overrides)
         if retry_ok:
-            return True, retry_placed, None
+            return True, retry_placed, None, override_edge, override_plus
         if retry_reason not in (
             "Proven infeasible under current constraints",
             "Stopped before solution (timebox)",
             "Stopped before solution (timebox / crash?)",
         ):
-            return retry_ok, retry_placed, retry_reason
+            return retry_ok, retry_placed, retry_reason, override_edge, override_plus
+        result_edge = override_edge
+        result_plus = override_plus
+        ok, placed, reason = retry_ok, retry_placed, retry_reason
 
-    return ok, placed, reason
+    return ok, placed, reason, result_edge, result_plus
 
 
 def _compute_edge_guard_cells(
@@ -247,19 +260,36 @@ def _backtracking_exact_cover(
     except Exception:
         node_limit_cfg = 300000
 
+    stats = {
+        "board": (W, H),
+        "tiles": n,
+        "max_cells": max_cells_cfg,
+        "max_tiles": max_tiles_cfg,
+        "node_limit": node_limit_cfg,
+        "nodes": 0,
+        "limit_hit": False,
+    }
+    setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+
     max_cells_cfg = max(1, max_cells_cfg)
     max_tiles_cfg = max(1, max_tiles_cfg)
     node_limit_cfg = max(1, node_limit_cfg)
 
     area_cells = W * H
     if area_cells > max_cells_cfg:
+        stats.update({"reason": "max_cells_exceeded"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
     # Permit modestly larger tile counts on small boards before giving up.
     if n > max_tiles_cfg and not (area_cells <= max_cells_cfg and n <= max_tiles_cfg + 8):
+        stats.update({"reason": "max_tiles_exceeded"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
     if len(options) != n:
+        stats.update({"reason": "options_mismatch"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
     # Build an exact-cover matrix that treats each grid cell and tile instance
@@ -272,6 +302,8 @@ def _backtracking_exact_cover(
 
     for tile_idx, placements in enumerate(options):
         if not placements:
+            stats.update({"reason": "empty_options"})
+            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
             return None
         for opt in placements:
             px, py, _rot, w, h = opt
@@ -289,6 +321,8 @@ def _backtracking_exact_cover(
 
     total_columns = tile_offset + n
     if any(col not in column_to_rows for col in range(total_columns)):
+        stats.update({"reason": "uncovered_column"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
     active_cols: set[int] = set(range(total_columns))
@@ -322,15 +356,21 @@ def _backtracking_exact_cover(
             return True
         col = _choose_column()
         if col is None:
+            stats.update({"reason": "dead_column"})
+            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
             return False
 
         candidates = [r for r in column_to_rows[col] if r in active_rows]
         if not candidates:
+            stats.update({"reason": "no_candidates"})
+            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
             return False
 
         for row_idx in candidates:
             if nodes_searched >= node_limit_cfg:
                 limit_hit = True
+                stats.update({"limit_hit": True})
+                setattr(_backtracking_exact_cover, "last_stats", dict(stats))
                 return False
             nodes_searched += 1
             solution_rows.append(row_idx)
@@ -358,8 +398,10 @@ def _backtracking_exact_cover(
         return False
 
     if not _search():
+        stats.update({"nodes": nodes_searched, "limit_hit": limit_hit})
         if limit_hit:
-            return None
+            stats.update({"reason": "node_limit"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
     placed_by_tile: List[Optional[Placed]] = [None] * n
@@ -369,9 +411,20 @@ def _backtracking_exact_cover(
         placed_by_tile[tile_idx] = Placed(px, py, Rect(w, h, tiles[tile_idx].name))
 
     if any(p is None for p in placed_by_tile):
+        stats.update({"nodes": nodes_searched, "reason": "incomplete_cover"})
+        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    return [p for p in placed_by_tile if p is not None]
+    solution = [p for p in placed_by_tile if p is not None]
+    stats.update({
+        "nodes": nodes_searched,
+        "limit_hit": limit_hit,
+        "placed": len(solution),
+        "result": "solved",
+    })
+    setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+
+    return solution
 
 
 def _placement_key(W: int, H: int, w: int, h: int, stride: int) -> Tuple[int, int, int, int, int]:
@@ -464,164 +517,239 @@ def try_pack_exact_cover(
     initial_hint: Optional[List[Placed]] = None,
 ) -> Tuple[bool, List[Placed], str]:
     """Exact-cover model; if allow_discard=True, coverage model (no callbacks)."""
-    # validate grid
+
+    result_ok: bool = False
+    result_reason: Optional[str] = None
+    result_placed: List[Placed] = []
+    board_W: Optional[int] = None
+    board_H: Optional[int] = None
+    tiles_requested: Optional[int] = None
+    backtracking_attempts: List[Dict[str, object]] = []
+
+    meta: Dict[str, object] = {
+        "allow_discard": bool(allow_discard),
+        "initial_hint_count": len(initial_hint or []),
+        "backtracking_attempts": backtracking_attempts,
+        "solved_via": None,
+    }
+
+    def _finish(ok_value: bool, placements_value: List[Placed], reason_value: Optional[str]):
+        nonlocal result_ok, result_reason, result_placed
+        result_ok = bool(ok_value)
+        result_reason = reason_value
+        result_placed = list(placements_value) if placements_value else []
+        return ok_value, placements_value, reason_value
+
     try:
-        W = int(W); H = int(H)
-    except Exception:
-        return False, [], "Bad grid: W/H must be integers"
-    if W <= 0 or H <= 0:
-        return False, [], "Bad grid: W/H must be positive"
+        try:
+            board_W = int(W)
+            board_H = int(H)
+        except Exception:
+            meta["error"] = "grid_not_integers"
+            return _finish(False, [], "Bad grid: W/H must be integers")
 
-    # normalize tiles
-    ok, tiles, reason = _expand_multiset(multiset)
-    if not ok:
-        return False, [], reason
-    if not tiles:
-        return False, [], "Bad demand: nothing parsed from request"
+        W, H = board_W, board_H
+        meta["board"] = {"W": W, "H": H}
 
-    randomize = bool(getattr(CFG, "RANDOMIZE_PLACEMENTS", False))
-    rng = _system_rng() if randomize else None
+        if W <= 0 or H <= 0:
+            meta["error"] = "grid_non_positive"
+            return _finish(False, [], "Bad grid: W/H must be positive")
 
-    tiles = list(tiles)
-    if randomize and rng is not None and len(tiles) > 1:
-        rng.shuffle(tiles)
+        ok, tiles, reason = _expand_multiset(multiset)
+        if not ok:
+            meta["error"] = "demand_parse"
+            meta["parse_reason"] = reason
+            return _finish(False, [], reason)
+        if not tiles:
+            meta["error"] = "demand_empty"
+            return _finish(False, [], "Bad demand: nothing parsed from request")
 
-    stride = max(1, int(getattr(CFG, "GRID_STRIDE_BASE", 1)))
-    dims = []
-    for r in tiles:
-        dims.append(abs(int(r.w)))
-        dims.append(abs(int(r.h)))
-    if dims:
-        dims_gcd = abs(int(dims[0]))
-        for dim in dims[1:]:
-            dims_gcd = math.gcd(dims_gcd, abs(int(dim)))
-        stride = min(stride, max(1, dims_gcd))
-    max_placements = int(getattr(CFG, "MAX_PLACEMENTS", 150000))
+        randomize = bool(getattr(CFG, "RANDOMIZE_PLACEMENTS", False))
+        rng = _system_rng() if randomize else None
 
-    # adaptive thinning
-    while True:
-        est_total = 0
+        tiles = list(tiles)
+        tiles_requested = len(tiles)
+        meta["tiles_requested"] = tiles_requested
+
+        if randomize and rng is not None and len(tiles) > 1:
+            rng.shuffle(tiles)
+
+        stride = max(1, int(getattr(CFG, "GRID_STRIDE_BASE", 1)))
+        dims: List[int] = []
         for r in tiles:
-            if r.w == r.h:
-                est_total += est_positions(W, H, r.w, r.h, stride)
+            dims.append(abs(int(r.w)))
+            dims.append(abs(int(r.h)))
+        if dims:
+            dims_gcd = abs(int(dims[0]))
+            for dim in dims[1:]:
+                dims_gcd = math.gcd(dims_gcd, abs(int(dim)))
+            stride = min(stride, max(1, dims_gcd))
+        max_placements = int(getattr(CFG, "MAX_PLACEMENTS", 150000))
+
+        while True:
+            est_total = 0
+            for r in tiles:
+                if r.w == r.h:
+                    est_total += est_positions(W, H, r.w, r.h, stride)
+                else:
+                    est_total += est_positions(W, H, r.w, r.h, stride)
+                    est_total += est_positions(W, H, r.h, r.w, stride)
+            if est_total <= max_placements or stride >= max(W, H):
+                break
+            stride *= 2
+
+        meta["stride"] = stride
+
+        forced: List[Placed] = []
+        remaining_tiles: List[Rect] = []
+
+        for rect in tiles:
+            if (rect.w == W and rect.h == H) or (rect.w == H and rect.h == W):
+                orientation = Rect(W, H, rect.name)
+                forced.append(Placed(0, 0, orientation))
             else:
-                est_total += est_positions(W, H, r.w, r.h, stride)
-                est_total += est_positions(W, H, r.h, r.w, stride)
-        if est_total <= max_placements or stride >= max(W, H):
-            break
-        stride *= 2
+                remaining_tiles.append(rect)
 
-    # forced placements: whole-board or strip fills that fully determine layout
-    forced: List[Placed] = []
-    remaining_tiles: List[Rect] = []
+        meta["forced_tiles"] = len(forced)
 
-    for rect in tiles:
-        if (rect.w == W and rect.h == H) or (rect.w == H and rect.h == W):
-            orientation = Rect(W, H, rect.name)
-            forced.append(Placed(0, 0, orientation))
-        else:
-            remaining_tiles.append(rect)
+        if len(forced) > 1:
+            meta["error"] = "conflicting_full_board_tiles"
+            return _finish(False, [], "Bad demand: multiple tiles match entire board")
 
-    if len(forced) > 1:
-        # Multiple whole-board tiles cannot coexist.
-        return False, [], "Bad demand: multiple tiles match entire board"
+        if forced and remaining_tiles:
+            meta["error"] = "full_board_conflict"
+            return _finish(False, [], "Bad demand: full-board tile conflicts with other tiles")
 
-    if forced and remaining_tiles:
-        return False, [], "Bad demand: full-board tile conflicts with other tiles"
+        if forced and not remaining_tiles:
+            meta["solved_via"] = "forced_full_board"
+            return _finish(True, list(forced), None)
 
-    if forced and not remaining_tiles:
-        return True, forced, None
+        if not forced:
+            remaining_tiles = list(tiles)
 
-    if not forced:
-        remaining_tiles = list(tiles)
+        def _orient_strip(rect: Rect, target: str) -> Optional[Rect]:
+            if target == "width":
+                if rect.w == W:
+                    return rect
+                if rect.h == W:
+                    return Rect(rect.h, rect.w, rect.name)
+            if target == "height":
+                if rect.h == H:
+                    return rect
+                if rect.w == H:
+                    return Rect(rect.h, rect.w, rect.name)
+            return None
 
-    # Detect strip fills that deterministically cover the board
-    def _orient_strip(rect: Rect, target: str) -> Optional[Rect]:
-        if target == "width":
-            if rect.w == W:
-                return rect
-            if rect.h == W:
-                return Rect(rect.h, rect.w, rect.name)
-        if target == "height":
-            if rect.h == H:
-                return rect
-            if rect.w == H:
-                return Rect(rect.h, rect.w, rect.name)
-        return None
+        width_strips: List[Rect] = []
+        other_tiles: List[Rect] = []
+        for rect in remaining_tiles:
+            oriented = _orient_strip(rect, "width")
+            if oriented is not None and oriented.w == W:
+                width_strips.append(oriented)
+            else:
+                other_tiles.append(rect)
 
-    width_strips: List[Rect] = []
-    other_tiles: List[Rect] = []
-    for rect in remaining_tiles:
-        oriented = _orient_strip(rect, "width")
-        if oriented is not None and oriented.w == W:
-            width_strips.append(oriented)
-        else:
-            other_tiles.append(rect)
+        if width_strips and not other_tiles:
+            total_height = sum(r.h for r in width_strips)
+            if total_height == H:
+                y = 0
+                strip_forced: List[Placed] = []
+                for rect in sorted(width_strips, key=lambda r: (-r.h, r.name or "")):
+                    strip_forced.append(Placed(0, y, Rect(rect.w, rect.h, rect.name)))
+                    y += rect.h
+                if y == H:
+                    strip_forced.extend(forced)
+                    meta["solved_via"] = "forced_strip_width"
+                    return _finish(True, strip_forced, None)
 
-    if width_strips and not other_tiles:
-        total_height = sum(r.h for r in width_strips)
-        if total_height == H:
-            y = 0
-            strip_forced: List[Placed] = []
-            for rect in sorted(width_strips, key=lambda r: (-r.h, r.name or "")):
-                strip_forced.append(Placed(0, y, Rect(rect.w, rect.h, rect.name)))
-                y += rect.h
-            if y == H:
-                strip_forced.extend(forced)
-                return True, strip_forced, None
+        height_strips: List[Rect] = []
+        other_tiles_h: List[Rect] = []
+        for rect in remaining_tiles:
+            oriented = _orient_strip(rect, "height")
+            if oriented is not None and oriented.h == H:
+                height_strips.append(oriented)
+            else:
+                other_tiles_h.append(rect)
 
-    height_strips: List[Rect] = []
-    other_tiles_h: List[Rect] = []
-    for rect in remaining_tiles:
-        oriented = _orient_strip(rect, "height")
-        if oriented is not None and oriented.h == H:
-            height_strips.append(oriented)
-        else:
-            other_tiles_h.append(rect)
+        if height_strips and not other_tiles_h:
+            total_width = sum(r.w for r in height_strips)
+            if total_width == W:
+                x = 0
+                strip_forced = []
+                for rect in sorted(height_strips, key=lambda r: (-r.w, r.name or "")):
+                    strip_forced.append(Placed(x, 0, Rect(rect.w, rect.h, rect.name)))
+                    x += rect.w
+                if x == W:
+                    strip_forced.extend(forced)
+                    meta["solved_via"] = "forced_strip_height"
+                    return _finish(True, strip_forced, None)
 
-    if height_strips and not other_tiles_h:
-        total_width = sum(r.w for r in height_strips)
-        if total_width == W:
-            x = 0
-            strip_forced = []
-            for rect in sorted(height_strips, key=lambda r: (-r.w, r.name or "")):
-                strip_forced.append(Placed(x, 0, Rect(rect.w, rect.h, rect.name)))
-                x += rect.w
-            if x == W:
-                strip_forced.extend(forced)
-                return True, strip_forced, None
+        tiles = remaining_tiles
 
-    tiles = remaining_tiles
+        options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
+        total_places = sum(len(o) for o in options)
+        meta["option_count"] = total_places
+        if total_places == 0:
+            meta["error"] = "no_options"
+            return _finish(False, [], "No placements remain (thinned away or grid too small)")
+        if total_places > max_placements and stride >= max(W, H):
+            meta["error"] = "model_capped"
+            meta["capped_placements"] = total_places
+            return _finish(False, [], (
+                f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
+            ))
 
-    options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
-    total_places = sum(len(o) for o in options)
-    if total_places == 0:
-        return False, [], "No placements remain (thinned away or grid too small)"
-    if total_places > max_placements and stride >= max(W, H):
-        return False, [], (
-            f"Model capped: {total_places:,} placements > limit ({max_placements:,}); stride={stride}"
-        )
+        ordering = list(range(len(tiles)))
+        if ordering:
+            if randomize and rng is not None:
+                rng.shuffle(ordering)
+            ordering.sort(key=lambda i: (len(options[i]) or 0, -(tiles[i].w * tiles[i].h)))
+            if any(idx != i for i, idx in enumerate(ordering)):
+                tiles = [tiles[i] for i in ordering]
+                options = [options[i] for i in ordering]
 
-    # Reorder tiles so the most constrained shapes appear first.  CP-SAT spends
-    # far less time exploring symmetric assignments when the tiles with the
-    # fewest legal placements lead the search.  Retain a shuffled tie-breaker
-    # when randomization is enabled so we keep the stochastic flavour while
-    # still prioritizing constrained pieces.
-    ordering = list(range(len(tiles)))
-    if ordering:
-        if randomize and rng is not None:
-            rng.shuffle(ordering)
-        ordering.sort(key=lambda i: (len(options[i]) or 0, -(tiles[i].w * tiles[i].h)))
-        if any(idx != i for i, idx in enumerate(ordering)):
-            tiles = [tiles[i] for i in ordering]
-            options = [options[i] for i in ordering]
+        backtracking_pref = bool(getattr(CFG, "BACKTRACK_PROBE_FIRST", True))
+        meta["backtracking_prefilter"] = backtracking_pref
 
-    def _solve_with_limit(limit_value, seconds, *, edge_guard_cells, plus_guard_enabled):
-        m = _cp.CpModel()
-        n = len(tiles)
+        def _run_backtracking(stage: str) -> Optional[List[Placed]]:
+            attempt: Dict[str, object] = {"stage": stage}
+            start_bt = time.time()
+            placements = _backtracking_exact_cover(W, H, tiles, options)
+            elapsed_bt = time.time() - start_bt
+            attempt["elapsed"] = elapsed_bt
+            stats = getattr(_backtracking_exact_cover, "last_stats", None)
+            if isinstance(stats, dict):
+                attempt.update({
+                    "nodes": stats.get("nodes"),
+                    "limit_hit": stats.get("limit_hit"),
+                    "reason": stats.get("reason"),
+                })
+            if placements is not None:
+                placements = list(placements)
+                placements.extend(forced)
+                attempt["placed"] = len(placements)
+                attempt["result"] = "solved"
+                backtracking_attempts.append(attempt)
+                return placements
+            attempt["placed"] = 0
+            attempt["result"] = "failed"
+            backtracking_attempts.append(attempt)
+            return None
 
-        # at most once (coverage) / exactly once (strict)
-        p = [[m.NewBoolVar(f"p_{i}_{k}") for k in range(len(options[i]))] for i in range(n)]
+        backtracking_pref_failed = False
+        if not allow_discard and backtracking_pref:
+            pref_solution = _run_backtracking("prefilter")
+            if pref_solution is not None:
+                meta["solved_via"] = "backtracking_prefilter"
+                return _finish(True, pref_solution, None)
+            backtracking_pref_failed = True
+
+        def _solve_with_limit(limit_value, seconds, *, edge_guard_cells, plus_guard_enabled):
+            m = _cp.CpModel()
+            n = len(tiles)
+
+            # at most once (coverage) / exactly once (strict)
+            p = [[m.NewBoolVar(f"p_{i}_{k}") for k in range(len(options[i]))] for i in range(n)]
         for i in range(n):
             if allow_discard:
                 if p[i]:
@@ -931,108 +1059,137 @@ def try_pack_exact_cover(
             return False, [], "Model invalid (configuration error)"
         return False, [], "Stopped before solution (timebox)"
 
-    same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
-
-    try:
-        max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
-    except Exception:
-        max_edge_ft_cfg = None
-
-    try:
-        test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
-    except Exception:
-        test_mode_flag = False
-
-    edge_guard_cells = _compute_edge_guard_cells(
-        max_edge_ft_cfg,
-        cell_size=CELL,
-        board_max=max(W, H),
-        test_mode=test_mode_flag,
-    )
-    plus_guard_enabled = _no_plus_guard_enabled(CFG)
-
-    def _attempt(edge_guard_cells_param, plus_guard_enabled_param):
-        return _solve_with_limit(
-            same_shape_cfg,
-            max_seconds,
-            edge_guard_cells=edge_guard_cells_param,
-            plus_guard_enabled=plus_guard_enabled_param,
+        same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
+    
+        try:
+            max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
+        except Exception:
+            max_edge_ft_cfg = None
+    
+        try:
+            test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
+        except Exception:
+            test_mode_flag = False
+    
+        edge_guard_cells = _compute_edge_guard_cells(
+            max_edge_ft_cfg,
+            cell_size=CELL,
+            board_max=max(W, H),
+            test_mode=test_mode_flag,
         )
-
-    ok, placed, reason = _resolve_guard_backoffs(
-        _attempt,
-        edge_guard_cells=edge_guard_cells,
-        plus_guard_enabled=plus_guard_enabled,
-    )
-
-    def _coverage_cells(placements: List[Placed]) -> int:
-        return sum(p.rect.w * p.rect.h for p in placements) if placements else 0
-
-    target_cells = W * H
-    best_ok, best_placed, best_reason = ok, placed, reason
-    best_coverage = _coverage_cells(placed)
-
-    guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
-
-    if allow_discard and guard_active and target_cells > 0 and best_coverage < target_cells:
-        fallback_plan: List[Tuple[Optional[int], bool]] = []
-        if edge_guard_cells is not None:
-            fallback_plan.append((None, plus_guard_enabled))
-        if plus_guard_enabled:
-            fallback_plan.append((edge_guard_cells, False))
-        if edge_guard_cells is not None and plus_guard_enabled:
-            fallback_plan.append((None, False))
-
-        for guard_edge, guard_plus in fallback_plan:
-            relax_ok, relax_placed, relax_reason = _attempt(guard_edge, guard_plus)
-            relax_cov = _coverage_cells(relax_placed)
-            improved = relax_ok and relax_cov > best_coverage
-            if not improved and not relax_ok and not best_ok:
-                improved = relax_cov > best_coverage
-            if improved:
-                best_ok = relax_ok
-                best_placed = relax_placed
-                best_reason = relax_reason
-                best_coverage = relax_cov
-                if best_coverage >= target_cells:
-                    break
-
-        ok, placed, reason = best_ok, best_placed, best_reason
-
-    guard_active = (edge_guard_cells is not None) or bool(plus_guard_enabled)
-
-    if not ok and not allow_discard and not guard_active:
-        fallback = _backtracking_exact_cover(W, H, tiles, options)
-        if fallback is not None:
-            fallback.extend(forced)
-            return True, fallback, None
-
-    if ok or reason != "Proven infeasible under current constraints":
-        return ok, placed, reason
-
-    # If the limit is finite, probe a relaxed model to provide actionable feedback.
-    try:
-        same_shape_int = int(same_shape_cfg)
-    except Exception:
-        same_shape_int = None
-
-    if same_shape_int is None or same_shape_int < 0:
-        return ok, placed, reason
-
-    diag_seconds = min(float(max_seconds), float(getattr(CFG, "SAME_SHAPE_DIAG_SECONDS", 10.0)))
-    diag_seconds = max(1.0, diag_seconds)
-    diag_ok, diag_placed, _ = _solve_with_limit(
-        None,
-        diag_seconds,
-        edge_guard_cells=edge_guard_cells,
-        plus_guard_enabled=plus_guard_enabled,
-    )
-    if diag_ok and diag_placed:
-        msg = (
-            "Proven infeasible under current constraints (same-shape limit "
-            f"{same_shape_int} prevents a feasible layout; try increasing TS_SAME_SHAPE_LIMIT "
-            "or setting it to -1 to disable the guard)."
+        plus_guard_enabled = _no_plus_guard_enabled(CFG)
+    
+        def _attempt(edge_guard_cells_param, plus_guard_enabled_param):
+            return _solve_with_limit(
+                same_shape_cfg,
+                max_seconds,
+                edge_guard_cells=edge_guard_cells_param,
+                plus_guard_enabled=plus_guard_enabled_param,
+            )
+    
+        cp_sat_start = time.time()
+        ok, placed, reason, active_edge_guard, active_plus_guard = _resolve_guard_backoffs(
+            _attempt,
+            edge_guard_cells=edge_guard_cells,
+            plus_guard_enabled=plus_guard_enabled,
         )
-        return False, [], msg
-
-    return ok, placed, reason
+        cp_sat_elapsed = time.time() - cp_sat_start
+        meta["cp_sat"] = {
+            "ok": bool(ok),
+            "reason": reason,
+            "edge_guard": active_edge_guard,
+            "plus_guard": bool(active_plus_guard),
+            "elapsed": cp_sat_elapsed,
+            "placements": len(placed) if placed else 0,
+        }
+    
+        def _coverage_cells(placements: List[Placed]) -> int:
+            return sum(p.rect.w * p.rect.h for p in placements) if placements else 0
+    
+        target_cells = W * H
+        best_ok, best_placed, best_reason = ok, placed, reason
+        best_coverage = _coverage_cells(placed)
+        meta["cp_sat_coverage_cells"] = best_coverage
+    
+        guard_active = (active_edge_guard is not None) or bool(active_plus_guard)
+    
+        if allow_discard and guard_active and target_cells > 0 and best_coverage < target_cells:
+            fallback_plan: List[Tuple[Optional[int], bool]] = []
+            if active_edge_guard is not None:
+                fallback_plan.append((None, active_plus_guard))
+            if active_plus_guard:
+                fallback_plan.append((active_edge_guard, False))
+            if active_edge_guard is not None and active_plus_guard:
+                fallback_plan.append((None, False))
+    
+            for guard_edge, guard_plus in fallback_plan:
+                relax_ok, relax_placed, relax_reason = _attempt(guard_edge, guard_plus)
+                relax_cov = _coverage_cells(relax_placed)
+                improved = relax_ok and relax_cov > best_coverage
+                if not improved and not relax_ok and not best_ok:
+                    improved = relax_cov > best_coverage
+                if improved:
+                    best_ok = relax_ok
+                    best_placed = relax_placed
+                    best_reason = relax_reason
+                    best_coverage = relax_cov
+                    if best_coverage >= target_cells:
+                        break
+    
+            ok, placed, reason = best_ok, best_placed, best_reason
+    
+        guard_active = (active_edge_guard is not None) or bool(active_plus_guard)
+    
+        if ok and placed:
+            meta.setdefault("solved_via", "cp_sat")
+    
+        if not ok and not allow_discard and not guard_active:
+            if backtracking_pref_failed:
+                meta["backtracking_skipped"] = "prefilter_failed"
+            else:
+                fallback_solution = _run_backtracking("post_cp_sat")
+                if fallback_solution is not None:
+                    meta["solved_via"] = "backtracking_post_cp_sat"
+                    return _finish(True, fallback_solution, None)
+    
+        if ok or reason != "Proven infeasible under current constraints":
+            return _finish(ok, placed, reason)
+    
+        # If the limit is finite, probe a relaxed model to provide actionable feedback.
+        try:
+            same_shape_int = int(same_shape_cfg)
+        except Exception:
+            same_shape_int = None
+    
+        if same_shape_int is None or same_shape_int < 0:
+            return _finish(ok, placed, reason)
+    
+        diag_seconds = min(float(max_seconds), float(getattr(CFG, "SAME_SHAPE_DIAG_SECONDS", 10.0)))
+        diag_seconds = max(1.0, diag_seconds)
+        diag_ok, diag_placed, _ = _solve_with_limit(
+            None,
+            diag_seconds,
+            edge_guard_cells=active_edge_guard,
+            plus_guard_enabled=active_plus_guard,
+        )
+        if diag_ok and diag_placed:
+            msg = (
+                "Proven infeasible under current constraints (same-shape limit "
+                f"{same_shape_int} prevents a feasible layout; try increasing TS_SAME_SHAPE_LIMIT "
+                "or setting it to -1 to disable the guard)."
+            )
+            return _finish(False, [], msg)
+    
+        return _finish(ok, placed, reason)
+    
+    finally:
+        if board_W is not None and board_H is not None:
+            meta.setdefault("board", {"W": board_W, "H": board_H})
+        if tiles_requested is not None:
+            meta.setdefault("tiles_requested", tiles_requested)
+        meta["ok"] = bool(result_ok)
+        meta["reason"] = result_reason
+        meta["placed"] = len(result_placed)
+        if meta.get("solved_via") is None and result_ok:
+            meta["solved_via"] = "cp_sat"
+        setattr(try_pack_exact_cover, "last_meta", meta)

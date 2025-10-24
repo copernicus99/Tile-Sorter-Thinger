@@ -112,7 +112,7 @@ def test_guard_backoff_skips_edge_guard_first(cp_sat_module):
             return True, ["ok"], None
         return False, [], "Proven infeasible under current constraints"
 
-    ok, placed, reason = cp_sat_module._resolve_guard_backoffs(
+    ok, placed, reason, edge_used, plus_used = cp_sat_module._resolve_guard_backoffs(
         fake_attempt,
         edge_guard_cells=3,
         plus_guard_enabled=True,
@@ -121,6 +121,8 @@ def test_guard_backoff_skips_edge_guard_first(cp_sat_module):
     assert ok
     assert placed == ["ok"]
     assert reason is None
+    assert edge_used is None
+    assert plus_used is True
     assert attempts == [(3, True), (None, True)]
 
 
@@ -133,7 +135,7 @@ def test_guard_backoff_drops_plus_guard_when_needed(cp_sat_module):
             return False, [], "Proven infeasible under current constraints"
         return True, ["ok"], None
 
-    ok, placed, reason = cp_sat_module._resolve_guard_backoffs(
+    ok, placed, reason, edge_used, plus_used = cp_sat_module._resolve_guard_backoffs(
         fake_attempt,
         edge_guard_cells=None,
         plus_guard_enabled=True,
@@ -142,6 +144,8 @@ def test_guard_backoff_drops_plus_guard_when_needed(cp_sat_module):
     assert ok
     assert placed == ["ok"]
     assert reason is None
+    assert edge_used is None
+    assert plus_used is False
     assert attempts == [(None, True), (None, False)]
 
 
@@ -149,7 +153,7 @@ def test_guard_backoff_preserves_non_infeasible_reason(cp_sat_module):
     def fake_attempt(*, edge_guard_cells, plus_guard_enabled):
         return False, [], "Model invalid (configuration error)"
 
-    ok, placed, reason = cp_sat_module._resolve_guard_backoffs(
+    ok, placed, reason, edge_used, plus_used = cp_sat_module._resolve_guard_backoffs(
         fake_attempt,
         edge_guard_cells=5,
         plus_guard_enabled=True,
@@ -158,6 +162,8 @@ def test_guard_backoff_preserves_non_infeasible_reason(cp_sat_module):
     assert not ok
     assert placed == []
     assert reason == "Model invalid (configuration error)"
+    assert edge_used == 5
+    assert plus_used is True
 
 
 def test_backtracking_exact_cover_solves_small_board(cp_sat_module):
