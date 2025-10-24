@@ -8,7 +8,7 @@ import math
 import threading
 import heapq
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional, Any, Iterable
+from typing import Dict, List, Tuple, Optional, Any, Iterable, Set
 
 import multiprocessing as mp
 
@@ -594,6 +594,7 @@ def solve_orchestrator(*args, **kwargs):
             partial_best: Dict[Tuple[int, int], float] = {}
             partial_stalls: Dict[Tuple[int, int], int] = {}
             plateau_limit = max(1, int(getattr(CFG, "PARTIAL_PLATEAU_LIMIT", 5)))
+            progress_boards: Set[Tuple[int, int]] = set()
 
             def _update_phase_progress() -> None:
                 elapsed_phase = time.time() - phase_start
@@ -628,13 +629,23 @@ def solve_orchestrator(*args, **kwargs):
                             break
                         if not base_candidates:
                             break
-                        queue = sorted(base_candidates, key=_sort_key)
+                        if not progress_boards:
+                            break
+                        queue = [
+                            cand
+                            for cand in base_candidates
+                            if (cand.W, cand.H) in progress_boards
+                        ]
+                        if not queue:
+                            break
+                        queue = sorted(queue, key=_sort_key)
                         total = max(total, attempt_idx + len(queue))
                         continue
 
                     remaining = seconds - elapsed_phase
                     cb = queue.pop(0)
                     attempt_idx += 1
+                    key = (cb.W, cb.H)
                     remaining_candidates = max(1, len(queue) + 1)
                     ideal_slice = remaining / float(remaining_candidates)
                     adaptive_slice = ideal_slice
@@ -705,6 +716,7 @@ def solve_orchestrator(*args, **kwargs):
 
                     if used_tiles > 0:
                         _record_best(used_tiles, coverage_pct)
+                        progress_boards.add(key)
 
                     if allow_discard and placed:
                         if best_tuple is None:
@@ -738,7 +750,6 @@ def solve_orchestrator(*args, **kwargs):
                     elapsed_now = time.time() - phase_start
                     remaining_after = seconds - elapsed_now
                     total = max(total, attempt_idx + len(queue))
-                    key = (cb.W, cb.H)
                     retries = retry_counts.get(key, 0)
                     improved = False
                     if board_area > 0 and used_area > 0:
@@ -773,6 +784,7 @@ def solve_orchestrator(*args, **kwargs):
                         base_candidates = [
                             cand for cand in base_candidates if (cand.W, cand.H) != key
                         ]
+                        progress_boards.discard(key)
                         queue = [cand for cand in queue if (cand.W, cand.H) != key]
                         total = max(total, attempt_idx + len(queue))
                         set_message(
@@ -783,6 +795,11 @@ def solve_orchestrator(*args, **kwargs):
                         and _should_retry_phase(last_reason)
                         and remaining_after >= max(5.0, min_retry_remaining)
                         and retries < max_retries
+                        and (
+                            not continue_on_partial
+                            or used_area > 0
+                            or key in progress_boards
+                        )
                     ):
                         retry_counts[key] = retries + 1
                         queue.insert(0, cb)

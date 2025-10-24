@@ -44,6 +44,7 @@ if "ortools" not in sys.modules:
     sys.modules["ortools.sat.python.cp_model"] = cp_model_mod
 
 from solver.orchestrator import (
+    CandidateBoard,
     _PHASE_D_MAX_CANDIDATES,
     _align_up_to_multiple,
     _bag_ft_to_cells,
@@ -141,7 +142,7 @@ def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
 
     def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
         calls.append((W, H, allow_discard, seconds))
-        return False, [], "no solution"
+        return False, [], "no solution", {}
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
 
@@ -188,6 +189,40 @@ def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
         assert seconds <= orchestrator.CFG.TIME_D + 1e-6
 
 
+def test_orchestrator_phase_d_does_not_requeue_without_progress(monkeypatch):
+    import solver.orchestrator as orchestrator
+
+    calls = []
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        calls.append((W, H, allow_discard, seconds))
+        return False, [], "Stopped before solution (timebox)", {}
+
+    phase_d_candidates = [
+        CandidateBoard(20, 20, "20 × 20 ft"),
+        CandidateBoard(20, 18, "20 × 18 ft"),
+        CandidateBoard(18, 20, "18 × 20 ft"),
+    ]
+
+    def fake_phase_d_candidates(*args, **kwargs):
+        return list(phase_d_candidates)
+
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator, "_phase_d_candidates", fake_phase_d_candidates)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 60)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+
+    bag_ft = {(2.0, 2.0): 30, (2.0, 3.0): 10}
+
+    orchestrator.solve_orchestrator(bag_ft=bag_ft)
+
+    d_calls = [(W, H, seconds) for (W, H, allow, seconds) in calls if allow]
+    assert len(d_calls) == len(phase_d_candidates)
+    assert all((W, H) in {(cb.W, cb.H) for cb in phase_d_candidates} for (W, H, _s) in d_calls)
+
+
 def test_orchestrator_phase_c_consumes_full_timebox(monkeypatch):
     import solver.orchestrator as orchestrator
 
@@ -195,7 +230,7 @@ def test_orchestrator_phase_c_consumes_full_timebox(monkeypatch):
 
     def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
         budgets.append((W, H, seconds))
-        return False, [], "no solution"
+        return False, [], "no solution", {}
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
 
@@ -227,7 +262,7 @@ def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
         calls.append((W, H, allow_discard))
         max_h = max(h for _w, h in bag.keys())
         if H < max_h:
-            return False, [], "grid too small"
+            return False, [], "grid too small", {}
 
         from models import Rect, Placed
 
@@ -237,7 +272,7 @@ def test_orchestrator_expands_board_to_cover_tall_tiles(monkeypatch):
             for _ in range(cnt):
                 placed.append(Placed(0, 0, rect))
 
-        return True, placed, None
+        return True, placed, None, {}
 
     monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
 
