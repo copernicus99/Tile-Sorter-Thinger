@@ -1105,12 +1105,12 @@ def try_pack_exact_cover(
             }
         plus_guard_enabled = _no_plus_guard_enabled(CFG)
     
-        def _attempt(edge_guard_cells_param, plus_guard_enabled_param):
+        def _attempt(*, edge_guard_cells, plus_guard_enabled):
             return _solve_with_limit(
                 same_shape_cfg,
                 max_seconds,
-                edge_guard_cells=edge_guard_cells_param,
-                plus_guard_enabled=plus_guard_enabled_param,
+                edge_guard_cells=edge_guard_cells,
+                plus_guard_enabled=plus_guard_enabled,
             )
     
         cp_sat_start = time.time()
@@ -1149,7 +1149,10 @@ def try_pack_exact_cover(
                 fallback_plan.append((None, False))
     
             for guard_edge, guard_plus in fallback_plan:
-                relax_ok, relax_placed, relax_reason = _attempt(guard_edge, guard_plus)
+                relax_ok, relax_placed, relax_reason = _attempt(
+                    edge_guard_cells=guard_edge,
+                    plus_guard_enabled=guard_plus,
+                )
                 relax_cov = _coverage_cells(relax_placed)
                 improved = relax_ok and relax_cov > best_coverage
                 if not improved and not relax_ok and not best_ok:
