@@ -158,6 +158,7 @@ def _compute_edge_guard_cells(
     cell_size: float,
     board_max: int,
     test_mode: bool,
+    max_tile_side_ft: Optional[float] = None,
 ) -> Optional[int]:
     """Return the seam guard length expressed in cells or ``None`` when disabled.
 
@@ -184,6 +185,15 @@ def _compute_edge_guard_cells(
         value_ft = None
 
     if value_ft is None or value_ft <= 0:
+        return None
+
+    try:
+        tile_side_ft = None if max_tile_side_ft is None else float(max_tile_side_ft)
+    except Exception:
+        tile_side_ft = None
+
+    if tile_side_ft is not None and tile_side_ft > value_ft + 1e-9:
+        # The configured guard would block the largest tile entirely, so relax it.
         return None
 
     try:
@@ -686,6 +696,11 @@ def try_pack_exact_cover(
 
         tiles = remaining_tiles
 
+        max_tile_side_cells = 0
+        if tiles:
+            max_tile_side_cells = max(max(abs(int(r.w)), abs(int(r.h))) for r in tiles)
+        max_tile_side_ft = max_tile_side_cells * CELL if max_tile_side_cells else 0.0
+
         options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
         total_places = sum(len(o) for o in options)
         meta["option_count"] = total_places
@@ -1065,18 +1080,29 @@ def try_pack_exact_cover(
             max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
         except Exception:
             max_edge_ft_cfg = None
-    
+
         try:
             test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
         except Exception:
             test_mode_flag = False
-    
+
         edge_guard_cells = _compute_edge_guard_cells(
             max_edge_ft_cfg,
             cell_size=CELL,
             board_max=max(W, H),
             test_mode=test_mode_flag,
+            max_tile_side_ft=max_tile_side_ft,
         )
+        if (
+            edge_guard_cells is None
+            and max_edge_ft_cfg not in (None, 0)
+            and max_tile_side_ft > 0
+            and max_tile_side_ft > float(max_edge_ft_cfg)
+        ):
+            meta["edge_guard_relaxed"] = {
+                "configured_max_edge_ft": float(max_edge_ft_cfg),
+                "max_tile_side_ft": max_tile_side_ft,
+            }
         plus_guard_enabled = _no_plus_guard_enabled(CFG)
     
         def _attempt(edge_guard_cells_param, plus_guard_enabled_param):
