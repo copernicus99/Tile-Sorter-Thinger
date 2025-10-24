@@ -164,21 +164,23 @@ def _normalize_result(result: Any) -> Dict[str, Any]:
 
     if isinstance(result, (tuple, list)):
         ok_flag: Optional[bool] = None
-        reason: Optional[str] = None
         payload: Optional[Dict[str, Any]] = None
         placements: Optional[List[Placed]] = None
+        string_values: List[str] = []
+
         seq = list(result)
         for elem in seq:
             if isinstance(elem, bool) and ok_flag is None:
                 ok_flag = elem
-            elif isinstance(elem, str) and not reason:
-                reason = elem
+            elif isinstance(elem, str):
+                string_values.append(elem)
             elif isinstance(elem, dict) and payload is None:
                 payload = elem
             elif isinstance(elem, (list, tuple)) and placements is None:
                 maybe_list = list(elem)
                 if not maybe_list or all(isinstance(p, Placed) for p in maybe_list):
                     placements = maybe_list  # type: ignore[assignment]
+
         if payload is None:
             for elem in seq:
                 if isinstance(elem, (tuple, list)):
@@ -188,20 +190,53 @@ def _normalize_result(result: Any) -> Dict[str, Any]:
                             break
                     if payload is not None:
                         break
+
         out = dict(payload or {})
+
         if placements is None and isinstance(out.get("placements"), (list, tuple)):
             maybe_list = list(out["placements"])  # type: ignore[index]
             if not maybe_list or all(isinstance(p, Placed) for p in maybe_list):
                 placements = maybe_list  # type: ignore[assignment]
+
         if placements is not None:
             out["placements"] = placements
+
         if ok_flag is None:
             ok_flag = bool(out.get("svg") or out.get("placed_count") or out.get("placements"))
+
         out["ok"] = bool(ok_flag)
-        if not out["ok"] and "strategy" not in out:
-            out["strategy"] = reason or "No solution (unspecified)."
-        elif out["ok"] and reason and "strategy" not in out:
-            out["strategy"] = reason
+
+        strategy_token: Optional[str] = None
+        reason_text: Optional[str] = None
+        if string_values:
+            if len(string_values) == 1:
+                if out["ok"]:
+                    strategy_token = string_values[0]
+                else:
+                    reason_text = string_values[0]
+            else:
+                strategy_token = string_values[0]
+                reason_text = string_values[-1]
+                if not out["ok"] and strategy_token and strategy_token.lower() == "error":
+                    strategy_token = None
+
+        if out["ok"]:
+            if strategy_token and "strategy" not in out:
+                out["strategy"] = strategy_token
+        else:
+            fallback_reason = out.get("reason") or reason_text
+            if isinstance(fallback_reason, str) and fallback_reason:
+                out["strategy"] = fallback_reason
+                out.setdefault("reason", fallback_reason)
+            elif string_values:
+                tail = string_values[-1]
+                if tail and tail.lower() != "error":
+                    out["strategy"] = tail
+                else:
+                    out["strategy"] = "No solution (unspecified)."
+            else:
+                out.setdefault("strategy", "No solution (unspecified).")
+
         return out
 
     return {"ok": False, "strategy": f"unexpected result from orchestrator: {type(result).__name__}"}
