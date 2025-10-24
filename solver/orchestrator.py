@@ -519,6 +519,16 @@ def solve_orchestrator(*args, **kwargs):
         sqrt_cells = max(sqrt_cells, max_tile_side)
         sqrt_cells = _align_up_to_multiple(sqrt_cells, grid_step)
 
+        log_attempt_detail(
+            "Run setup",
+            demand_count=demand_count,
+            area_sqft=round(area_sqft, 2),
+            grid_step=grid_step,
+            max_tile_side=max_tile_side,
+            base_side_cells=base_side_cells,
+            sqrt_cells=sqrt_cells,
+        )
+
         set_status("Solving")
         set_phase("S0")
         set_phase_total(1)
@@ -537,6 +547,7 @@ def solve_orchestrator(*args, **kwargs):
             coverage_pct = max(0.0, float(coverage_pct))
             used_tiles = max(0, int(used_tiles))
             better = False
+            changed = False
             if coverage_pct > best_cover_pct + 1e-9:
                 better = True
             elif abs(coverage_pct - best_cover_pct) <= 1e-9 and used_tiles > best_used_tiles:
@@ -544,13 +555,22 @@ def solve_orchestrator(*args, **kwargs):
             if better:
                 best_cover_pct = coverage_pct
                 best_used_tiles = used_tiles
+                changed = True
             else:
                 if used_tiles > best_used_tiles:
                     best_used_tiles = used_tiles
+                    changed = True
                 if coverage_pct > best_cover_pct:
                     best_cover_pct = coverage_pct
+                    changed = True
             set_best_used(best_used_tiles)
             set_coverage_pct(best_cover_pct)
+            if changed:
+                log_attempt_detail(
+                    "Best progress",
+                    used_tiles=best_used_tiles,
+                    coverage_pct=round(best_cover_pct, 2),
+                )
 
         def _run_phase(
             label: str,
@@ -662,6 +682,15 @@ def solve_orchestrator(*args, **kwargs):
                         total=max(total, attempt_idx + len(queue)),
                     )
                     set_grid(cb.label)
+                    log_attempt_detail(
+                        "Attempt dispatched",
+                        phase=label,
+                        board=f"{cb.W}×{cb.H}",
+                        queue_size=len(queue),
+                        remaining_round=round(remaining, 2),
+                        adaptive_slice=round(adaptive_slice, 2),
+                        budget=round(per_attempt, 2),
+                    )
                     attempt_started = time.time()
                     hint = hint_cache.get((cb.W, cb.H))
                     ok, placed, reason, solve_meta = _run_cp_sat_isolated(
@@ -779,6 +808,15 @@ def solve_orchestrator(*args, **kwargs):
                             set_message(
                                 f"Phase {label} re-queue {cb.label} to chase full coverage – {detail}"
                             )
+                            log_attempt_detail(
+                                "Partial retry",
+                                phase=label,
+                                board=f"{cb.W}×{cb.H}",
+                                coverage_pct=round(coverage_pct, 2),
+                                stall_count=stall_count,
+                                plateau_limit=plateau_limit,
+                                improved=improved,
+                            )
                             _update_phase_progress()
                             continue
                         base_candidates = [
@@ -789,6 +827,14 @@ def solve_orchestrator(*args, **kwargs):
                         total = max(total, attempt_idx + len(queue))
                         set_message(
                             f"Phase {label} plateau on {cb.label} at {coverage_pct:.2f}% – skipping further retries"
+                        )
+                        log_attempt_detail(
+                            "Partial plateau",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            coverage_pct=round(coverage_pct, 2),
+                            stall_count=partial_stalls.get(key, 0),
+                            plateau_limit=plateau_limit,
                         )
                     if (
                         not ok
@@ -808,8 +854,30 @@ def solve_orchestrator(*args, **kwargs):
                         set_message(
                             f"Phase {label} re-queue {cb.label} after '{last_reason}' ({retry_counts[key]}/{max_retries})"
                         )
+                        log_attempt_detail(
+                            "Attempt retry",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            reason=last_reason or "",
+                            retries=retry_counts[key],
+                            max_retries=max_retries,
+                            remaining_after=round(remaining_after, 2),
+                        )
                         _update_phase_progress()
                         continue
+                    elif (
+                        not ok
+                        and _should_retry_phase(last_reason)
+                        and retries >= max_retries
+                    ):
+                        log_attempt_detail(
+                            "Retry limit reached",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            reason=last_reason or "",
+                            retries=retries,
+                            max_retries=max_retries,
+                        )
 
                     if require_full_duration:
                         wait_remaining = max(0.0, per_attempt - attempt_elapsed)
