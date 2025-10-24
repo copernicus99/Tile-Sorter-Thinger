@@ -354,6 +354,45 @@ def _safe_parent_poll(parent, timeout):
         return True
 
 
+def _terminate_process(proc: mp.Process, grace: float = 0.2) -> None:
+    """Best-effort helper that tears down ``proc`` within ``grace`` seconds."""
+
+    try:
+        proc.join(timeout=grace)
+    except Exception:
+        pass
+
+    if not proc.is_alive():
+        return
+
+    terminate = getattr(proc, "terminate", None)
+    if callable(terminate):
+        try:
+            terminate()
+        except Exception:
+            pass
+
+    try:
+        proc.join(timeout=grace)
+    except Exception:
+        pass
+
+    if not proc.is_alive():
+        return
+
+    kill = getattr(proc, "kill", None)
+    if callable(kill):
+        try:
+            kill()
+        except Exception:
+            pass
+
+    try:
+        proc.join(timeout=grace)
+    except Exception:
+        pass
+
+
 def _run_cp_sat_isolated(
     W: int,
     H: int,
@@ -377,11 +416,20 @@ def _run_cp_sat_isolated(
     reason = None
     got_message = False
 
-    deadline = time.time() + max(1.0, float(seconds) + 1.0)
-    while time.time() < deadline and proc.is_alive():
-        if _safe_parent_poll(parent, 0.05):
+    try:
+        budget = max(0.0, float(seconds))
+    except Exception:
+        budget = 0.0
+    # Allow a small grace window for process spin-up / teardown.
+    deadline = time.monotonic() + max(1.0, budget + 1.0)
+
+    while proc.is_alive():
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
             break
-        time.sleep(0.05)
+        wait_slice = min(0.1, remaining)
+        if _safe_parent_poll(parent, wait_slice):
+            break
 
     try:
         if parent.poll(0):
@@ -401,10 +449,8 @@ def _run_cp_sat_isolated(
         reason = f"Parent recv exception: {type(e).__name__}: {e}"
 
     try:
-        proc.join(timeout=0.2)
         if proc.is_alive():
-            proc.kill()
-            proc.join(timeout=0.2)
+            _terminate_process(proc)
     finally:
         try:
             parent.close()
@@ -535,6 +581,9 @@ def solve_orchestrator(*args, **kwargs):
             max_retries = max(0, int(getattr(CFG, "PHASE_RETRY_LIMIT", 3)))
             min_retry_remaining = min(60.0, max(10.0, 0.2 * seconds)) if seconds > 0 else 0.0
             recent_attempts: List[float] = []
+            partial_best: Dict[Tuple[int, int], float] = {}
+            partial_stalls: Dict[Tuple[int, int], int] = {}
+            plateau_limit = max(1, int(getattr(CFG, "PARTIAL_PLATEAU_LIMIT", 5)))
 
             def _update_phase_progress() -> None:
                 elapsed_phase = time.time() - phase_start
@@ -662,6 +711,15 @@ def solve_orchestrator(*args, **kwargs):
                     total = max(total, attempt_idx + len(queue))
                     key = (cb.W, cb.H)
                     retries = retry_counts.get(key, 0)
+                    improved = False
+                    if board_area > 0 and used_area > 0:
+                        prev_best_cov = partial_best.get(key, 0.0)
+                        if coverage_pct > prev_best_cov + 1e-9:
+                            partial_best[key] = coverage_pct
+                            partial_stalls[key] = 0
+                            improved = True
+                        else:
+                            partial_stalls[key] = partial_stalls.get(key, 0) + 1
                     if (
                         continue_on_partial
                         and board_area > 0
@@ -669,14 +727,28 @@ def solve_orchestrator(*args, **kwargs):
                         and used_area < board_area
                         and remaining_after > 1.0
                     ):
-                        queue.insert(0, cb)
-                        queue = sorted(queue, key=_sort_key)
+                        stall_count = partial_stalls.get(key, 0)
+                        if improved or stall_count < plateau_limit:
+                            queue.insert(0, cb)
+                            queue = sorted(queue, key=_sort_key)
+                            total = max(total, attempt_idx + len(queue))
+                            if improved:
+                                detail = f"improved to {coverage_pct:.2f}%"
+                            else:
+                                detail = f"stalled at {coverage_pct:.2f}% (retry {stall_count}/{plateau_limit})"
+                            set_message(
+                                f"Phase {label} re-queue {cb.label} to chase full coverage – {detail}"
+                            )
+                            _update_phase_progress()
+                            continue
+                        base_candidates = [
+                            cand for cand in base_candidates if (cand.W, cand.H) != key
+                        ]
+                        queue = [cand for cand in queue if (cand.W, cand.H) != key]
                         total = max(total, attempt_idx + len(queue))
                         set_message(
-                            f"Phase {label} re-queue {cb.label} to chase full coverage ({coverage_pct:.2f}% so far)"
+                            f"Phase {label} plateau on {cb.label} at {coverage_pct:.2f}% – skipping further retries"
                         )
-                        _update_phase_progress()
-                        continue
                     if (
                         not ok
                         and _should_retry_phase(last_reason)
