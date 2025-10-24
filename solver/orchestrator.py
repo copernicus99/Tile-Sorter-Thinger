@@ -618,6 +618,14 @@ def solve_orchestrator(*args, **kwargs):
     Strategy values are the option letters A–F from the specification.
     """
     t0 = time.time()
+
+    log_attempt_detail(
+        "Guard configuration",
+        TS_TEST_MODE=1 if getattr(CFG, "TEST_MODE", False) else 0,
+        TS_MAX_EDGE_FT=float(getattr(CFG, "MAX_EDGE_FT", 0.0)),
+        TS_NO_PLUS=1 if getattr(CFG, "NO_PLUS", False) else 0,
+        TS_SAME_SHAPE_LIMIT=int(getattr(CFG, "SAME_SHAPE_LIMIT", -1)),
+    )
     try:
         inbound = None
         if args:
