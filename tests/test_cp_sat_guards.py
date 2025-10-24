@@ -248,6 +248,29 @@ def test_force_backtracking_requires_strict_mode(cp_sat_module):
     assert "Backtracking rescue" in (reason or "")
 
 
+def test_force_backtracking_handles_crash_demand(cp_sat_module):
+    from tests.data import CRASH_DEMAND_BAG_FT
+    from models import ft_to_cells
+
+    W = ft_to_cells(10.5)
+    H = ft_to_cells(10.5)
+    bag_cells = {
+        (ft_to_cells(w_ft), ft_to_cells(h_ft)): count
+        for (w_ft, h_ft), count in CRASH_DEMAND_BAG_FT.items()
+    }
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(
+        W,
+        H,
+        bag_cells,
+        force_backtracking=True,
+    )
+
+    assert ok, reason
+    assert placed
+    assert len(placed) == sum(bag_cells.values())
+
+
 def test_backtracking_respects_limits(monkeypatch, cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [Rect(1, 1, f"t{i}") for i in range(10)]

@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import os
+import sys
 import time
 import traceback
 import math
 import threading
 import heapq
+import tempfile
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Any, Iterable, Set
 
@@ -336,8 +339,31 @@ def _descending_values(start: int, end: int, *, step: int = 1) -> List[int]:
 
 # ---------- CP-SAT isolation ----------
 
-def _cp_worker(conn, W, H, bag, seconds, allow_discard, hint):
+def _cp_worker(conn, W, H, bag, seconds, allow_discard, hint, stderr_path=None):
+    stderr_handle = None
     try:
+        if stderr_path:
+            try:
+                fd = os.open(
+                    stderr_path,
+                    os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+                    0o644,
+                )
+                try:
+                    os.dup2(fd, 2)
+                finally:
+                    if fd not in (0, 1, 2):
+                        os.close(fd)
+                stderr_handle = open(
+                    stderr_path,
+                    "a",
+                    buffering=1,
+                    encoding="utf-8",
+                    errors="replace",
+                )
+                sys.stderr = stderr_handle
+            except Exception:
+                stderr_handle = None
         os.environ["ORTOOLS_CP_SAT_NUM_THREADS"] = "1"
         os.environ["NUM_CPUS"] = "1"
         ok, placed, reason = try_pack_exact_cover(
@@ -363,6 +389,15 @@ def _cp_worker(conn, W, H, bag, seconds, allow_discard, hint):
             conn.close()
         except Exception:
             pass
+        if stderr_handle:
+            try:
+                stderr_handle.flush()
+            except Exception:
+                pass
+            try:
+                stderr_handle.close()
+            except Exception:
+                pass
 
 
 def _safe_parent_poll(parent, timeout):
@@ -420,8 +455,23 @@ def _run_cp_sat_isolated(
     *,
     hint: Optional[List[Placed]] = None,
 ):
+    try:
+        stderr_tmp = tempfile.NamedTemporaryFile(
+            prefix="cp_sat_",
+            suffix=".stderr",
+            delete=False,
+        )
+        stderr_path = stderr_tmp.name
+    except Exception:
+        stderr_path = None
+    else:
+        stderr_tmp.close()
+
     parent, child = mp.Pipe(duplex=False)
-    proc = mp.Process(target=_cp_worker, args=(child, W, H, bag, seconds, allow_discard, hint))
+    proc = mp.Process(
+        target=_cp_worker,
+        args=(child, W, H, bag, seconds, allow_discard, hint, stderr_path),
+    )
     proc.daemon = True
     proc.start()
     try:
@@ -433,7 +483,10 @@ def _run_cp_sat_isolated(
     placed: List[Placed] = []
     reason = None
     meta: Optional[Dict[str, object]] = None
-    got_message = False
+    payload_received = False
+    payload_kind: Optional[str] = None
+    payload_raw_type: Optional[str] = None
+    placement_count = 0
 
     try:
         budget = max(0.0, float(seconds))
@@ -452,7 +505,6 @@ def _run_cp_sat_isolated(
 
     try:
         if parent.poll(0):
-            got_message = True
             payload = parent.recv()
             if isinstance(payload, tuple) and len(payload) == 4:
                 ok_msg, placed_msg, reason_msg, meta_msg = payload
@@ -464,9 +516,13 @@ def _run_cp_sat_isolated(
             for x, y, (w, h, nm) in placed_msg:
                 out.append(Placed(x, y, Rect(w, h, nm)))
             placed = out
+            placement_count = len(placed_msg) if hasattr(placed_msg, "__len__") else len(out)
             reason = reason_msg
             if isinstance(meta_msg, dict):
                 meta = meta_msg
+            payload_received = True
+            payload_kind = "result"
+            payload_raw_type = type(payload).__name__
         else:
             reason = "Stopped before solution (timebox / crash?)"
     except (EOFError, BrokenPipeError):
@@ -485,10 +541,43 @@ def _run_cp_sat_isolated(
 
     if proc.exitcode == -1073741819:  # 0xC0000005
         ok = False
-        if not got_message or not reason:
+        if not payload_received or not reason:
             reason = "Native solver crash (0xC0000005) – isolated; server is fine"
 
-    return ok, placed, reason, meta
+    stderr_tail: Optional[str] = None
+    if stderr_path and os.path.exists(stderr_path):
+        try:
+            with open(stderr_path, "rb") as fh:
+                fh.seek(0, os.SEEK_END)
+                size = fh.tell()
+                limit = 2048
+                fh.seek(max(0, size - limit))
+                data = fh.read()
+            stderr_tail = data.decode("utf-8", errors="replace")
+        except Exception:
+            stderr_tail = None
+        finally:
+            with suppress(OSError):
+                os.remove(stderr_path)
+    elif stderr_path:
+        with suppress(OSError):
+            os.remove(stderr_path)
+
+    isolation_meta: Dict[str, object] = {
+        "exitcode": proc.exitcode,
+        "payload_received": payload_received,
+        "payload_kind": payload_kind,
+        "payload_raw_type": payload_raw_type,
+        "placement_count": placement_count,
+        "stderr_tail": (stderr_tail or "").strip(),
+    }
+
+    meta_out: Dict[str, object] = {}
+    if isinstance(meta, dict):
+        meta_out.update(meta)
+    meta_out["isolation"] = isolation_meta
+
+    return ok, placed, reason, meta_out
 
 
 def _run_backtracking_rescue(
@@ -661,6 +750,7 @@ def solve_orchestrator(*args, **kwargs):
             partial_stalls: Dict[Tuple[int, int], int] = {}
             plateau_limit = max(1, int(getattr(CFG, "PARTIAL_PLATEAU_LIMIT", 5)))
             progress_boards: Set[Tuple[int, int]] = set()
+            rescue_attempted: Set[Tuple[int, int]] = set()
 
             def _update_phase_progress() -> None:
                 elapsed_phase = time.time() - phase_start
@@ -748,14 +838,47 @@ def solve_orchestrator(*args, **kwargs):
                         hint=hint,
                     )
                     retries = retry_counts.get(key, 0)
+                    board_area = cb.W * cb.H if cb else 0
+                    used_area = (
+                        sum(p.rect.w * p.rect.h for p in placed)
+                        if placed
+                        else 0
+                    )
+                    crash_like = _is_crash_reason(reason)
 
-                    if (
+                    if crash_like and placed:
+                        log_attempt_detail(
+                            "Crash partial discarded",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            placements=len(placed),
+                            coverage_pct=round(
+                                (100.0 * used_area / float(board_area))
+                                if board_area > 0 and used_area > 0
+                                else 0.0,
+                                2,
+                            ),
+                        )
+                        placed = []
+                        used_area = 0
+
+                    trigger_crash_rescue = (
+                        not ok
+                        and crash_like
+                        and key not in rescue_attempted
+                        and (board_area == 0 or used_area < board_area)
+                    )
+                    trigger_retry_rescue = (
                         not ok
                         and not allow_discard
                         and not placed
                         and retries >= max_retries
-                        and _is_crash_reason(reason)
-                    ):
+                        and _should_retry_phase(last_reason)
+                    )
+
+                    if trigger_crash_rescue or trigger_retry_rescue:
+                        rescue_attempted.add(key)
+                        trigger = "crash" if trigger_crash_rescue else "retry_limit"
                         log_attempt_detail(
                             "Fallback started",
                             phase=label,
@@ -763,6 +886,7 @@ def solve_orchestrator(*args, **kwargs):
                             reason=reason or "",
                             retries=retries,
                             max_retries=max_retries,
+                            trigger=trigger,
                         )
                         set_message(
                             f"Phase {label} CP-SAT failed for {cb.label}; running deterministic rescue"
@@ -779,6 +903,7 @@ def solve_orchestrator(*args, **kwargs):
                         if fb_ok and fb_placed:
                             ok = True
                             placed = fb_placed
+                            used_area = sum(p.rect.w * p.rect.h for p in placed)
                             reason = fb_reason
                             solve_meta = fb_meta or solve_meta
                             log_attempt_detail(
@@ -792,6 +917,7 @@ def solve_orchestrator(*args, **kwargs):
                         else:
                             reason = fb_reason or reason
                             solve_meta = fb_meta or solve_meta
+                            retry_counts[key] = max_retries
                             log_attempt_detail(
                                 "Fallback failed",
                                 phase=label,
@@ -810,32 +936,55 @@ def solve_orchestrator(*args, **kwargs):
 
                     last_reason = str(reason) if reason else None
 
-                    meta_payload = solve_meta if isinstance(solve_meta, dict) else None
-                    if meta_payload:
-                        log_attempt_detail(
-                            "Solver detail",
-                            phase=label,
-                            board=f"{cb.W}×{cb.H}",
-                            ok=ok,
-                            reason=reason or "",
-                            solved_via=meta_payload.get("solved_via"),
-                            placements=meta_payload.get("placed"),
-                            coverage_cells=meta_payload.get("cp_sat_coverage_cells"),
-                            allow_discard=allow_discard,
-                            guard_edge=meta_payload.get("cp_sat", {}).get("edge_guard")
-                            if isinstance(meta_payload.get("cp_sat"), dict)
-                            else None,
-                            guard_plus=meta_payload.get("cp_sat", {}).get("plus_guard")
-                            if isinstance(meta_payload.get("cp_sat"), dict)
-                            else None,
+                    meta_payload = solve_meta if isinstance(solve_meta, dict) else {}
+                    isolation_meta = None
+                    if isinstance(meta_payload, dict):
+                        isolation_meta = meta_payload.get("isolation")
+                    detail_kwargs: Dict[str, Any] = {
+                        "phase": label,
+                        "board": f"{cb.W}×{cb.H}",
+                        "ok": ok,
+                        "reason": reason or "",
+                        "allow_discard": allow_discard,
+                    }
+                    if isinstance(meta_payload, dict) and meta_payload:
+                        detail_kwargs.update(
+                            {
+                                "solved_via": meta_payload.get("solved_via"),
+                                "placements": meta_payload.get("placed"),
+                                "coverage_cells": meta_payload.get("cp_sat_coverage_cells"),
+                                "guard_edge": meta_payload.get("cp_sat", {}).get("edge_guard")
+                                if isinstance(meta_payload.get("cp_sat"), dict)
+                                else None,
+                                "guard_plus": meta_payload.get("cp_sat", {}).get("plus_guard")
+                                if isinstance(meta_payload.get("cp_sat"), dict)
+                                else None,
+                            }
                         )
+                    if isolation_meta and isinstance(isolation_meta, dict):
+                        tail = isolation_meta.get("stderr_tail")
+                        detail_kwargs.update(
+                            {
+                                "isolation_exitcode": isolation_meta.get("exitcode"),
+                                "isolation_payload_received": isolation_meta.get("payload_received"),
+                                "isolation_payload_kind": isolation_meta.get("payload_kind"),
+                                "isolation_payload_type": isolation_meta.get("payload_raw_type"),
+                                "isolation_placement_count": isolation_meta.get("placement_count"),
+                                "isolation_stderr_tail": tail[-512:] if isinstance(tail, str) else None,
+                            }
+                        )
+                    if detail_kwargs:
+                        log_attempt_detail("Solver detail", **detail_kwargs)
 
                     if placed:
                         hint_cache[(cb.W, cb.H)] = list(placed)
 
                     used_tiles = len(placed) if placed else 0
-                    used_area = sum(p.rect.w * p.rect.h for p in placed) if placed else 0
-                    board_area = cb.W * cb.H if cb else 0
+                    used_area = (
+                        sum(p.rect.w * p.rect.h for p in placed)
+                        if placed
+                        else used_area
+                    )
                     coverage_pct = (
                         100.0 * used_area / float(board_area)
                         if board_area > 0 and used_area > 0
@@ -962,6 +1111,25 @@ def solve_orchestrator(*args, **kwargs):
                             max_retries=max_retries,
                             remaining_after=round(remaining_after, 2),
                         )
+                        blockers: List[str] = []
+                        if allow_discard:
+                            blockers.append("allow_discard=True")
+                        if placed:
+                            blockers.append(f"placements={len(placed)}")
+                        if retries < max_retries:
+                            blockers.append(f"retry_count={retries}/{max_retries}")
+                        if not _is_crash_reason(last_reason):
+                            blockers.append("reason_not_crash_like")
+                        if blockers:
+                            log_attempt_detail(
+                                "Fallback skipped",
+                                phase=label,
+                                board=f"{cb.W}×{cb.H}",
+                                blocked_by="; ".join(blockers),
+                                reason=last_reason or "",
+                                retries=retries,
+                                max_retries=max_retries,
+                            )
                         _update_phase_progress()
                         continue
                     elif (
