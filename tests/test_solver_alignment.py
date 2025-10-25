@@ -74,3 +74,26 @@ def test_seam_guard_ignores_empty_runs(monkeypatch):
 
     assert ok, reason
     assert len(placed) == 2
+
+
+def test_backtracking_rescue_disabled_under_guards(monkeypatch):
+    orchestrator = pytest.importorskip("solver.orchestrator")
+
+    monkeypatch.setattr(orchestrator.CFG, "TEST_MODE", False, raising=False)
+    monkeypatch.setattr(orchestrator.CFG, "MAX_EDGE_FT", 6.0, raising=False)
+    monkeypatch.setattr(orchestrator.CFG, "NO_PLUS", True, raising=False)
+    monkeypatch.setattr(orchestrator.CFG, "SAME_SHAPE_LIMIT", 1, raising=False)
+
+    ok, placed, reason, meta = orchestrator._run_backtracking_rescue(
+        4,
+        4,
+        {(2, 2): 4},
+        seconds=1.0,
+    )
+
+    assert not ok
+    assert placed == []
+    assert "CP-SAT" in reason
+    assert isinstance(meta, dict)
+    assert meta.get("error") == "backtracking_guard_blocked"
+    assert meta.get("guards")
