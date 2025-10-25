@@ -166,6 +166,59 @@ def test_guard_backoff_preserves_non_infeasible_reason(cp_sat_module):
     assert plus_used is True
 
 
+def test_crash_demand_guards_disable_backtracking(monkeypatch, cp_sat_module):
+    from models import ft_to_cells
+    from tests.data.crash_demand import CRASH_DEMAND_BAG_FT
+
+    Rect = cp_sat_module.Rect
+
+    monkeypatch.setattr(cp_sat_module.CFG, "SAME_SHAPE_LIMIT", 1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_EDGE_FT", 6.0, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "NO_PLUS", False, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "TEST_MODE", False, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "BACKTRACK_PROBE_FIRST", True, raising=False)
+
+    def fake_build_options(W, H, tiles, stride, *, rng=None, randomize=False):
+        return [((0, 0, 0, min(W, t.w), min(H, t.h)),) for t in tiles]
+
+    monkeypatch.setattr(cp_sat_module, "build_options", fake_build_options)
+
+    def forbid_backtracking(*args, **kwargs):  # pragma: no cover - sanity guard
+        raise AssertionError("backtracking should not run when guards are active")
+
+    monkeypatch.setattr(cp_sat_module, "_backtracking_exact_cover", forbid_backtracking)
+
+    calls = {}
+
+    def fake_resolver(attempt, *, edge_guard_cells, plus_guard_enabled):
+        calls["edge_guard"] = edge_guard_cells
+        calls["plus_guard"] = plus_guard_enabled
+        return False, [], "Simulated CP-SAT unavailable", edge_guard_cells, plus_guard_enabled
+
+    monkeypatch.setattr(cp_sat_module, "_resolve_guard_backoffs", fake_resolver)
+
+    tiles = []
+    for (w_ft, h_ft), count in CRASH_DEMAND_BAG_FT.items():
+        w = ft_to_cells(w_ft)
+        h = ft_to_cells(h_ft)
+        for idx in range(count):
+            tiles.append(Rect(w, h, f"{w_ft}x{h_ft}_{idx}"))
+
+    board = ft_to_cells(10.5)
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(board, board, tiles, allow_discard=False, max_seconds=1)
+
+    assert not ok
+    assert placed == []
+    assert reason == "Simulated CP-SAT unavailable"
+    assert calls["edge_guard"] == ft_to_cells(6.0)
+    assert calls["plus_guard"] is False
+
+    meta = getattr(cp_sat_module.try_pack_exact_cover, "last_meta", {})
+    assert meta.get("tiles_requested") == sum(CRASH_DEMAND_BAG_FT.values())
+    assert meta.get("backtracking_prefilter") is False
+    assert meta.get("backtracking_prefilter_blocked") == "guards"
+
 def test_backtracking_exact_cover_solves_small_board(cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [
@@ -205,7 +258,38 @@ def test_backtracking_handles_medium_board(cp_sat_module):
     assert len(covered) == 400
 
 
-def test_force_backtracking_solves_board(cp_sat_module):
+def test_guard_blocks_backtracking_prefilter(monkeypatch, cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [Rect(1, 1, "A")]
+
+    monkeypatch.setattr(cp_sat_module.CFG, "SAME_SHAPE_LIMIT", 1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_EDGE_FT", 1.0, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "NO_PLUS", True, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "TEST_MODE", False, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "BACKTRACK_PROBE_FIRST", True, raising=False)
+
+    def fake_backtracking(*args, **kwargs):  # pragma: no cover - ensures guard skip
+        raise AssertionError("backtracking should not run when guards are active")
+
+    placements = [cp_sat_module.Placed(0, 0, Rect(1, 1, "A"))]
+
+    def fake_resolver(attempt, *, edge_guard_cells, plus_guard_enabled):
+        return True, placements, None, edge_guard_cells, plus_guard_enabled
+
+    monkeypatch.setattr(cp_sat_module, "_backtracking_exact_cover", fake_backtracking)
+    monkeypatch.setattr(cp_sat_module, "_resolve_guard_backoffs", fake_resolver)
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(3, 3, tiles)
+
+    assert ok
+    assert reason is None
+    assert placed == placements
+
+    meta = getattr(cp_sat_module.try_pack_exact_cover, "last_meta", {})
+    assert meta.get("backtracking_prefilter") is False
+    assert meta.get("backtracking_prefilter_blocked") == "guards"
+
+def test_force_backtracking_solves_board(monkeypatch, cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [
         Rect(2, 2, "A"),
@@ -213,6 +297,10 @@ def test_force_backtracking_solves_board(cp_sat_module):
         Rect(2, 2, "C"),
         Rect(2, 2, "D"),
     ]
+
+    monkeypatch.setattr(cp_sat_module.CFG, "SAME_SHAPE_LIMIT", -1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_EDGE_FT", None, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "NO_PLUS", False, raising=False)
 
     ok, placed, reason = cp_sat_module.try_pack_exact_cover(
         4,
@@ -248,9 +336,13 @@ def test_force_backtracking_requires_strict_mode(cp_sat_module):
     assert "Backtracking rescue" in (reason or "")
 
 
-def test_force_backtracking_handles_crash_demand(cp_sat_module):
+def test_force_backtracking_handles_crash_demand(monkeypatch, cp_sat_module):
     from tests.data import CRASH_DEMAND_BAG_FT
     from models import ft_to_cells
+
+    monkeypatch.setattr(cp_sat_module.CFG, "SAME_SHAPE_LIMIT", -1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_EDGE_FT", None, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "NO_PLUS", False, raising=False)
 
     W = ft_to_cells(10.5)
     H = ft_to_cells(10.5)

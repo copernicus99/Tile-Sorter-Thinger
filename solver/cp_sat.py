@@ -963,6 +963,37 @@ def try_pack_exact_cover(
             max_tile_side_cells = max(max(abs(int(r.w)), abs(int(r.h))) for r in tiles)
         max_tile_side_ft = max_tile_side_cells * CELL if max_tile_side_cells else 0.0
 
+        same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
+        try:
+            same_shape_int = int(same_shape_cfg)
+        except Exception:
+            same_shape_int = None
+
+        try:
+            max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
+        except Exception:
+            max_edge_ft_cfg = None
+
+        try:
+            test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
+        except Exception:
+            test_mode_flag = False
+
+        edge_guard_cells = _compute_edge_guard_cells(
+            max_edge_ft_cfg,
+            cell_size=CELL,
+            board_max=max(W, H),
+            test_mode=test_mode_flag,
+            max_tile_side_ft=max_tile_side_ft,
+        )
+        plus_guard_enabled = _no_plus_guard_enabled(CFG)
+
+        guards_require_cp_sat = (
+            plus_guard_enabled
+            or (edge_guard_cells is not None)
+            or (same_shape_int is not None and same_shape_int >= 0)
+        )
+
         options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
         total_places = sum(len(o) for o in options)
         meta["option_count"] = total_places
@@ -986,6 +1017,9 @@ def try_pack_exact_cover(
                 options = [options[i] for i in ordering]
 
         backtracking_pref = bool(getattr(CFG, "BACKTRACK_PROBE_FIRST", True))
+        if guards_require_cp_sat and backtracking_pref:
+            backtracking_pref = False
+            meta["backtracking_prefilter_blocked"] = "guards"
         meta["backtracking_prefilter"] = backtracking_pref
 
         def _run_backtracking(stage: str) -> Optional[List[Placed]]:
@@ -1369,25 +1403,6 @@ def try_pack_exact_cover(
                 return False, [], "Model invalid (configuration error)"
             return False, [], "Stopped before solution (timebox)"
 
-        same_shape_cfg = getattr(CFG, "SAME_SHAPE_LIMIT", None)
-    
-        try:
-            max_edge_ft_cfg = getattr(CFG, "MAX_EDGE_FT", None)
-        except Exception:
-            max_edge_ft_cfg = None
-
-        try:
-            test_mode_flag = bool(getattr(CFG, "TEST_MODE", False))
-        except Exception:
-            test_mode_flag = False
-
-        edge_guard_cells = _compute_edge_guard_cells(
-            max_edge_ft_cfg,
-            cell_size=CELL,
-            board_max=max(W, H),
-            test_mode=test_mode_flag,
-            max_tile_side_ft=max_tile_side_ft,
-        )
         if (
             edge_guard_cells is None
             and max_edge_ft_cfg not in (None, 0)
