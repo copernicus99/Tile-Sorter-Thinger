@@ -705,6 +705,7 @@ def solve_orchestrator(*args, **kwargs):
         sqrt_cells = _ceil_sqrt_cells(area_cells)
         sqrt_cells = max(sqrt_cells, max_tile_side)
         sqrt_cells = _align_up_to_multiple(sqrt_cells, grid_step)
+        base_side_cells = max(base_side_cells, sqrt_cells)
 
         log_attempt_detail(
             "Run setup",
