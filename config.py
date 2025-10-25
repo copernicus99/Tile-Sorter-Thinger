@@ -29,11 +29,13 @@ MAX_CANDIDATES       = int(os.getenv("TS_MAX_CANDIDATES", "4000"))
 # ======= Rule / guard knobs =======
 BLOCK_EXACT_10x10     = int(os.getenv("TS_BLOCK_EXACT_10x10", "0"))
 MAX_INTERNAL_SEAM_FT  = float(os.getenv("TS_MAX_INTERNAL_SEAM_FT", "3"))
-MAX_EDGE_FT           = float(os.getenv("TS_MAX_EDGE_FT", "6"))
-NO_PLUS               = int(os.getenv("TS_NO_PLUS", "1")) != 0
+MAX_EDGE_FT           = float(os.getenv("TS_MAX_EDGE_FT", "6"))   # ===========================
+NO_PLUS               = int(os.getenv("TS_NO_PLUS", "0")) != 0    # ===========================
+
 # By default we allow unlimited reuse of the same shape.  Setting a positive
 # integer (via TS_SAME_SHAPE_LIMIT) restores the guard to cap repeats.
-SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "-1"))
+SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "1")) # ===========================
+
 # Default the base grid to 10 ft × 10 ft (100 ft²) so the orchestrator
 # follows the desired A/B (<100 ft²) and C–F (≥100 ft²) phase split without
 # requiring an override.
@@ -46,8 +48,8 @@ S1_MAX_HEIGHT_FT      = float(os.getenv("TS_S1_MAX_HEIGHT_FT", "16"))
 # ======= Legacy A..F timeboxes (seconds) =======
 TIME_A = int(os.getenv("TS_TIME_A", "600"))
 TIME_B = int(os.getenv("TS_TIME_B", "600"))
-TIME_C = int(os.getenv("TS_TIME_C", "300"))
-TIME_D = int(os.getenv("TS_TIME_D", "1800"))
+TIME_C = int(os.getenv("TS_TIME_C", "900"))
+TIME_D = int(os.getenv("TS_TIME_D", "900"))
 TIME_E = int(os.getenv("TS_TIME_E", "900"))
 TIME_F = int(os.getenv("TS_TIME_F", "900"))
 
@@ -73,7 +75,7 @@ COORDS_OUT  = os.getenv("TS_COORDS_OUT", "coords.txt")
 LAYOUT_HTML = os.getenv("TS_LAYOUT_HTML", "layout_view.html")
 
 # ======= Test mode (edge-perimeter relaxation) =======
-TEST_MODE = (os.getenv("TS_TEST_MODE", "1") == "1")  # on by default
+TEST_MODE = (os.getenv("TS_TEST_MODE", "0") == "1")  # ===========================
 
 class CFG:
     CELL = CELL
