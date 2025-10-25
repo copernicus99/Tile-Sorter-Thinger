@@ -1434,7 +1434,13 @@ def try_pack_exact_cover(
     
         guard_active = (active_edge_guard is not None) or bool(active_plus_guard)
     
-        if allow_discard and guard_active and target_cells > 0 and best_coverage < target_cells:
+        if (
+            allow_discard
+            and guard_active
+            and target_cells > 0
+            and best_coverage < target_cells
+            and not best_ok
+        ):
             fallback_plan: List[Tuple[Optional[int], bool]] = []
             if active_edge_guard is not None:
                 fallback_plan.append((None, active_plus_guard))
