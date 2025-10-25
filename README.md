@@ -53,7 +53,7 @@ All solver knobs are exposed via environment variables (prefix `TS_`). Defaults 
 |  | `TS_MAX_INTERNAL_SEAM_FT` | `3` | Maximum seam length allowed inside composite tiles.【F:config.py†L17-L20】 |
 |  | `TS_MAX_EDGE_FT` | `6` | Maximum exposed edge length for placed tiles.【F:config.py†L17-L20】 |
 |  | `TS_NO_PLUS` | `1` | When non-zero, disallows plus-shaped placements.【F:config.py†L17-L21】 |
-|  | `TS_SAME_SHAPE_LIMIT` | `-1` | Maximum reuse count for identical tile shapes (`-1` disables the guard).【F:config.py†L21-L25】 |
+|  | `TS_SAME_SHAPE_LIMIT` | `1` | Maximum same-shape neighbours allowed per tile (`-1` disables the guard).【F:config.py†L21-L25】 |
 | Grid heuristics | `TS_BASE_GRID_AREA_SQFT` | `100` | Starting board area (ft²) used to split phases between small and large grids.【F:config.py†L25-L28】 |
 | Pre-flight sizing | `TS_S_MAX_EST_PLACEMENTS` | `150000` | Estimate cap for preliminary passes.【F:config.py†L30-L33】 |
 |  | `TS_S1_MAX_HEIGHT_FT` | `16` | Maximum board height (ft) evaluated in stage S1.【F:config.py†L30-L33】 |
