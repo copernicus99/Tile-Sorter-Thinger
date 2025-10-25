@@ -93,7 +93,8 @@ def test_backtracking_rescue_disabled_under_guards(monkeypatch):
 
     assert not ok
     assert placed == []
-    assert "CP-SAT" in reason
+    assert "Backtracking rescue failed" in reason
+    assert "guard_blocked" in reason
     assert isinstance(meta, dict)
-    assert meta.get("error") == "backtracking_guard_blocked"
+    assert meta.get("error") == "backtracking_rescue_failed"
     assert meta.get("guards")
