@@ -53,12 +53,158 @@ _RNG: Optional[random.Random] = None
 _PLACEMENT_CACHE: Dict[Tuple[int, int, int, int, int], Tuple[Tuple[int, int, int, int, int], ...]] = {}
 
 
+def _placements_satisfy_guards(
+    W: int,
+    H: int,
+    placements: Sequence[Placed],
+    guards: Optional[Dict[str, object]] = None,
+) -> bool:
+    """Return ``True`` when the placements respect all active guards."""
+
+    if not placements:
+        return True
+
+    guard_cfg = guards or {}
+    same_shape_limit = guard_cfg.get("same_shape_limit")
+    try:
+        same_shape_limit = None if same_shape_limit is None else int(same_shape_limit)
+    except Exception:
+        same_shape_limit = None
+
+    edge_limit_cells = guard_cfg.get("max_edge_cells")
+    try:
+        edge_limit_cells = None if edge_limit_cells is None else int(edge_limit_cells)
+    except Exception:
+        edge_limit_cells = None
+
+    no_plus = bool(guard_cfg.get("no_plus"))
+
+    total_cells = max(0, int(W)) * max(0, int(H))
+    if total_cells <= 0:
+        return False
+
+    grid: List[int] = [-1] * total_cells
+    shapes: List[Tuple[int, int]] = []
+
+    for idx, placed in enumerate(placements):
+        rect = getattr(placed, "rect", None)
+        if rect is None:
+            return False
+        try:
+            px = int(placed.x)
+            py = int(placed.y)
+            w = int(rect.w)
+            h = int(rect.h)
+        except Exception:
+            return False
+        if px < 0 or py < 0 or w <= 0 or h <= 0:
+            return False
+        if px + w > W or py + h > H:
+            return False
+        shape_key = (min(w, h), max(w, h))
+        shapes.append(shape_key)
+        for dy in range(h):
+            row_offset = (py + dy) * W
+            for dx in range(w):
+                cell = row_offset + px + dx
+                if cell < 0 or cell >= total_cells:
+                    return False
+                if grid[cell] != -1:
+                    # Overlap indicates an inconsistent placement.
+                    return False
+                grid[cell] = idx
+
+    def _seam_guard_passes() -> bool:
+        if edge_limit_cells is None or edge_limit_cells < 0:
+            return True
+        max_dim = max(W, H)
+        if edge_limit_cells >= max_dim:
+            return True
+        limit = edge_limit_cells
+        # vertical seams
+        for x in range(1, W):
+            run = 0
+            for y in range(H):
+                left = grid[y * W + (x - 1)]
+                right = grid[y * W + x]
+                if left != -1 and right != -1 and left != right:
+                    run += 1
+                    if run > limit:
+                        return False
+                else:
+                    run = 0
+        # horizontal seams
+        for y in range(1, H):
+            run = 0
+            row_above = (y - 1) * W
+            row_here = y * W
+            for x in range(W):
+                top = grid[row_above + x]
+                bottom = grid[row_here + x]
+                if top != -1 and bottom != -1 and top != bottom:
+                    run += 1
+                    if run > limit:
+                        return False
+                else:
+                    run = 0
+        return True
+
+    def _no_plus_guard_passes() -> bool:
+        if not no_plus:
+            return True
+        for y in range(1, H):
+            row_above = (y - 1) * W
+            row_here = y * W
+            for x in range(1, W):
+                nw = grid[row_above + (x - 1)]
+                ne = grid[row_above + x]
+                sw = grid[row_here + (x - 1)]
+                se = grid[row_here + x]
+                if -1 in (nw, ne, sw, se):
+                    continue
+                if len({nw, ne, sw, se}) >= 4:
+                    return False
+        return True
+
+    def _same_shape_guard_passes() -> bool:
+        if same_shape_limit is None or same_shape_limit < 0:
+            return True
+        adjacency: Dict[int, set[int]] = defaultdict(set)
+        for y in range(H):
+            row = y * W
+            for x in range(W):
+                here = grid[row + x]
+                if here == -1:
+                    continue
+                if x + 1 < W:
+                    right = grid[row + x + 1]
+                    if right != -1 and right != here and shapes[here] == shapes[right]:
+                        adjacency[here].add(right)
+                        adjacency[right].add(here)
+                if y + 1 < H:
+                    down = grid[(y + 1) * W + x]
+                    if down != -1 and down != here and shapes[here] == shapes[down]:
+                        adjacency[here].add(down)
+                        adjacency[down].add(here)
+        for neighbors in adjacency.values():
+            if len(neighbors) > same_shape_limit:
+                return False
+        return True
+
+    return (
+        _seam_guard_passes()
+        and _no_plus_guard_passes()
+        and _same_shape_guard_passes()
+    )
+
+
 def _grid_fill_exact_cover(
     W: int,
     H: int,
     tiles: Sequence[Rect],
     *,
     deadline: Optional[float] = None,
+    guards: Optional[Dict[str, object]] = None,
 ) -> Optional[List[Placed]]:
     """Fast DFS tiler that anchors every placement at the next uncovered cell.
 
@@ -189,7 +335,9 @@ def _grid_fill_exact_cover(
         if _deadline_exceeded():
             return False
         if placed_tiles == tiles_total:
-            return True
+            if _placements_satisfy_guards(W, H, placements, guards):
+                return True
+            return False
         next_idx = grid.find(0)
         if next_idx == -1:
             return False
@@ -421,12 +569,14 @@ def _backtracking_exact_cover(
     options: Sequence[Sequence[Tuple[int, int, int, int, int]]],
     *,
     max_seconds: Optional[float] = None,
+    guards: Optional[Dict[str, object]] = None,
 ) -> Optional[List[Placed]]:
     """Deterministic exact-cover search used as a last-resort fallback.
 
     The helper targets small boards where CP-SAT either times out or is
-    unavailable.  It only supports the pure exact-cover case (no discards,
-    guards disabled).  Two search strategies are attempted:
+    unavailable.  It only supports the pure exact-cover case (no discards) and
+    now evaluates guard constraints once a full placement is assembled.  Two
+    search strategies are attempted:
 
     #.  A greedy tile-filling DFS that walks the grid cell-by-cell.  This is
         extremely effective for well-behaved racks (e.g. the crash regression
@@ -520,7 +670,7 @@ def _backtracking_exact_cover(
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    greedy = _grid_fill_exact_cover(W, H, tiles, deadline=deadline)
+    greedy = _grid_fill_exact_cover(W, H, tiles, deadline=deadline, guards=guards)
     greedy_timed_out = bool(getattr(_grid_fill_exact_cover, "timed_out", False))
     if greedy is not None:
         stats.update({
@@ -608,11 +758,31 @@ def _backtracking_exact_cover(
                     break
         return best_col
 
+    best_solution: Optional[List[Placed]] = None
+
+    def _rows_to_placements(rows: Sequence[int]) -> Optional[List[Placed]]:
+        placed_by_tile: List[Optional[Placed]] = [None] * n
+        for row_idx in rows:
+            tile_idx, opt = row_info[row_idx]
+            px, py, _rot, w, h = opt
+            placed_by_tile[tile_idx] = Placed(px, py, Rect(w, h, tiles[tile_idx].name))
+        if any(p is None for p in placed_by_tile):
+            return None
+        return [p for p in placed_by_tile if p is not None]
+
     def _search() -> bool:
-        nonlocal nodes_searched, limit_hit
+        nonlocal nodes_searched, limit_hit, best_solution
         if _deadline_exceeded():
             return False
         if not active_cols:
+            placements = _rows_to_placements(solution_rows)
+            if placements is None:
+                stats.update({"reason": "incomplete_cover"})
+                setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+                return False
+            if not _placements_satisfy_guards(W, H, placements, guards):
+                return False
+            best_solution = placements
             return True
         col = _choose_column()
         if col is None:
@@ -668,18 +838,11 @@ def _backtracking_exact_cover(
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    placed_by_tile: List[Optional[Placed]] = [None] * n
-    for row_idx in solution_rows:
-        tile_idx, opt = row_info[row_idx]
-        px, py, _rot, w, h = opt
-        placed_by_tile[tile_idx] = Placed(px, py, Rect(w, h, tiles[tile_idx].name))
-
-    if any(p is None for p in placed_by_tile):
-        stats.update({"nodes": nodes_searched, "reason": "incomplete_cover"})
+    solution = best_solution or []
+    if not solution:
+        stats.update({"nodes": nodes_searched, "reason": "guard_blocked"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
-
-    solution = [p for p in placed_by_tile if p is not None]
     stats.update({
         "nodes": nodes_searched,
         "limit_hit": limit_hit,
@@ -994,6 +1157,16 @@ def try_pack_exact_cover(
             or (same_shape_int is not None and same_shape_int >= 0)
         )
 
+        guard_settings: Dict[str, object] = {}
+        if edge_guard_cells is not None:
+            guard_settings["max_edge_cells"] = edge_guard_cells
+        if plus_guard_enabled:
+            guard_settings["no_plus"] = True
+        if same_shape_int is not None and same_shape_int >= 0:
+            guard_settings["same_shape_limit"] = same_shape_int
+        if not guard_settings:
+            guard_settings = {}
+
         options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
         total_places = sum(len(o) for o in options)
         meta["option_count"] = total_places
@@ -1031,6 +1204,7 @@ def try_pack_exact_cover(
                 tiles,
                 options,
                 max_seconds=max_seconds,
+                guards=guard_settings,
             )
             elapsed_bt = time.time() - start_bt
             attempt["elapsed"] = elapsed_bt

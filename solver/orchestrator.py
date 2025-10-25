@@ -630,16 +630,6 @@ def _run_backtracking_rescue(
                 f"same-shape adjacency limit {same_shape_value}"
             )
 
-    if guard_descriptions:
-        reason = (
-            "Backtracking rescue unavailable: guard enforcement requires CP-SAT"
-        )
-        meta = {
-            "error": "backtracking_guard_blocked",
-            "guards": guard_descriptions,
-        }
-        return False, [], reason, meta
-
     try:
         ok, placed, reason = try_pack_exact_cover(
             W=W,
@@ -659,6 +649,8 @@ def _run_backtracking_rescue(
         )
 
     meta = getattr(try_pack_exact_cover, "last_meta", None)
+    if isinstance(meta, dict) and guard_descriptions:
+        meta.setdefault("guards", guard_descriptions)
     return ok, placed, reason, meta
 
 

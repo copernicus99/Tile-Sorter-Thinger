@@ -34,7 +34,7 @@ NO_PLUS               = int(os.getenv("TS_NO_PLUS", "0")) != 0    # ============
 
 # By default we allow unlimited reuse of the same shape.  Setting a positive
 # integer (via TS_SAME_SHAPE_LIMIT) restores the guard to cap repeats.
-SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "1")) # ===========================
+SAME_SHAPE_LIMIT      = int(os.getenv("TS_SAME_SHAPE_LIMIT", "-1")) # ===========================
 
 # Default the base grid to 10 ft × 10 ft (100 ft²) so the orchestrator
 # follows the desired A/B (<100 ft²) and C–F (≥100 ft²) phase split without
