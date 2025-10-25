@@ -588,6 +588,58 @@ def _run_backtracking_rescue(
     hint: Optional[List[Placed]] = None,
     seconds: Optional[float] = None,
 ):
+    guard_descriptions: List[str] = []
+
+    test_mode = False
+    try:
+        test_mode = bool(getattr(CFG, "TEST_MODE", False))
+    except Exception:
+        test_mode = False
+
+    if not test_mode:
+        try:
+            max_edge_ft = getattr(CFG, "MAX_EDGE_FT", None)
+        except Exception:
+            max_edge_ft = None
+        try:
+            edge_value = None if max_edge_ft is None else float(max_edge_ft)
+        except Exception:
+            edge_value = None
+        if edge_value is not None and edge_value > 0:
+            guard_descriptions.append(f"edge length ≤ {edge_value:g} ft")
+
+        try:
+            no_plus_flag = bool(getattr(CFG, "NO_PLUS", False))
+        except Exception:
+            no_plus_flag = False
+        if no_plus_flag:
+            guard_descriptions.append("no-plus intersections")
+
+        try:
+            same_shape_limit = getattr(CFG, "SAME_SHAPE_LIMIT", None)
+        except Exception:
+            same_shape_limit = None
+        try:
+            same_shape_value = (
+                None if same_shape_limit is None else int(same_shape_limit)
+            )
+        except Exception:
+            same_shape_value = None
+        if same_shape_value is not None and same_shape_value >= 0:
+            guard_descriptions.append(
+                f"same-shape adjacency limit {same_shape_value}"
+            )
+
+    if guard_descriptions:
+        reason = (
+            "Backtracking rescue unavailable: guard enforcement requires CP-SAT"
+        )
+        meta = {
+            "error": "backtracking_guard_blocked",
+            "guards": guard_descriptions,
+        }
+        return False, [], reason, meta
+
     try:
         ok, placed, reason = try_pack_exact_cover(
             W=W,
