@@ -2,7 +2,7 @@ import math
 import random
 import time
 from collections import defaultdict
-from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence
+from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence, Set
 from ortools.sat.python import cp_model as _cp
 
 from models import Placed, Rect
@@ -260,6 +260,20 @@ def _grid_fill_exact_cover(
     tile_types: List[Dict[str, object]] = []
     timed_out = False
 
+    same_shape_limit: Optional[int] = None
+    adjacency_enabled = False
+    if isinstance(guards, dict):
+        maybe_limit = guards.get("same_shape_limit")
+        try:
+            if maybe_limit is not None:
+                same_shape_limit = int(maybe_limit)
+        except Exception:
+            same_shape_limit = None
+        if same_shape_limit is not None and same_shape_limit >= 0:
+            adjacency_enabled = True
+        else:
+            same_shape_limit = None
+
     def _deadline_exceeded() -> bool:
         nonlocal timed_out
         if deadline is None:
@@ -299,6 +313,9 @@ def _grid_fill_exact_cover(
         reverse=True,
     )
 
+    for idx, tile in enumerate(tile_types):
+        tile["shape_id"] = idx
+
     offset_cache: Dict[Tuple[int, int, int], Tuple[int, ...]] = {}
 
     def _offsets_for(width: int, height: int) -> Tuple[int, ...]:
@@ -327,8 +344,11 @@ def _grid_fill_exact_cover(
 
     tiles_total = sum(int(tile["count"]) for tile in tile_types)
     grid = bytearray(W * H)
+    owners: List[int] = [-1] * (W * H)
     placements: List[Placed] = []
     placed_tiles = 0
+    placement_shapes: List[int] = []
+    placement_neighbors: List[Set[int]] = []
 
     def _search(filled_cells: int) -> bool:
         nonlocal placed_tiles
@@ -366,13 +386,76 @@ def _grid_fill_exact_cover(
                 if isinstance(names_list, list) and 0 <= name_idx < len(names_list):
                     name = names_list[name_idx]
                 placements.append(Placed(x, y, Rect(w, h, name)))
+                placement_shapes.append(int(tile["shape_id"]))
+                placement_neighbors.append(set())
+                new_idx = len(placements) - 1
                 for off in offsets:
                     grid[base + off] = 1
+                    owners[base + off] = new_idx
+
+                neighbor_ids: Set[int] = set()
+                if adjacency_enabled and same_shape_limit is not None:
+                    shape_id = placement_shapes[new_idx]
+                    for off in offsets:
+                        cell = base + off
+                        cy, cx = divmod(cell, W)
+                        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                            nx = cx + dx
+                            ny = cy + dy
+                            if nx < 0 or ny < 0 or nx >= W or ny >= H:
+                                continue
+                            neighbor_owner = owners[ny * W + nx]
+                            if neighbor_owner == -1 or neighbor_owner == new_idx:
+                                continue
+                            if placement_shapes[neighbor_owner] != shape_id:
+                                continue
+                            neighbor_ids.add(neighbor_owner)
+
+                    if len(neighbor_ids) > same_shape_limit:
+                        # guard violation — undo and continue with next placement
+                        for off in offsets:
+                            grid[base + off] = 0
+                            owners[base + off] = -1
+                        placements.pop()
+                        placement_shapes.pop()
+                        placement_neighbors.pop()
+                        placed_tiles -= 1
+                        tile["used"] -= 1
+                        continue
+
+                    violation = False
+                    for neighbor in neighbor_ids:
+                        neighbor_set = placement_neighbors[neighbor]
+                        if new_idx not in neighbor_set and len(neighbor_set) >= same_shape_limit:
+                            violation = True
+                            break
+                    if violation:
+                        for off in offsets:
+                            grid[base + off] = 0
+                            owners[base + off] = -1
+                        placements.pop()
+                        placement_shapes.pop()
+                        placement_neighbors.pop()
+                        placed_tiles -= 1
+                        tile["used"] -= 1
+                        continue
+
+                    for neighbor in neighbor_ids:
+                        placement_neighbors[new_idx].add(neighbor)
+                        placement_neighbors[neighbor].add(new_idx)
+
                 if _search(filled_cells + w * h):
                     return True
+                if adjacency_enabled and same_shape_limit is not None:
+                    for neighbor in list(placement_neighbors[new_idx]):
+                        placement_neighbors[neighbor].discard(new_idx)
+                    placement_neighbors[new_idx].clear()
                 for off in offsets:
                     grid[base + off] = 0
+                    owners[base + off] = -1
                 placements.pop()
+                placement_shapes.pop()
+                placement_neighbors.pop()
                 placed_tiles -= 1
                 tile["used"] -= 1
         return False
