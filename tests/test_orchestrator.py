@@ -190,6 +190,31 @@ def test_orchestrator_phase_d_sticks_to_10x10(monkeypatch):
         assert seconds <= orchestrator.CFG.TIME_D + 1e-6
 
 
+def test_orchestrator_skips_phase_c_when_demand_exceeds_base(monkeypatch):
+    import solver.orchestrator as orchestrator
+    from models import Rect, Placed
+
+    calls = []
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        calls.append((W, H, allow_discard))
+        if not allow_discard:
+            pytest.fail("Phase C should be skipped when demand exceeds base board")
+        rect = Rect(w=min(W, 6), h=min(H, 6), name="tile")
+        return True, [Placed(0, 0, rect)], "ok", {}
+
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 1)
+
+    bag_ft = {(3.0, 3.0): 20}  # total area 180 ft² > 10×10 base grid
+
+    orchestrator.solve_orchestrator(bag_ft=bag_ft)
+
+    assert calls
+    assert all(allow for (_W, _H, allow) in calls)
+
+
 def test_orchestrator_phase_d_does_not_requeue_without_progress(monkeypatch):
     import solver.orchestrator as orchestrator
 
