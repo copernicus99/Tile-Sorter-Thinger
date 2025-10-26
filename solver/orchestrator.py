@@ -918,6 +918,22 @@ def solve_orchestrator(*args, **kwargs):
                         idx=attempt_idx,
                         total=max(total, attempt_idx + len(queue)),
                     )
+
+                    board_area = cb.W * cb.H if cb else 0
+                    if not allow_discard and board_area < area_cells:
+                        log_attempt_detail(
+                            "Attempt skipped",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            reason="Board area smaller than total tile demand",
+                            board_area=board_area,
+                            demand_area=area_cells,
+                        )
+                        set_message(
+                            f"Phase {label} skipped {cb.label}: demand exceeds board area"
+                        )
+                        continue
+
                     set_grid(cb.label)
                     log_attempt_detail(
                         "Attempt dispatched",
