@@ -1144,7 +1144,7 @@ def build_options(
     rng_local = _system_rng() if (randomize and rng is None) else rng
 
     board_cells = max(0, int(W)) * max(0, int(H))
-    coverage: List[int] = [0] * board_cells if board_cells else []
+    coverage_counts: List[int] = [0] * board_cells if board_cells else []
     tile_option_counts: List[int] = []
     duplicates_pruned = 0
     thinned = False
@@ -1183,13 +1183,6 @@ def build_options(
                     continue
                 seen.add(key)
                 t.append(loc)
-                if coverage:
-                    for dy in range(lh):
-                        row_offset = (py + dy) * W
-                        for dx in range(lw):
-                            idx_cell = row_offset + px + dx
-                            if 0 <= idx_cell < len(coverage):
-                                coverage[idx_cell] += 1
                 total_for_rect += 1
 
         if total_for_rect > max_opts_per_rect and len(t) > max_opts_per_rect:
@@ -1205,18 +1198,33 @@ def build_options(
         if randomize and rng_local is not None and len(t) > 1:
             rng_local.shuffle(t)
 
+        if coverage_counts:
+            for px, py, _rot, lw, lh in t:
+                for dy in range(lh):
+                    row_offset = (py + dy) * W
+                    for dx in range(lw):
+                        idx_cell = row_offset + px + dx
+                        if 0 <= idx_cell < len(coverage_counts):
+                            coverage_counts[idx_cell] += 1
+
         opts.append(t)
         tile_option_counts.append(len(t))
         total_options += len(t)
 
-    forced_slack: Set[int] = set()
-    if coverage and not thinned:
-        forced_slack = {cell for cell, count in enumerate(coverage) if count == 0}
+    forced_slack_cells: Set[int] = set()
+    if coverage_counts:
+        forced_slack_cells = {
+            cell for cell, count in enumerate(coverage_counts) if count == 0
+        }
+
+    # Use a deterministic, JSON-serialisable container for metadata so
+    # instrumentation can safely record the slack hints.
+    forced_slack: Tuple[int, ...] = tuple(sorted(forced_slack_cells))
 
     meta: Dict[str, object] = {
         "option_count": total_options,
         "tile_option_counts": tile_option_counts,
-        "coverage": coverage if coverage else None,
+        "coverage": coverage_counts if coverage_counts else None,
         "forced_slack": forced_slack,
         "duplicates_pruned": duplicates_pruned,
         "thinned": thinned,
