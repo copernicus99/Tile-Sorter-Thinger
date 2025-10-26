@@ -205,6 +205,7 @@ def _grid_fill_exact_cover(
     *,
     deadline: Optional[float] = None,
     guards: Optional[Dict[str, object]] = None,
+    forced_slack: Optional[Set[int]] = None,
 ) -> Optional[List[Placed]]:
     """Fast DFS tiler that anchors every placement at the next uncovered cell.
 
@@ -216,7 +217,9 @@ def _grid_fill_exact_cover(
     but is dramatically cheaper to evaluate for racks containing only a handful
     of distinct shapes.  All tiles must be placed, yet the board may contain
     slack area; any uncovered cells simply remain empty once every tile has been
-    positioned.
+    positioned.  Callers may supply ``forced_slack`` to pre-mark board cells that
+    can never be covered by any placement; this keeps the DFS from repeatedly
+    attempting to anchor tiles on those unreachable locations.
     """
 
     try:
@@ -349,6 +352,12 @@ def _grid_fill_exact_cover(
     placed_tiles = 0
     placement_shapes: List[int] = []
     placement_neighbors: List[Set[int]] = []
+
+    forced_slack = {int(cell) for cell in (forced_slack or set())}
+    if forced_slack:
+        for cell in forced_slack:
+            if 0 <= cell < W * H:
+                grid[cell] = 1
 
     def _search(filled_cells: int) -> bool:
         nonlocal placed_tiles
@@ -653,6 +662,7 @@ def _backtracking_exact_cover(
     *,
     max_seconds: Optional[float] = None,
     guards: Optional[Dict[str, object]] = None,
+    forced_slack: Optional[Set[int]] = None,
 ) -> Optional[List[Placed]]:
     """Deterministic exact-cover search used as a last-resort fallback.
 
@@ -703,8 +713,6 @@ def _backtracking_exact_cover(
     if time_limit is not None and time_limit <= 0:
         time_limit = None
 
-    deadline = time.time() + time_limit if time_limit is not None else None
-
     stats = {
         "board": (W, H),
         "tiles": n,
@@ -715,6 +723,7 @@ def _backtracking_exact_cover(
         "limit_hit": False,
         "time_limit": time_limit,
         "timed_out": False,
+        "symmetry_pruned": 0,
     }
     setattr(_backtracking_exact_cover, "last_stats", dict(stats))
 
@@ -731,6 +740,12 @@ def _backtracking_exact_cover(
         stats.update({"reason": "tile_dims_invalid"})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
+
+    slack_cells = max(0, area_cells - tile_area)
+    forced_slack = {int(cell) for cell in (forced_slack or set()) if 0 <= int(cell) < area_cells}
+    stats["slack_cells"] = slack_cells
+    stats["forced_slack_cells"] = len(forced_slack)
+    stats["free_slack_cells"] = max(0, slack_cells - len(forced_slack))
 
     if tile_area > area_cells:
         stats.update({"reason": "tile_area_exceeds_board"})
@@ -753,29 +768,78 @@ def _backtracking_exact_cover(
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    greedy = _grid_fill_exact_cover(W, H, tiles, deadline=deadline, guards=guards)
-    greedy_timed_out = bool(getattr(_grid_fill_exact_cover, "timed_out", False))
-    if greedy is not None:
-        stats.update({
-            "method": "grid_fill",
-            "result": "solved",
-            "nodes": n,
-            "limit_hit": False,
-            "timed_out": False,
-        })
-        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-        return greedy
-    if greedy_timed_out:
-        stats.update({"reason": "time_limit", "timed_out": True})
-        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-        return None
+    group_ids: List[int] = [0] * n
+    group_lookup: Dict[Tuple[int, int], int] = {}
+    for idx, rect in enumerate(tiles):
+        try:
+            rw = abs(int(rect.w))
+            rh = abs(int(rect.h))
+        except Exception:
+            stats.update({"reason": "tile_dims_invalid"})
+            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+            return None
+        key = (min(rw, rh), max(rw, rh))
+        group_ids[idx] = group_lookup.setdefault(key, len(group_lookup))
 
-    # Build an exact-cover matrix that treats each grid cell and tile instance
-    # as a column.  Rows represent a specific placement of a specific tile.
-    total_cells = area_cells
+    guard_dict: Dict[str, object]
+    if isinstance(guards, dict):
+        guard_dict = {k: v for k, v in guards.items() if v is not None}
+    else:
+        guard_dict = {}
+
+    same_shape_cfg = guard_dict.get("same_shape_limit")
+    try:
+        same_shape_limit = None if same_shape_cfg is None else int(same_shape_cfg)
+    except Exception:
+        same_shape_limit = None
+
+    coverage_ratio = (tile_area / area_cells) if area_cells else 0.0
+    stats["coverage_ratio"] = coverage_ratio
+    stats["same_shape_limit"] = same_shape_limit
+
+    try:
+        relax_allowed = bool(getattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE", True))
+    except Exception:
+        relax_allowed = True
+    try:
+        relax_threshold = float(
+            getattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE_THRESHOLD", 0.92)
+        )
+    except Exception:
+        relax_threshold = 0.92
+
+    guard_variants: List[Tuple[Optional[Dict[str, object]], bool]] = []
+    base_guard = guard_dict or None
+    guard_variants.append((base_guard, False))
+    if (
+        relax_allowed
+        and same_shape_limit is not None
+        and same_shape_limit >= 0
+        and coverage_ratio >= relax_threshold
+    ):
+        relaxed = dict(guard_dict)
+        if "same_shape_limit" in relaxed:
+            relaxed.pop("same_shape_limit", None)
+            guard_variants.append((relaxed or None, True))
+
+    if forced_slack:
+        cell_lookup: Dict[int, int] = {}
+        next_idx = 0
+        for cell in range(area_cells):
+            if cell in forced_slack:
+                continue
+            cell_lookup[cell] = next_idx
+            next_idx += 1
+        total_cells = next_idx
+    else:
+        cell_lookup = {cell: cell for cell in range(area_cells)}
+        total_cells = area_cells
+
     tile_offset = total_cells
     row_columns: List[Tuple[int, ...]] = []
     row_info: List[Tuple[int, Tuple[int, int, int, int, int]]] = []
+    row_groups: List[int] = []
+    row_keys: List[Tuple[int, int, int, int, int]] = []
     column_to_rows: Dict[int, List[int]] = defaultdict(list)
 
     for tile_idx, placements in enumerate(options):
@@ -786,156 +850,251 @@ def _backtracking_exact_cover(
         for opt in placements:
             px, py, _rot, w, h = opt
             columns: List[int] = [tile_offset + tile_idx]
+            skip_row = False
             for dy in range(h):
                 row_offset = (py + dy) * W
                 for dx in range(w):
-                    columns.append(row_offset + px + dx)
+                    cell = row_offset + px + dx
+                    mapped = cell_lookup.get(cell)
+                    if mapped is None:
+                        skip_row = True
+                        break
+                    columns.append(mapped)
+                if skip_row:
+                    break
+            if skip_row:
+                continue
             row_idx = len(row_columns)
             cols_tuple = tuple(columns)
             row_columns.append(cols_tuple)
             row_info.append((tile_idx, opt))
+            row_groups.append(group_ids[tile_idx])
+            row_keys.append((py, px, w, h, _rot))
             for col in cols_tuple:
                 column_to_rows[col].append(row_idx)
 
     total_columns = tile_offset + n
-    if any(col not in column_to_rows for col in range(total_columns)):
-        stats.update({"reason": "uncovered_column"})
+    is_primary: List[bool] = [False] * total_columns
+    for col in range(tile_offset, total_columns):
+        is_primary[col] = True
+
+    missing_primary = [
+        col
+        for col in range(tile_offset, total_columns)
+        if (col not in column_to_rows) or (not column_to_rows[col])
+    ]
+    if missing_primary:
+        stats.update({"reason": "uncovered_tile", "missing_primary": len(missing_primary)})
         setattr(_backtracking_exact_cover, "last_stats", dict(stats))
         return None
 
-    active_cols: set[int] = set(range(total_columns))
-    active_rows: set[int] = set(range(len(row_columns)))
-    solution_rows: List[int] = []
-    nodes_searched = 0
-    limit_hit = False
+    last_stats: Optional[Dict[str, object]] = None
 
-    timed_out = False
+    def _run_search(active_guards, attempt_deadline):
+        active_cols: set[int] = set(range(total_columns))
+        active_primary: set[int] = {col for col in active_cols if is_primary[col]}
+        active_rows: set[int] = set(range(len(row_columns)))
+        solution_rows: List[int] = []
+        nodes_searched = 0
+        limit_hit = False
+        timed_out = False
+        best_solution: Optional[List[Placed]] = None
+        group_assignments: Dict[int, Dict[int, Tuple[int, int, int, int, int]]] = defaultdict(dict)
+        symmetry_pruned = 0
 
-    def _deadline_exceeded() -> bool:
-        nonlocal timed_out
-        if deadline is None:
+        def _deadline_exceeded() -> bool:
+            nonlocal timed_out
+            if attempt_deadline is None:
+                return False
+            if time.time() >= attempt_deadline:
+                timed_out = True
+                return True
             return False
-        if time.time() >= deadline:
-            timed_out = True
-            return True
-        return False
 
-    def _choose_column() -> Optional[int]:
-        best_col = None
-        best_count = None
-        if _deadline_exceeded():
-            return None
-        for col in active_cols:
-            candidates = 0
-            for row_idx in column_to_rows[col]:
-                if row_idx in active_rows:
-                    candidates += 1
-                    if best_count is not None and candidates >= best_count:
-                        break
-            if candidates == 0:
+        def _choose_column() -> Optional[int]:
+            best_col = None
+            best_count = None
+            if _deadline_exceeded():
                 return None
-            if best_col is None or candidates < best_count:
-                best_col = col
-                best_count = candidates
-                if best_count == 1:
-                    break
-        return best_col
+            if not active_primary:
+                return None
+            for col in list(active_primary):
+                candidates = 0
+                for row_idx in column_to_rows[col]:
+                    if row_idx in active_rows:
+                        candidates += 1
+                        if best_count is not None and candidates >= best_count:
+                            break
+                if candidates == 0:
+                    return col
+                if best_col is None or candidates < best_count:
+                    best_col = col
+                    best_count = candidates
+                    if best_count == 1:
+                        break
+            return best_col
 
-    best_solution: Optional[List[Placed]] = None
+        def _rows_to_placements(rows: Sequence[int]) -> Optional[List[Placed]]:
+            placed_by_tile: List[Optional[Placed]] = [None] * n
+            for row_idx in rows:
+                tile_idx, opt = row_info[row_idx]
+                px, py, _rot, w, h = opt
+                placed_by_tile[tile_idx] = Placed(
+                    px, py, Rect(w, h, tiles[tile_idx].name)
+                )
+            if any(p is None for p in placed_by_tile):
+                return None
+            return [p for p in placed_by_tile if p is not None]
 
-    def _rows_to_placements(rows: Sequence[int]) -> Optional[List[Placed]]:
-        placed_by_tile: List[Optional[Placed]] = [None] * n
-        for row_idx in rows:
-            tile_idx, opt = row_info[row_idx]
-            px, py, _rot, w, h = opt
-            placed_by_tile[tile_idx] = Placed(px, py, Rect(w, h, tiles[tile_idx].name))
-        if any(p is None for p in placed_by_tile):
-            return None
-        return [p for p in placed_by_tile if p is not None]
-
-    def _search() -> bool:
-        nonlocal nodes_searched, limit_hit, best_solution
-        if _deadline_exceeded():
-            return False
-        if not active_cols:
-            placements = _rows_to_placements(solution_rows)
-            if placements is None:
-                stats.update({"reason": "incomplete_cover"})
-                setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-                return False
-            if not _placements_satisfy_guards(W, H, placements, guards):
-                return False
-            best_solution = placements
-            return True
-        col = _choose_column()
-        if col is None:
-            stats.update({"reason": "dead_column"})
-            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-            return False
-
-        candidates = [r for r in column_to_rows[col] if r in active_rows]
-        if not candidates:
-            stats.update({"reason": "no_candidates"})
-            setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-            return False
-
-        for row_idx in candidates:
+        def _search() -> bool:
+            nonlocal nodes_searched, limit_hit, best_solution, symmetry_pruned
             if _deadline_exceeded():
                 return False
-            if nodes_searched >= node_limit_cfg:
-                limit_hit = True
-                stats.update({"limit_hit": True})
-                setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-                return False
-            nodes_searched += 1
-            solution_rows.append(row_idx)
-
-            removed_cols: List[int] = []
-            removed_rows: List[int] = []
-            for c in row_columns[row_idx]:
-                if c in active_cols:
-                    active_cols.remove(c)
-                    removed_cols.append(c)
-                    for r in column_to_rows[c]:
-                        if r in active_rows:
-                            active_rows.remove(r)
-                            removed_rows.append(r)
-
-            if _search():
+            if not active_primary:
+                placements = _rows_to_placements(solution_rows)
+                if placements is None:
+                    return False
+                if not _placements_satisfy_guards(W, H, placements, active_guards):
+                    return False
+                best_solution = placements
                 return True
+            col = _choose_column()
+            if col is None:
+                return False
 
-            for r in reversed(removed_rows):
-                active_rows.add(r)
-            for c in reversed(removed_cols):
-                active_cols.add(c)
-            solution_rows.pop()
+            candidates = [r for r in column_to_rows[col] if r in active_rows]
+            if not candidates:
+                return False
 
-        return False
+            for row_idx in candidates:
+                if _deadline_exceeded():
+                    return False
+                if nodes_searched >= node_limit_cfg:
+                    limit_hit = True
+                    return False
+                nodes_searched += 1
+                solution_rows.append(row_idx)
 
-    if not _search():
-        stats.update({"nodes": nodes_searched, "limit_hit": limit_hit, "timed_out": timed_out})
+                tile_idx, _ = row_info[row_idx]
+                group_id = row_groups[row_idx]
+                key = row_keys[row_idx]
+                group_map = group_assignments[group_id]
+                violation = False
+                for other_idx, other_key in group_map.items():
+                    if other_idx == tile_idx:
+                        continue
+                    if other_idx < tile_idx and other_key > key:
+                        violation = True
+                        break
+                    if other_idx > tile_idx and other_key < key:
+                        violation = True
+                        break
+                if violation:
+                    symmetry_pruned += 1
+                    solution_rows.pop()
+                    continue
+                previous_key = group_map.get(tile_idx)
+                group_map[tile_idx] = key
+
+                removed_cols: List[int] = []
+                removed_rows: List[int] = []
+                for c in row_columns[row_idx]:
+                    if c in active_cols:
+                        active_cols.remove(c)
+                        removed_cols.append(c)
+                        if is_primary[c]:
+                            active_primary.discard(c)
+                        for r in column_to_rows[c]:
+                            if r in active_rows:
+                                active_rows.remove(r)
+                                removed_rows.append(r)
+
+                if _search():
+                    return True
+
+                for r in reversed(removed_rows):
+                    active_rows.add(r)
+                for c in reversed(removed_cols):
+                    active_cols.add(c)
+                    if is_primary[c]:
+                        active_primary.add(c)
+                solution_rows.pop()
+                if previous_key is None:
+                    group_map.pop(tile_idx, None)
+                else:
+                    group_map[tile_idx] = previous_key
+
+            return False
+
+        solved = _search()
+        result_stats: Dict[str, object] = {
+            "nodes": nodes_searched,
+            "limit_hit": limit_hit,
+            "timed_out": timed_out,
+            "symmetry_pruned": symmetry_pruned,
+        }
+        if solved and best_solution:
+            result_stats.update({
+                "placed": len(best_solution),
+                "result": "solved",
+                "coverage_cells": sum(p.rect.w * p.rect.h for p in best_solution),
+            })
+            return best_solution, result_stats
         if timed_out:
-            stats.update({"reason": "time_limit"})
+            result_stats["reason"] = "time_limit"
         elif limit_hit:
-            stats.update({"reason": "node_limit"})
-        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-        return None
+            result_stats["reason"] = "node_limit"
+        else:
+            result_stats.setdefault("reason", "guard_blocked")
+        return None, result_stats
 
-    solution = best_solution or []
-    if not solution:
-        stats.update({"nodes": nodes_searched, "reason": "guard_blocked"})
-        setattr(_backtracking_exact_cover, "last_stats", dict(stats))
-        return None
-    stats.update({
-        "nodes": nodes_searched,
-        "limit_hit": limit_hit,
-        "placed": len(solution),
-        "result": "solved",
-        "timed_out": timed_out,
-    })
-    setattr(_backtracking_exact_cover, "last_stats", dict(stats))
+    for active_guard, relaxed_flag in guard_variants:
+        attempt_stats = dict(stats)
+        attempt_stats["same_shape_guard_relaxed"] = bool(relaxed_flag)
+        attempt_stats["guards_active"] = bool(active_guard)
+        attempt_stats["guard_keys"] = sorted(active_guard.keys()) if active_guard else []
 
-    return solution
+        if time_limit is not None:
+            attempt_deadline = time.time() + max(0.0, time_limit)
+        else:
+            attempt_deadline = None
+
+        greedy = _grid_fill_exact_cover(
+            W,
+            H,
+            tiles,
+            deadline=attempt_deadline,
+            guards=active_guard,
+            forced_slack=forced_slack,
+        )
+        greedy_timed_out = bool(getattr(_grid_fill_exact_cover, "timed_out", False))
+        if greedy is not None:
+            attempt_stats.update({
+                "method": "grid_fill",
+                "result": "solved",
+                "nodes": n,
+                "limit_hit": False,
+                "timed_out": False,
+                "symmetry_pruned": 0,
+            })
+            setattr(_backtracking_exact_cover, "last_stats", dict(attempt_stats))
+            return greedy
+        if greedy_timed_out:
+            attempt_stats.update({"reason": "time_limit", "timed_out": True, "symmetry_pruned": 0})
+            last_stats = attempt_stats
+            setattr(_backtracking_exact_cover, "last_stats", dict(attempt_stats))
+            continue
+
+        placements, search_stats = _run_search(active_guard, attempt_deadline)
+        attempt_stats.update(search_stats)
+        setattr(_backtracking_exact_cover, "last_stats", dict(attempt_stats))
+        if placements is not None:
+            return placements
+        last_stats = attempt_stats
+
+    if last_stats is not None:
+        setattr(_backtracking_exact_cover, "last_stats", dict(last_stats))
+    return None
 
 
 def _placement_key(W: int, H: int, w: int, h: int, stride: int) -> Tuple[int, int, int, int, int]:
@@ -969,15 +1128,30 @@ def _compute_locs(W: int, H: int, w: int, h: int, stride: int) -> Tuple[Tuple[in
     return locs
 
 
-def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Optional[random.Random] = None, randomize: bool = False):
-    opts = []
+def build_options(
+    W: int,
+    H: int,
+    tiles: List[Rect],
+    stride: int,
+    *,
+    rng: Optional[random.Random] = None,
+    randomize: bool = False,
+):
+    opts: List[List[Tuple[int, int, int, int, int]]] = []
     phase_seed = (W * 1315423911 ^ H * 2654435761) & 0xFFFFFFFF
     max_opts_per_tile = int(getattr(CFG, "MAX_OPTIONS_PER_TILE", 2000))
     max_opts_per_rect = int(getattr(CFG, "MAX_OPTIONS_PER_RECT", 2000))
     rng_local = _system_rng() if (randomize and rng is None) else rng
 
+    board_cells = max(0, int(W)) * max(0, int(H))
+    coverage: List[int] = [0] * board_cells if board_cells else []
+    tile_option_counts: List[int] = []
+    duplicates_pruned = 0
+    thinned = False
+    total_options = 0
+
     for idx, r in enumerate(tiles):
-        t = []
+        t: List[Tuple[int, int, int, int, int]] = []
         cfgs = [(r.w, r.h, 0)] if r.w == r.h else [(r.w, r.h, 0), (r.h, r.w, 1)]
         total_for_rect = 0
 
@@ -985,12 +1159,14 @@ def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Option
             rng_local.shuffle(cfgs)
 
         for (w, h, rot) in cfgs:
-            locs = [(*loc[:2], rot, loc[3], loc[4]) for loc in _compute_locs(W, H, w, h, stride)]
+            raw_locs = _compute_locs(W, H, w, h, stride)
+            locs = [(*loc[:2], rot, loc[3], loc[4]) for loc in raw_locs]
 
             if randomize and rng_local is not None and len(locs) > 1:
                 rng_local.shuffle(locs)
 
             if len(locs) > max_opts_per_tile:
+                thinned = True
                 if randomize and rng_local is not None:
                     locs = locs[:max_opts_per_tile]
                 else:
@@ -998,10 +1174,26 @@ def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Option
                     offset = (phase_seed + idx * 97 + w * 17 + h * 23 + rot * 31) % step
                     locs = locs[offset::step][:max_opts_per_tile]
 
-            t.extend(locs)
-            total_for_rect += len(locs)
+            seen: Set[Tuple[int, int, int, int]] = set()
+            for loc in locs:
+                px, py, _rot, lw, lh = loc
+                key = (px, py, lw, lh)
+                if key in seen:
+                    duplicates_pruned += 1
+                    continue
+                seen.add(key)
+                t.append(loc)
+                if coverage:
+                    for dy in range(lh):
+                        row_offset = (py + dy) * W
+                        for dx in range(lw):
+                            idx_cell = row_offset + px + dx
+                            if 0 <= idx_cell < len(coverage):
+                                coverage[idx_cell] += 1
+                total_for_rect += 1
 
         if total_for_rect > max_opts_per_rect and len(t) > max_opts_per_rect:
+            thinned = True
             if randomize and rng_local is not None:
                 rng_local.shuffle(t)
                 t = t[:max_opts_per_rect]
@@ -1014,8 +1206,23 @@ def build_options(W: int, H: int, tiles: List[Rect], stride: int, *, rng: Option
             rng_local.shuffle(t)
 
         opts.append(t)
+        tile_option_counts.append(len(t))
+        total_options += len(t)
 
-    return opts
+    forced_slack: Set[int] = set()
+    if coverage and not thinned:
+        forced_slack = {cell for cell, count in enumerate(coverage) if count == 0}
+
+    meta: Dict[str, object] = {
+        "option_count": total_options,
+        "tile_option_counts": tile_option_counts,
+        "coverage": coverage if coverage else None,
+        "forced_slack": forced_slack,
+        "duplicates_pruned": duplicates_pruned,
+        "thinned": thinned,
+    }
+
+    return opts, meta
 
 # ---------------- main solve ----------------
 def try_pack_exact_cover(
@@ -1250,9 +1457,18 @@ def try_pack_exact_cover(
         if not guard_settings:
             guard_settings = {}
 
-        options = build_options(W, H, tiles, stride, rng=rng, randomize=randomize)
-        total_places = sum(len(o) for o in options)
+        options, options_meta = build_options(
+            W, H, tiles, stride, rng=rng, randomize=randomize
+        )
+        total_places = int(options_meta.get("option_count", sum(len(o) for o in options)))
         meta["option_count"] = total_places
+        forced_slack_cells: Set[int] = set(options_meta.get("forced_slack") or ())
+        meta["forced_slack_cells"] = len(forced_slack_cells)
+        meta["options_thinned"] = bool(options_meta.get("thinned"))
+        meta["option_duplicates_pruned"] = int(options_meta.get("duplicates_pruned", 0))
+        tile_option_counts = options_meta.get("tile_option_counts")
+        if isinstance(tile_option_counts, list) and len(tile_option_counts) == len(options):
+            meta["tile_option_counts"] = list(tile_option_counts)
         if total_places == 0:
             meta["error"] = "no_options"
             return _finish(False, [], "No placements remain (thinned away or grid too small)")
@@ -1271,6 +1487,10 @@ def try_pack_exact_cover(
             if any(idx != i for i, idx in enumerate(ordering)):
                 tiles = [tiles[i] for i in ordering]
                 options = [options[i] for i in ordering]
+                if "tile_option_counts" in meta:
+                    toc_list = meta.get("tile_option_counts")
+                    if isinstance(toc_list, list) and len(toc_list) == len(ordering):
+                        meta["tile_option_counts"] = [toc_list[i] for i in ordering]
 
         backtracking_pref = bool(getattr(CFG, "BACKTRACK_PROBE_FIRST", True))
         if guards_require_cp_sat and backtracking_pref:
@@ -1288,6 +1508,7 @@ def try_pack_exact_cover(
                 options,
                 max_seconds=max_seconds,
                 guards=guard_settings,
+                forced_slack=forced_slack_cells,
             )
             elapsed_bt = time.time() - start_bt
             attempt["elapsed"] = elapsed_bt
@@ -1297,6 +1518,10 @@ def try_pack_exact_cover(
                     "nodes": stats.get("nodes"),
                     "limit_hit": stats.get("limit_hit"),
                     "reason": stats.get("reason"),
+                    "same_shape_guard_relaxed": stats.get("same_shape_guard_relaxed"),
+                    "coverage_ratio": stats.get("coverage_ratio"),
+                    "forced_slack_cells": stats.get("forced_slack_cells"),
+                    "free_slack_cells": stats.get("free_slack_cells"),
                 })
             if placements is not None:
                 placements = list(placements)

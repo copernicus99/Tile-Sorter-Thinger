@@ -166,6 +166,34 @@ def test_guard_backoff_preserves_non_infeasible_reason(cp_sat_module):
     assert plus_used is True
 
 
+def test_backtracking_prunes_identical_tile_permutations(monkeypatch, cp_sat_module):
+    Rect = cp_sat_module.Rect
+
+    def fake_grid_fill(*args, **kwargs):
+        setattr(cp_sat_module._grid_fill_exact_cover, "timed_out", False)
+        return None
+
+    monkeypatch.setattr(cp_sat_module, "_grid_fill_exact_cover", fake_grid_fill)
+
+    tiles = [Rect(2, 2, "A"), Rect(2, 2, "B")]
+    options = [
+        ((2, 0, 0, 2, 2), (0, 0, 0, 2, 2)),
+        ((0, 0, 0, 2, 2), (2, 0, 0, 2, 2)),
+    ]
+
+    result = cp_sat_module._backtracking_exact_cover(
+        4, 2, tiles, options, max_seconds=1
+    )
+
+    assert result is not None
+    assert len(result) == 2
+    positions = [(p.y, p.x) for p in result]
+    assert positions == sorted(positions)
+
+    stats = getattr(cp_sat_module._backtracking_exact_cover, "last_stats", {})
+    assert stats.get("symmetry_pruned", 0) >= 1
+
+
 def test_crash_demand_guards_disable_backtracking(monkeypatch, cp_sat_module):
     from models import ft_to_cells
     from tests.data.crash_demand import CRASH_DEMAND_BAG_FT
@@ -179,7 +207,15 @@ def test_crash_demand_guards_disable_backtracking(monkeypatch, cp_sat_module):
     monkeypatch.setattr(cp_sat_module.CFG, "BACKTRACK_PROBE_FIRST", True, raising=False)
 
     def fake_build_options(W, H, tiles, stride, *, rng=None, randomize=False):
-        return [((0, 0, 0, min(W, t.w), min(H, t.h)),) for t in tiles]
+        opts = [((0, 0, 0, min(W, t.w), min(H, t.h)),) for t in tiles]
+        meta = {
+            "option_count": sum(len(o) for o in opts),
+            "forced_slack": set(),
+            "duplicates_pruned": 0,
+            "thinned": False,
+            "tile_option_counts": [len(o) for o in opts],
+        }
+        return opts, meta
 
     monkeypatch.setattr(cp_sat_module, "build_options", fake_build_options)
 
@@ -227,9 +263,15 @@ def test_backtracking_exact_cover_solves_small_board(cp_sat_module):
         Rect(2, 2, "C"),
         Rect(2, 2, "D"),
     ]
-    options = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
+    options, meta = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
 
-    placements = cp_sat_module._backtracking_exact_cover(4, 4, tiles, options)
+    placements = cp_sat_module._backtracking_exact_cover(
+        4,
+        4,
+        tiles,
+        options,
+        forced_slack=set(meta.get("forced_slack") or ()),
+    )
 
     assert placements is not None
     assert len(placements) == len(tiles)
@@ -243,9 +285,15 @@ def test_backtracking_handles_medium_board(cp_sat_module):
         Rect(20, 10, "A"),
         Rect(20, 10, "B"),
     ]
-    options = cp_sat_module.build_options(20, 20, tiles, stride=1, randomize=False)
+    options, meta = cp_sat_module.build_options(20, 20, tiles, stride=1, randomize=False)
 
-    placements = cp_sat_module._backtracking_exact_cover(20, 20, tiles, options)
+    placements = cp_sat_module._backtracking_exact_cover(
+        20,
+        20,
+        tiles,
+        options,
+        forced_slack=set(meta.get("forced_slack") or ()),
+    )
 
     assert placements is not None
     assert len(placements) == len(tiles)
@@ -256,6 +304,82 @@ def test_backtracking_handles_medium_board(cp_sat_module):
         for dy in range(p.rect.h)
     }
     assert len(covered) == 400
+
+
+def test_backtracking_supports_slack_cells(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [
+        Rect(3, 3, "A"),
+        Rect(2, 3, "B"),
+        Rect(2, 2, "C"),
+        Rect(2, 2, "D"),
+    ]
+    options, meta = cp_sat_module.build_options(5, 5, tiles, stride=1, randomize=False)
+
+    placements = cp_sat_module._backtracking_exact_cover(
+        5,
+        5,
+        tiles,
+        options,
+        forced_slack=set(meta.get("forced_slack") or ()),
+    )
+
+    assert placements is not None
+    assert len(placements) == len(tiles)
+    total_area = sum(p.rect.w * p.rect.h for p in placements)
+    assert total_area == 23
+    assert {(p.x, p.y, p.rect.w, p.rect.h) for p in placements}
+
+    stats = getattr(cp_sat_module._backtracking_exact_cover, "last_stats", {})
+    assert stats.get("slack_cells") == 2
+
+
+def test_forced_slack_cells_reduce_search(monkeypatch, cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [Rect(2, 2, f"sq{i}") for i in range(12)]
+
+    options, meta = cp_sat_module.build_options(9, 6, tiles, stride=2, randomize=False)
+    forced_slack = set(meta.get("forced_slack") or ())
+
+    assert len(forced_slack) == 6
+    assert meta.get("thinned") is False
+
+    greedy_fail = cp_sat_module._grid_fill_exact_cover(9, 6, tiles)
+    assert greedy_fail is None
+
+    greedy = cp_sat_module._grid_fill_exact_cover(9, 6, tiles, forced_slack=forced_slack)
+    assert greedy is not None
+
+    placements = cp_sat_module._backtracking_exact_cover(
+        9,
+        6,
+        tiles,
+        options,
+        forced_slack=forced_slack,
+    )
+
+    assert placements is not None
+    assert len(placements) == len(tiles)
+
+    stats = getattr(cp_sat_module._backtracking_exact_cover, "last_stats", {})
+    assert stats.get("forced_slack_cells") == 6
+    assert stats.get("free_slack_cells") == 0
+
+    monkeypatch.setattr(cp_sat_module.CFG, "SAME_SHAPE_LIMIT", -1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_EDGE_FT", None, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "NO_PLUS", False, raising=False)
+
+    ok, placed, reason = cp_sat_module.try_pack_exact_cover(
+        9,
+        6,
+        tiles,
+        force_backtracking=True,
+    )
+
+    assert ok, reason
+    assert len(placed) == len(tiles)
+    meta = getattr(cp_sat_module.try_pack_exact_cover, "last_meta", {})
+    assert meta.get("forced_slack_cells") == 6
 
 
 def test_guard_blocks_backtracking_prefilter(monkeypatch, cp_sat_module):
@@ -366,8 +490,17 @@ def test_force_backtracking_handles_crash_demand(monkeypatch, cp_sat_module):
 def test_backtracking_respects_limits(monkeypatch, cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [Rect(1, 1, f"t{i}") for i in range(10)]
-    options = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
+    options, meta = cp_sat_module.build_options(4, 4, tiles, stride=1, randomize=False)
 
     monkeypatch.setattr(cp_sat_module.CFG, "BACKTRACK_MAX_TILES", 4, raising=False)
 
-    assert cp_sat_module._backtracking_exact_cover(4, 4, tiles, options) is None
+    assert (
+        cp_sat_module._backtracking_exact_cover(
+            4,
+            4,
+            tiles,
+            options,
+            forced_slack=set(meta.get("forced_slack") or ()),
+        )
+        is None
+    )

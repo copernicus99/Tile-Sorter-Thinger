@@ -213,12 +213,13 @@ def _is_crash_reason(reason: Optional[str]) -> bool:
 
 
 def _phase_c_candidates(base_side: int, *, grid_step: int) -> List[CandidateBoard]:
-    """Return the single Phase C base board candidate."""
+    """Return the Phase C base board sized to the provided baseline."""
 
-    _ = base_side  # kept for signature compatibility
-    _ = grid_step
-    ten_cells = max(6, ft_to_cells(10.0))
-    return [CandidateBoard(ten_cells, ten_cells, f"{_fmt_ft(ten_cells)} × {_fmt_ft(ten_cells)} ft")]
+    side = max(6, int(base_side))
+    if grid_step > 1:
+        side = _align_up_to_multiple(side, grid_step)
+    label = f"{_fmt_ft(side)} × {_fmt_ft(side)} ft"
+    return [CandidateBoard(side, side, label)]
 
 
 _PHASE_D_MAX_CANDIDATES = 15
@@ -266,6 +267,8 @@ def _phase_d_candidates(
     seen: set[Tuple[int, int]] = set()
     out: List[CandidateBoard] = []
 
+    min_area = max(0, int(area_cells))
+
     while heap and len(out) < _PHASE_D_MAX_CANDIDATES:
         priority, Wc, Hc = heapq.heappop(heap)
         key = (Wc, Hc)
@@ -275,7 +278,8 @@ def _phase_d_candidates(
 
         Wc = max(6, int(Wc))
         Hc = max(6, int(Hc))
-        out.append(CandidateBoard(Wc, Hc, f"{_fmt_ft(Wc)} × {_fmt_ft(Hc)} ft"))
+        if Wc * Hc >= min_area:
+            out.append(CandidateBoard(Wc, Hc, f"{_fmt_ft(Wc)} × {_fmt_ft(Hc)} ft"))
 
         for dW, dH in ((-step, 0), (step, 0), (0, -step), (0, step)):
             next_W = Wc + dW
@@ -290,7 +294,17 @@ def _phase_d_candidates(
             heapq.heappush(heap, (next_priority, next_W, next_H))
 
     if not out:
-        out.append(CandidateBoard(base, base, f"{_fmt_ft(base)} × {_fmt_ft(base)} ft"))
+        fallback_side = max(
+            base,
+            _align_up_to_multiple(_ceil_sqrt_cells(min_area), step),
+        )
+        out.append(
+            CandidateBoard(
+                fallback_side,
+                fallback_side,
+                f"{_fmt_ft(fallback_side)} × {_fmt_ft(fallback_side)} ft",
+            )
+        )
 
     return out
 
@@ -929,7 +943,9 @@ def solve_orchestrator(*args, **kwargs):
                         and _should_retry_phase(last_reason)
                     )
 
-                    if trigger_crash_rescue or trigger_retry_rescue:
+                    rescue_supported = (not allow_discard) or (board_area >= area_cells)
+
+                    if (trigger_crash_rescue or trigger_retry_rescue) and rescue_supported:
                         rescue_attempted.add(key)
                         trigger = "crash" if trigger_crash_rescue else "retry_limit"
                         log_attempt_detail(
@@ -978,6 +994,17 @@ def solve_orchestrator(*args, **kwargs):
                                 elapsed=round(fb_elapsed, 2),
                                 reason=reason or "",
                             )
+                    elif trigger_crash_rescue or trigger_retry_rescue:
+                        rescue_attempted.add(key)
+                        log_attempt_detail(
+                            "Fallback skipped",
+                            phase=label,
+                            board=f"{cb.W}×{cb.H}",
+                            reason=reason or "",
+                            allow_discard=allow_discard,
+                            board_area=board_area,
+                            demand_area=area_cells,
+                        )
 
                     attempt_elapsed = time.time() - attempt_started
                     recent_attempts.append(attempt_elapsed)
