@@ -1,6 +1,7 @@
 import sys
 import time
 import types
+from typing import List, Optional, Tuple
 
 import pytest
 
@@ -49,6 +50,7 @@ from solver.orchestrator import (
     _align_up_to_multiple,
     _bag_ft_to_cells,
     _coerce_bag_ft,
+    _fmt_ft,
     _grid_step_from_bag,
     _phase_c_candidates,
     _phase_d_candidates,
@@ -94,9 +96,11 @@ def test_phase_c_candidates_returns_only_base_board():
 
     assert len(candidates) == 1
     cb = candidates[0]
-    ten_cells = ft_to_cells(10.0)
-    assert cb.W == cb.H == ten_cells
-    assert "10.0 × 10.0 ft" in cb.label
+    expected_side = _align_up_to_multiple(base_side, grid_step)
+    expected_side = max(6, expected_side)
+    assert cb.W == cb.H == expected_side
+    expected_label = f"{_fmt_ft(expected_side)} × {_fmt_ft(expected_side)} ft"
+    assert cb.label == expected_label
 
 
 def test_phase_d_candidates_walk_nearby_grids():
@@ -114,10 +118,10 @@ def test_phase_d_candidates_walk_nearby_grids():
     dims = [(cb.W, cb.H) for cb in candidates]
 
     assert dims
-    assert dims[0] == (base_side, base_side)
+    assert dims[0][0] * dims[0][1] >= area_cells
     assert len(dims) <= _PHASE_D_MAX_CANDIDATES
     assert any(w > base_side or h > base_side for w, h in dims)
-    assert any(w < base_side or h < base_side for w, h in dims)
+    assert all(w * h >= area_cells for w, h in dims)
     assert all(shrink_floor <= min(w, h) for w, h in dims)
     assert all(max(w, h) <= base_side + 4 for w, h in dims)
 
@@ -479,3 +483,63 @@ def test_phase_f_crash_triggers_rescue_even_with_allow_discard(monkeypatch):
     assert ok
     assert strategy == "F"
     assert placed
+
+
+def test_phase_d_crash_skips_rescue_when_board_too_small(monkeypatch):
+    import solver.orchestrator as orchestrator
+
+    candidate = CandidateBoard(10, 10, "10 × 10 ft")
+
+    def fake_phase_d_candidates(*args, **kwargs):
+        return [candidate]
+
+    call_state = {"count": 0}
+
+    def fake_run_cp_sat_isolated(W, H, bag, seconds, allow_discard, *, hint=None):
+        call_state["count"] += 1
+        return (
+            False,
+            [],
+            "Subprocess ended early (pipe closed)",
+            {
+                "isolation": {
+                    "exitcode": -11,
+                    "payload_received": False,
+                    "payload_kind": None,
+                    "payload_raw_type": None,
+                    "placement_count": 0,
+                    "stderr_tail": "Segmentation fault",
+                }
+            },
+        )
+
+    rescue_calls: List[Tuple[int, int, Optional[float], Optional[object]]] = []
+
+    def fake_run_backtracking_rescue(W, H, bag, *, hint=None, seconds=None):
+        rescue_calls.append((W, H, seconds, hint))
+        return False, [], "Deterministic rescue skipped", {"solved_via": "rescue"}
+
+    monkeypatch.setattr(orchestrator, "_phase_d_candidates", fake_phase_d_candidates)
+    monkeypatch.setattr(orchestrator, "_run_cp_sat_isolated", fake_run_cp_sat_isolated)
+    monkeypatch.setattr(orchestrator, "_run_backtracking_rescue", fake_run_backtracking_rescue)
+
+    monkeypatch.setattr(orchestrator.CFG, "TIME_C", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_D", 0.1)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_E", 0)
+    monkeypatch.setattr(orchestrator.CFG, "TIME_F", 0)
+    monkeypatch.setattr(orchestrator.CFG, "BASE_GRID_AREA_SQFT", 1, raising=False)
+    monkeypatch.setattr(orchestrator.CFG, "PHASE_RETRY_LIMIT", 1, raising=False)
+
+    bag_ft = {
+        (5.0, 5.0): 3,  # total demand area is 300 cells; board area is only 100 cells
+    }
+
+    ok, placed, W_ft, H_ft, strategy, reason, meta = orchestrator.solve_orchestrator(
+        bag_ft=bag_ft
+    )
+
+    assert call_state["count"] == 1
+    assert not rescue_calls, "Deterministic rescue should be skipped when board is undersized"
+    assert not ok
+    assert strategy in (None, "error")
+    assert not placed
