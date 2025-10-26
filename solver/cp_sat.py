@@ -1,7 +1,7 @@
 import math
 import random
 import time
-from collections import defaultdict
+from collections import defaultdict, Counter
 from typing import List, Tuple, Dict, Iterable, Union, Optional, Sequence, Set
 from ortools.sat.python import cp_model as _cp
 
@@ -1144,7 +1144,7 @@ def build_options(
     rng_local = _system_rng() if (randomize and rng is None) else rng
 
     board_cells = max(0, int(W)) * max(0, int(H))
-    coverage: List[int] = [0] * board_cells if board_cells else []
+    coverage_counts: List[int] = [0] * board_cells if board_cells else []
     tile_option_counts: List[int] = []
     duplicates_pruned = 0
     thinned = False
@@ -1183,13 +1183,6 @@ def build_options(
                     continue
                 seen.add(key)
                 t.append(loc)
-                if coverage:
-                    for dy in range(lh):
-                        row_offset = (py + dy) * W
-                        for dx in range(lw):
-                            idx_cell = row_offset + px + dx
-                            if 0 <= idx_cell < len(coverage):
-                                coverage[idx_cell] += 1
                 total_for_rect += 1
 
         if total_for_rect > max_opts_per_rect and len(t) > max_opts_per_rect:
@@ -1205,24 +1198,284 @@ def build_options(
         if randomize and rng_local is not None and len(t) > 1:
             rng_local.shuffle(t)
 
+        if coverage_counts:
+            for px, py, _rot, lw, lh in t:
+                for dy in range(lh):
+                    row_offset = (py + dy) * W
+                    for dx in range(lw):
+                        idx_cell = row_offset + px + dx
+                        if 0 <= idx_cell < len(coverage_counts):
+                            coverage_counts[idx_cell] += 1
+
         opts.append(t)
         tile_option_counts.append(len(t))
         total_options += len(t)
 
-    forced_slack: Set[int] = set()
-    if coverage and not thinned:
-        forced_slack = {cell for cell, count in enumerate(coverage) if count == 0}
+    forced_slack_cells: Set[int] = set()
+    if coverage_counts:
+        forced_slack_cells = {
+            cell for cell, count in enumerate(coverage_counts) if count == 0
+        }
+
+    # Use a deterministic, JSON-serialisable container for metadata so
+    # instrumentation can safely record the slack hints.
+    forced_slack: Tuple[int, ...] = tuple(sorted(forced_slack_cells))
 
     meta: Dict[str, object] = {
         "option_count": total_options,
         "tile_option_counts": tile_option_counts,
-        "coverage": coverage if coverage else None,
+        "coverage": coverage_counts if coverage_counts else None,
         "forced_slack": forced_slack,
         "duplicates_pruned": duplicates_pruned,
         "thinned": thinned,
     }
 
     return opts, meta
+
+
+def _augment_forced_slack(
+    W: int,
+    H: int,
+    tiles: Sequence[Rect],
+    options: Sequence[Sequence[Tuple[int, int, int, int, int]]],
+    forced_slack: Set[int],
+    slack_cells: int,
+    *,
+    coverage: Optional[Sequence[int]] = None,
+) -> Tuple[Set[int], List[List[Tuple[int, int, int, int, int]]], List[int], bool]:
+    """Expand forced slack cells while preserving at least one placement per tile.
+
+    The helper greedily marks additional slack cells whenever removing the
+    associated placements leaves every tile with at least one viable placement.
+    The returned options drop any placement that intersects the final slack set
+    so the deterministic backtracking search does not reconsider dominated
+    states.  ``coverage`` may be provided to reuse the original coverage counts;
+    they are recomputed when placements are removed.
+    """
+
+    try:
+        board_cells = max(0, int(W)) * max(0, int(H))
+    except Exception:
+        return set(forced_slack), [list(seq) for seq in options], list(coverage or []), False
+
+    if board_cells <= 0:
+        return set(forced_slack), [list(seq) for seq in options], list(coverage or []), False
+
+    try:
+        slack_cells = max(0, int(slack_cells))
+    except Exception:
+        slack_cells = 0
+
+    existing_slack = set(int(cell) for cell in forced_slack if 0 <= int(cell) < board_cells)
+    if slack_cells <= len(existing_slack):
+        refined = [list(seq) for seq in options]
+        if coverage is None:
+            cov = [0] * board_cells
+            for placements in refined:
+                for px, py, _rot, w, h in placements:
+                    for dy in range(h):
+                        row_offset = (py + dy) * W
+                        for dx in range(w):
+                            idx_cell = row_offset + px + dx
+                            if 0 <= idx_cell < board_cells:
+                                cov[idx_cell] += 1
+        else:
+            cov = list(coverage)
+        return existing_slack, refined, cov, False
+
+    tile_entries: List[List[Tuple[Tuple[int, int, int, int, int], Tuple[int, ...]]]] = []
+    active_flags: List[List[bool]] = []
+    active_counts: List[int] = []
+    cell_to_entries: Dict[int, List[Tuple[int, int]]] = defaultdict(list)
+
+    for tile_idx, placements in enumerate(options):
+        tile_list: List[Tuple[Tuple[int, int, int, int, int], Tuple[int, ...]]] = []
+        flags: List[bool] = []
+        active_count = 0
+        for opt in placements:
+            px, py, _rot, w, h = opt
+            cells: List[int] = []
+            for dy in range(h):
+                row_offset = (py + dy) * W
+                for dx in range(w):
+                    idx_cell = row_offset + px + dx
+                    cells.append(idx_cell)
+            cell_tuple = tuple(cells)
+            tile_list.append((opt, cell_tuple))
+            if any(cell in existing_slack for cell in cell_tuple):
+                flags.append(False)
+                continue
+            flags.append(True)
+            active_count += 1
+            entry_idx = len(tile_list) - 1
+            for cell in cell_tuple:
+                if 0 <= cell < board_cells:
+                    cell_to_entries[cell].append((tile_idx, entry_idx))
+        if active_count == 0:
+            return existing_slack, [list(seq) for seq in options], list(coverage or []), False
+        tile_entries.append(tile_list)
+        active_flags.append(flags)
+        active_counts.append(active_count)
+
+    slack_remaining = max(0, slack_cells - len(existing_slack))
+    improved = False
+    skipped_cells: Set[int] = set()
+
+    def _snapshot_active_options() -> Optional[List[List[Tuple[int, int, int, int, int]]]]:
+        snapshot: List[List[Tuple[int, int, int, int, int]]] = []
+        for tile_idx, placements in enumerate(tile_entries):
+            opts: List[Tuple[int, int, int, int, int]] = []
+            for opt_idx, (opt, cell_tuple) in enumerate(placements):
+                if not active_flags[tile_idx][opt_idx]:
+                    continue
+                if any(cell in existing_slack for cell in cell_tuple):
+                    continue
+                opts.append(opt)
+            if not opts:
+                return None
+            snapshot.append(opts)
+        return snapshot
+
+    while slack_remaining > 0:
+        candidate_cell: Optional[int] = None
+        candidate_score: Optional[Tuple[int, int]] = None
+        for cell, entries in cell_to_entries.items():
+            if cell in existing_slack or cell in skipped_cells:
+                continue
+            active_entries = [
+                (tile_idx, opt_idx)
+                for tile_idx, opt_idx in entries
+                if active_flags[tile_idx][opt_idx]
+            ]
+            if not active_entries:
+                candidate_cell = cell
+                candidate_score = (0, cell)
+                break
+            per_tile = Counter(tile_idx for tile_idx, _ in active_entries)
+            feasible = True
+            for tile_idx, cover_count in per_tile.items():
+                if active_counts[tile_idx] - cover_count <= 0:
+                    feasible = False
+                    break
+            if not feasible:
+                continue
+            score = (len(active_entries), cell)
+            if candidate_score is None or score < candidate_score:
+                candidate_cell = cell
+                candidate_score = score
+        if candidate_cell is None:
+            break
+        existing_slack.add(candidate_cell)
+        affected = [
+            (tile_idx, opt_idx)
+            for tile_idx, opt_idx in cell_to_entries.get(candidate_cell, [])
+            if active_flags[tile_idx][opt_idx]
+        ]
+        for tile_idx, opt_idx in affected:
+            if not active_flags[tile_idx][opt_idx]:
+                continue
+            active_flags[tile_idx][opt_idx] = False
+            active_counts[tile_idx] -= 1
+
+        snapshot = _snapshot_active_options()
+        if snapshot is None:
+            for tile_idx, opt_idx in affected:
+                if not active_flags[tile_idx][opt_idx]:
+                    active_flags[tile_idx][opt_idx] = True
+                    active_counts[tile_idx] += 1
+            existing_slack.remove(candidate_cell)
+            skipped_cells.add(candidate_cell)
+            continue
+
+        board_total = board_cells
+        used = [False] * board_total
+        for cell in existing_slack:
+            if 0 <= cell < board_total:
+                used[cell] = True
+
+        order = sorted(range(len(snapshot)), key=lambda idx: len(snapshot[idx]))
+
+        def _dfs(pos: int) -> bool:
+            if pos >= len(order):
+                return True
+            tile_idx = order[pos]
+            options_for_tile = snapshot[tile_idx]
+            for opt in options_for_tile:
+                px, py, _rot, w, h = opt
+                cells: List[int] = []
+                conflict = False
+                for dy in range(h):
+                    row_offset = (py + dy) * W
+                    for dx in range(w):
+                        cell = row_offset + px + dx
+                        if cell < 0 or cell >= board_total or used[cell]:
+                            conflict = True
+                            break
+                        cells.append(cell)
+                    if conflict:
+                        break
+                if conflict:
+                    continue
+                for cell in cells:
+                    used[cell] = True
+                if _dfs(pos + 1):
+                    return True
+                for cell in cells:
+                    used[cell] = False
+            return False
+
+        if not _dfs(0):
+            for tile_idx, opt_idx in affected:
+                if not active_flags[tile_idx][opt_idx]:
+                    active_flags[tile_idx][opt_idx] = True
+                    active_counts[tile_idx] += 1
+            existing_slack.remove(candidate_cell)
+            skipped_cells.add(candidate_cell)
+            continue
+
+        slack_remaining -= 1
+        improved = True
+
+    if not improved:
+        refined = [list(seq) for seq in options]
+        if coverage is None:
+            cov = [0] * board_cells
+            for placements in refined:
+                for px, py, _rot, w, h in placements:
+                    for dy in range(h):
+                        row_offset = (py + dy) * W
+                        for dx in range(w):
+                            idx_cell = row_offset + px + dx
+                            if 0 <= idx_cell < board_cells:
+                                cov[idx_cell] += 1
+        else:
+            cov = list(coverage)
+        return existing_slack, refined, cov, False
+
+    refined_options: List[List[Tuple[int, int, int, int, int]]] = []
+    for tile_idx, placements in enumerate(tile_entries):
+        filtered: List[Tuple[int, int, int, int, int]] = []
+        for opt_idx, (opt, cell_tuple) in enumerate(placements):
+            if not active_flags[tile_idx][opt_idx]:
+                continue
+            if any(cell in existing_slack for cell in cell_tuple):
+                continue
+            filtered.append(opt)
+        if not filtered:
+            return set(int(cell) for cell in forced_slack), [list(seq) for seq in options], list(coverage or []), False
+        refined_options.append(filtered)
+
+    coverage_counts = [0] * board_cells
+    for placements in refined_options:
+        for px, py, _rot, w, h in placements:
+            for dy in range(h):
+                row_offset = (py + dy) * W
+                for dx in range(w):
+                    idx_cell = row_offset + px + dx
+                    if 0 <= idx_cell < board_cells:
+                        coverage_counts[idx_cell] += 1
+
+    return existing_slack, refined_options, coverage_counts, True
 
 # ---------------- main solve ----------------
 def try_pack_exact_cover(
@@ -1460,15 +1713,56 @@ def try_pack_exact_cover(
         options, options_meta = build_options(
             W, H, tiles, stride, rng=rng, randomize=randomize
         )
-        total_places = int(options_meta.get("option_count", sum(len(o) for o in options)))
-        meta["option_count"] = total_places
+
+        coverage_counts = options_meta.get("coverage")
+        if not isinstance(coverage_counts, list):
+            coverage_counts = None
+
         forced_slack_cells: Set[int] = set(options_meta.get("forced_slack") or ())
+
+        try:
+            tile_area_total = sum(abs(int(r.w)) * abs(int(r.h)) for r in tiles)
+        except Exception:
+            tile_area_total = 0
+        board_cells = W * H
+        slack_total = max(0, board_cells - tile_area_total)
+
+        augmented_slack = False
+        if slack_total > len(forced_slack_cells):
+            (
+                augmented_slack_cells,
+                refined_options,
+                refined_coverage,
+                augmented,
+            ) = _augment_forced_slack(
+                W,
+                H,
+                tiles,
+                options,
+                forced_slack_cells,
+                slack_total,
+                coverage=coverage_counts,
+            )
+            if augmented:
+                options = refined_options
+                forced_slack_cells = augmented_slack_cells
+                coverage_counts = refined_coverage
+                augmented_slack = True
+
+        total_places = sum(len(o) for o in options)
+        meta["option_count"] = total_places
+        meta["forced_slack"] = tuple(sorted(forced_slack_cells))
         meta["forced_slack_cells"] = len(forced_slack_cells)
         meta["options_thinned"] = bool(options_meta.get("thinned"))
         meta["option_duplicates_pruned"] = int(options_meta.get("duplicates_pruned", 0))
-        tile_option_counts = options_meta.get("tile_option_counts")
-        if isinstance(tile_option_counts, list) and len(tile_option_counts) == len(options):
+        if coverage_counts is not None:
+            meta["coverage"] = list(coverage_counts)
+        tile_option_counts = [len(o) for o in options]
+        if tile_option_counts:
             meta["tile_option_counts"] = list(tile_option_counts)
+        meta["forced_slack_augmented"] = augmented_slack
+        if slack_total:
+            meta["free_slack_cells"] = max(0, slack_total - len(forced_slack_cells))
         if total_places == 0:
             meta["error"] = "no_options"
             return _finish(False, [], "No placements remain (thinned away or grid too small)")

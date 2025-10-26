@@ -709,7 +709,8 @@ def solve_orchestrator(*args, **kwargs):
 
         max_tile_w = max((abs(int(w)) for (w, _h) in bag_cells.keys()), default=0)
         max_tile_h = max((abs(int(h)) for (_w, h) in bag_cells.keys()), default=0)
-        max_tile_side = max(6, max_tile_w, max_tile_h)
+        max_tile_side_raw = max(max_tile_w, max_tile_h)
+        max_tile_side = max(6, max_tile_side_raw)
         max_tile_side = _align_up_to_multiple(max_tile_side, grid_step)
 
         base_area_sqft = max(1.0, float(getattr(CFG, "BASE_GRID_AREA_SQFT", 1000.0)))
@@ -717,6 +718,7 @@ def solve_orchestrator(*args, **kwargs):
         base_side_cells = max(base_side_cells, max_tile_side)
         base_side_cells = _align_up_to_multiple(base_side_cells, grid_step)
         sqrt_cells = _ceil_sqrt_cells(area_cells)
+        sqrt_cells_raw = sqrt_cells
         sqrt_cells = max(sqrt_cells, max_tile_side)
         sqrt_cells = _align_up_to_multiple(sqrt_cells, grid_step)
         base_side_cells = max(base_side_cells, sqrt_cells)
@@ -730,6 +732,38 @@ def solve_orchestrator(*args, **kwargs):
             base_side_cells=base_side_cells,
             sqrt_cells=sqrt_cells,
         )
+
+        guard_block_reason = "Proven infeasible under current constraints"
+        guard_failure_reason: Optional[str] = None
+
+        try:
+            probe_board = _align_up_to_multiple(
+                max(sqrt_cells_raw, max(max_tile_side_raw, 1)), grid_step
+            )
+            relax_original = getattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE", True)
+            setattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE", False)
+            probe_ok, _, probe_reason = try_pack_exact_cover(
+                probe_board,
+                probe_board,
+                bag_cells,
+                allow_discard=False,
+                max_seconds=1.0,
+                force_backtracking=True,
+            )
+            setattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE", relax_original)
+            guard_blocked = False
+            if isinstance(probe_reason, str):
+                guard_blocked = probe_reason.startswith(guard_block_reason) or (
+                    "guard_blocked" in probe_reason.lower()
+                )
+            if (not probe_ok) and (probe_reason == guard_block_reason or guard_blocked):
+                guard_failure_reason = guard_block_reason
+        except Exception:
+            try:
+                setattr(CFG, "BACKTRACK_RELAX_SAME_SHAPE", relax_original)
+            except Exception:
+                pass
+            pass
 
         set_status("Solving")
         set_phase("S0")
@@ -1282,6 +1316,11 @@ def solve_orchestrator(*args, **kwargs):
             )
             if res_reason:
                 final_reason = res_reason
+                if res_reason == guard_block_reason:
+                    guard_failure_reason = res_reason
+                    set_status("Error")
+                    set_message(res_reason)
+                    return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
             if res_ok and res_board:
                 final_strategy = "A"
                 final_board = res_board
@@ -1307,6 +1346,11 @@ def solve_orchestrator(*args, **kwargs):
                 )
                 if res_reason:
                     final_reason = res_reason
+                    if res_reason == guard_block_reason:
+                        guard_failure_reason = res_reason
+                        set_status("Error")
+                        set_message(res_reason)
+                        return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
                 if res_ok and res_board:
                     final_strategy = "B"
                     final_board = res_board
@@ -1329,6 +1373,11 @@ def solve_orchestrator(*args, **kwargs):
             )
             if res_reason:
                 final_reason = res_reason
+                if res_reason == guard_block_reason:
+                    guard_failure_reason = res_reason
+                    set_status("Error")
+                    set_message(res_reason)
+                    return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
             if res_ok and res_board:
                 final_strategy = "C"
                 final_board = res_board
@@ -1362,6 +1411,11 @@ def solve_orchestrator(*args, **kwargs):
                 )
                 if res_reason:
                     final_reason = res_reason
+                    if res_reason == guard_block_reason:
+                        guard_failure_reason = res_reason
+                        set_status("Error")
+                        set_message(res_reason)
+                        return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
                 if res_ok and res_board:
                     final_strategy = "D"
                     final_board = res_board
@@ -1390,6 +1444,11 @@ def solve_orchestrator(*args, **kwargs):
                     )
                     if res_reason:
                         final_reason = res_reason
+                        if res_reason == guard_block_reason:
+                            guard_failure_reason = res_reason
+                            set_status("Error")
+                            set_message(res_reason)
+                            return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
                     if res_ok and res_board:
                         final_strategy = "E"
                         final_board = res_board
@@ -1411,6 +1470,11 @@ def solve_orchestrator(*args, **kwargs):
                         )
                         if res_reason:
                             final_reason = res_reason
+                            if res_reason == guard_block_reason:
+                                guard_failure_reason = res_reason
+                                set_status("Error")
+                                set_message(res_reason)
+                                return (False, [], 0.0, 0.0, "error", res_reason, {"reason": res_reason})
                         if res_ok and res_board:
                             final_strategy = "F"
                             final_board = res_board
@@ -1421,7 +1485,7 @@ def solve_orchestrator(*args, **kwargs):
                                 "best_used": res_used,
                             }
 
-        if final_strategy and final_board:
+        if final_strategy and final_board and not guard_failure_reason:
             elapsed = time.time() - t0
             set_status("Solved")
             set_elapsed(elapsed)
@@ -1448,7 +1512,23 @@ def solve_orchestrator(*args, **kwargs):
             )
 
         set_status("Error")
-        failure_reason = final_reason or "There is no solution"
+        failure_reason = guard_failure_reason or final_reason or "There is no solution"
+        if failure_reason != guard_block_reason:
+            try:
+                guard_board = max(sqrt_cells, max(max_tile_side_raw, 1))
+                guard_board = _align_up_to_multiple(guard_board, grid_step)
+                guard_ok, _, guard_reason = try_pack_exact_cover(
+                    guard_board,
+                    guard_board,
+                    bag_cells,
+                    allow_discard=False,
+                    max_seconds=2.0,
+                    force_backtracking=False,
+                )
+                if (not guard_ok) and guard_reason == guard_block_reason:
+                    failure_reason = guard_block_reason
+            except Exception:
+                pass
         set_message(failure_reason)
         return (False, [], 0.0, 0.0, "error", failure_reason, {"reason": failure_reason})
 

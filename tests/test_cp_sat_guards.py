@@ -382,6 +382,83 @@ def test_forced_slack_cells_reduce_search(monkeypatch, cp_sat_module):
     assert meta.get("forced_slack_cells") == 6
 
 
+def test_forced_slack_cells_reported_when_thinned(monkeypatch, cp_sat_module):
+    Rect = cp_sat_module.Rect
+
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_OPTIONS_PER_TILE", 1, raising=False)
+    monkeypatch.setattr(cp_sat_module.CFG, "MAX_OPTIONS_PER_RECT", 2000, raising=False)
+
+    tiles = [Rect(1, 1, "solo")]
+    options, meta = cp_sat_module.build_options(5, 5, tiles, stride=2, randomize=False)
+
+    assert meta.get("thinned") is True
+    assert len(options) == 1
+    assert len(options[0]) == 1
+
+    forced_slack = set(meta.get("forced_slack") or ())
+    assert len(forced_slack) == 24
+
+    placements = cp_sat_module._backtracking_exact_cover(
+        5,
+        5,
+        tiles,
+        options,
+        forced_slack=forced_slack,
+    )
+
+    assert placements is not None
+    assert len(placements) == 1
+    only = placements[0]
+    covered_cell = only.y * 5 + only.x
+    assert covered_cell not in forced_slack
+
+
+def test_forced_slack_augmentation_marks_sparse_cells(cp_sat_module):
+    Rect = cp_sat_module.Rect
+    tiles = [Rect(2, 2, f"sq{i}") for i in range(4)]
+
+    options, meta = cp_sat_module.build_options(6, 6, tiles, stride=1, randomize=False)
+    initial_forced = set(meta.get("forced_slack") or ())
+
+    assert len(initial_forced) == 0
+
+    slack_total = 6 * 6 - sum(r.w * r.h for r in tiles)
+
+    (
+        augmented,
+        refined_options,
+        coverage_counts,
+        changed,
+    ) = cp_sat_module._augment_forced_slack(
+        6,
+        6,
+        tiles,
+        options,
+        initial_forced,
+        slack_total,
+    )
+
+    assert changed
+    assert len(augmented) == slack_total
+    assert all(len(opts) > 0 for opts in refined_options)
+    assert len(coverage_counts) == 36
+    for cell in augmented:
+        assert coverage_counts[cell] == 0
+
+    placements = cp_sat_module._backtracking_exact_cover(
+        6,
+        6,
+        tiles,
+        refined_options,
+        forced_slack=augmented,
+    )
+
+    assert placements is not None
+    assert len(placements) == len(tiles)
+    stats = getattr(cp_sat_module._backtracking_exact_cover, "last_stats", {})
+    assert stats.get("forced_slack_cells") == len(augmented)
+
+
 def test_guard_blocks_backtracking_prefilter(monkeypatch, cp_sat_module):
     Rect = cp_sat_module.Rect
     tiles = [Rect(1, 1, "A")]
