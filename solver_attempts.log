@@ -1,285 +1,314 @@
-2025-10-25 13:18:58 [INFO] Run timer started
-2025-10-25 13:19:03 [INFO] Progress reset
-2025-10-25 13:19:03 [INFO] Run timer started
-2025-10-25 13:19:03 [INFO] Phase started | phase=1
-2025-10-25 13:19:03 [INFO] Guard configuration | TS_TEST_MODE=0 TS_MAX_EDGE_FT=6.0 TS_NO_PLUS=0 TS_SAME_SHAPE_LIMIT=1
-2025-10-25 13:19:03 [INFO] Run setup | demand_count=47 area_sqft=109.75 grid_step=1 max_tile_side=6 base_side_cells=20 sqrt_cells=21
-2025-10-25 13:19:03 [INFO] Phase finished | phase=1 duration=0.01s
-2025-10-25 13:19:03 [INFO] Phase started | phase=S0
-2025-10-25 13:19:03 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
-2025-10-25 13:19:03 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
-2025-10-25 13:19:03 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.01s reason=phase_change
-2025-10-25 13:19:03 [INFO] Phase finished | phase=S0 duration=0.01s
-2025-10-25 13:19:03 [INFO] Phase started | phase=C
-2025-10-25 13:19:03 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=900.00s slice=1/1
-2025-10-25 13:19:03 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-25 13:19:03 [INFO] Attempt dispatched | phase=C board=20×20 queue_size=0 remaining_round=900.0 adaptive_slice=900.0 budget=900.0
-2025-10-25 13:20:11 [INFO] Fallback started | phase=C board=20×20 reason=Subprocess ended early (pipe closed) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:20:11 [INFO] Fallback failed | phase=C board=20×20 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:20:11 [INFO] Solver detail | phase=C board=20×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=False placements=0
-2025-10-25 13:34:03 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=900.00s budget=900.00s slice=1/1 reason=phase_change
-2025-10-25 13:34:03 [INFO] Phase finished | phase=C duration=900.01s
-2025-10-25 13:34:03 [INFO] Phase started | phase=D
-2025-10-25 13:34:03 [INFO] Attempt started | phase=D attempt=10.5 × 10.5 ft grid=10.0 × 10.0 ft budget=60.00s slice=1/15
-2025-10-25 13:34:03 [INFO] Grid updated | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-25 13:34:03 [INFO] Attempt dispatched | phase=D board=21×21 queue_size=14 remaining_round=900.0 adaptive_slice=60.0 budget=60.0
-2025-10-25 13:35:04 [INFO] Fallback started | phase=D board=21×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:37:48 [INFO] Fallback failed | phase=D board=21×21 elapsed=164.24 reason=Backtracking rescue failed (time_limit)
-2025-10-25 13:37:48 [INFO] Solver detail | phase=D board=21×21 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 13:37:48 [INFO] Retry limit reached | phase=D board=21×21 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 13:37:48 [INFO] Attempt finished | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=225.73s budget=60.00s slice=1/15 reason=switch
-2025-10-25 13:37:48 [INFO] Attempt started | phase=D attempt=10.0 × 10.5 ft grid=10.5 × 10.5 ft budget=48.16s slice=2/15
-2025-10-25 13:37:48 [INFO] Grid updated | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft
-2025-10-25 13:37:48 [INFO] Attempt dispatched | phase=D board=20×21 queue_size=13 remaining_round=674.27 adaptive_slice=48.16 budget=48.16
-2025-10-25 13:38:38 [INFO] Fallback started | phase=D board=20×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:38:38 [INFO] Fallback failed | phase=D board=20×21 elapsed=0.03 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:38:38 [INFO] Solver detail | phase=D board=20×21 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:38:38 [INFO] Attempt finished | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft duration=49.67s budget=48.16s slice=2/15 reason=switch
-2025-10-25 13:38:38 [INFO] Attempt started | phase=D attempt=10.5 × 10.0 ft grid=10.0 × 10.5 ft budget=48.05s slice=3/15
-2025-10-25 13:38:38 [INFO] Grid updated | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft
-2025-10-25 13:38:38 [INFO] Attempt dispatched | phase=D board=21×20 queue_size=12 remaining_round=624.6 adaptive_slice=48.05 budget=48.05
-2025-10-25 13:39:28 [INFO] Fallback started | phase=D board=21×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:39:28 [INFO] Fallback failed | phase=D board=21×20 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:39:28 [INFO] Solver detail | phase=D board=21×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:39:28 [INFO] Attempt finished | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft duration=49.53s budget=48.05s slice=3/15 reason=switch
-2025-10-25 13:39:28 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=10.5 × 10.0 ft budget=47.92s slice=4/15
-2025-10-25 13:39:28 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
-2025-10-25 13:39:28 [INFO] Attempt dispatched | phase=D board=20×20 queue_size=11 remaining_round=575.07 adaptive_slice=47.92 budget=47.92
-2025-10-25 13:40:17 [INFO] Fallback started | phase=D board=20×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:40:17 [INFO] Fallback failed | phase=D board=20×20 elapsed=0.04 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:40:17 [INFO] Solver detail | phase=D board=20×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:40:17 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=49.41s budget=47.92s slice=4/15 reason=switch
-2025-10-25 13:40:17 [INFO] Attempt started | phase=D attempt=9.5 × 10.5 ft grid=10.0 × 10.0 ft budget=47.79s slice=5/15
-2025-10-25 13:40:17 [INFO] Grid updated | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft
-2025-10-25 13:40:17 [INFO] Attempt dispatched | phase=D board=19×21 queue_size=10 remaining_round=525.67 adaptive_slice=47.79 budget=47.79
-2025-10-25 13:41:06 [INFO] Fallback started | phase=D board=19×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:41:06 [INFO] Fallback failed | phase=D board=19×21 elapsed=0.03 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:41:06 [INFO] Solver detail | phase=D board=19×21 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:41:06 [INFO] Attempt finished | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft duration=49.19s budget=47.79s slice=5/15 reason=switch
-2025-10-25 13:41:06 [INFO] Attempt started | phase=D attempt=10.5 × 9.5 ft grid=9.5 × 10.5 ft budget=47.65s slice=6/15
-2025-10-25 13:41:06 [INFO] Grid updated | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft
-2025-10-25 13:41:06 [INFO] Attempt dispatched | phase=D board=21×19 queue_size=9 remaining_round=476.47 adaptive_slice=47.65 budget=47.65
-2025-10-25 13:41:55 [INFO] Fallback started | phase=D board=21×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:41:55 [INFO] Fallback failed | phase=D board=21×19 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:41:55 [INFO] Solver detail | phase=D board=21×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:41:55 [INFO] Attempt finished | phase=D attempt=10.5 × 9.5 ft grid=10.5 × 9.5 ft duration=49.09s budget=47.65s slice=6/15 reason=switch
-2025-10-25 13:41:55 [INFO] Attempt started | phase=D attempt=9.0 × 11.0 ft grid=10.5 × 9.5 ft budget=47.49s slice=7/15
-2025-10-25 13:41:55 [INFO] Grid updated | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft
-2025-10-25 13:41:55 [INFO] Attempt dispatched | phase=D board=18×22 queue_size=8 remaining_round=427.38 adaptive_slice=47.49 budget=47.49
-2025-10-25 13:42:44 [INFO] Fallback started | phase=D board=18×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:42:44 [INFO] Fallback failed | phase=D board=18×22 elapsed=0.04 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:42:44 [INFO] Solver detail | phase=D board=18×22 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:42:44 [INFO] Attempt finished | phase=D attempt=9.0 × 11.0 ft grid=9.0 × 11.0 ft duration=48.94s budget=47.49s slice=7/15 reason=switch
-2025-10-25 13:42:44 [INFO] Attempt started | phase=D attempt=9.5 × 10.0 ft grid=9.0 × 11.0 ft budget=47.31s slice=8/15
-2025-10-25 13:42:44 [INFO] Grid updated | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft
-2025-10-25 13:42:44 [INFO] Attempt dispatched | phase=D board=19×20 queue_size=7 remaining_round=378.44 adaptive_slice=47.31 budget=47.31
-2025-10-25 13:43:33 [INFO] Fallback started | phase=D board=19×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:43:33 [INFO] Fallback failed | phase=D board=19×20 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:43:33 [INFO] Solver detail | phase=D board=19×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:43:33 [INFO] Attempt finished | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft duration=48.82s budget=47.31s slice=8/15 reason=switch
-2025-10-25 13:43:33 [INFO] Attempt started | phase=D attempt=10.0 × 9.5 ft grid=9.5 × 10.0 ft budget=47.09s slice=9/15
-2025-10-25 13:43:33 [INFO] Grid updated | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft
-2025-10-25 13:43:33 [INFO] Attempt dispatched | phase=D board=20×19 queue_size=6 remaining_round=329.62 adaptive_slice=47.09 budget=47.09
-2025-10-25 13:44:22 [INFO] Fallback started | phase=D board=20×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:44:22 [INFO] Fallback failed | phase=D board=20×19 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:44:22 [INFO] Solver detail | phase=D board=20×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:44:22 [INFO] Attempt finished | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft duration=48.52s budget=47.09s slice=9/15 reason=switch
-2025-10-25 13:44:22 [INFO] Attempt started | phase=D attempt=9.0 × 10.5 ft grid=10.0 × 9.5 ft budget=46.85s slice=10/15
-2025-10-25 13:44:22 [INFO] Grid updated | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft
-2025-10-25 13:44:22 [INFO] Attempt dispatched | phase=D board=18×21 queue_size=5 remaining_round=281.1 adaptive_slice=46.85 budget=46.85
-2025-10-25 13:45:10 [INFO] Fallback started | phase=D board=18×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:45:10 [INFO] Fallback failed | phase=D board=18×21 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:45:10 [INFO] Solver detail | phase=D board=18×21 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:45:10 [INFO] Attempt finished | phase=D attempt=9.0 × 10.5 ft grid=9.0 × 10.5 ft duration=48.31s budget=46.85s slice=10/15 reason=switch
-2025-10-25 13:45:10 [INFO] Attempt started | phase=D attempt=9.5 × 9.5 ft grid=9.0 × 10.5 ft budget=46.56s slice=11/15
-2025-10-25 13:45:10 [INFO] Grid updated | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft
-2025-10-25 13:45:10 [INFO] Attempt dispatched | phase=D board=19×19 queue_size=4 remaining_round=232.79 adaptive_slice=46.56 budget=46.56
-2025-10-25 13:45:58 [INFO] Fallback started | phase=D board=19×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:45:58 [INFO] Fallback failed | phase=D board=19×19 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:45:58 [INFO] Solver detail | phase=D board=19×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:45:58 [INFO] Attempt finished | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft duration=48.02s budget=46.56s slice=11/15 reason=switch
-2025-10-25 13:45:58 [INFO] Attempt started | phase=D attempt=9.0 × 10.0 ft grid=9.5 × 9.5 ft budget=46.19s slice=12/15
-2025-10-25 13:45:58 [INFO] Grid updated | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft
-2025-10-25 13:45:58 [INFO] Attempt dispatched | phase=D board=18×20 queue_size=3 remaining_round=184.77 adaptive_slice=46.19 budget=46.19
-2025-10-25 13:46:46 [INFO] Fallback started | phase=D board=18×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:46:46 [INFO] Fallback failed | phase=D board=18×20 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:46:46 [INFO] Solver detail | phase=D board=18×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:46:46 [INFO] Attempt finished | phase=D attempt=9.0 × 10.0 ft grid=9.0 × 10.0 ft duration=47.64s budget=46.19s slice=12/15 reason=switch
-2025-10-25 13:46:46 [INFO] Attempt started | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 10.0 ft budget=45.71s slice=13/15
-2025-10-25 13:46:46 [INFO] Grid updated | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft
-2025-10-25 13:46:46 [INFO] Attempt dispatched | phase=D board=18×19 queue_size=2 remaining_round=137.13 adaptive_slice=45.71 budget=45.71
-2025-10-25 13:47:33 [INFO] Fallback started | phase=D board=18×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:47:33 [INFO] Fallback failed | phase=D board=18×19 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:47:33 [INFO] Solver detail | phase=D board=18×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:47:33 [INFO] Attempt finished | phase=D attempt=9.0 × 9.5 ft grid=9.0 × 9.5 ft duration=47.14s budget=45.71s slice=13/15 reason=switch
-2025-10-25 13:47:33 [INFO] Attempt started | phase=D attempt=9.5 × 9.0 ft grid=9.0 × 9.5 ft budget=44.99s slice=14/15
-2025-10-25 13:47:33 [INFO] Grid updated | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft
-2025-10-25 13:47:33 [INFO] Attempt dispatched | phase=D board=19×18 queue_size=1 remaining_round=89.98 adaptive_slice=44.99 budget=44.99
-2025-10-25 13:48:19 [INFO] Fallback started | phase=D board=19×18 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:48:19 [INFO] Fallback failed | phase=D board=19×18 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:48:19 [INFO] Solver detail | phase=D board=19×18 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:48:19 [INFO] Attempt finished | phase=D attempt=9.5 × 9.0 ft grid=9.5 × 9.0 ft duration=46.44s budget=44.99s slice=14/15 reason=switch
-2025-10-25 13:48:19 [INFO] Attempt started | phase=D attempt=9.0 × 9.0 ft grid=9.5 × 9.0 ft budget=43.55s slice=15/15
-2025-10-25 13:48:19 [INFO] Grid updated | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft
-2025-10-25 13:48:19 [INFO] Attempt dispatched | phase=D board=18×18 queue_size=0 remaining_round=43.55 adaptive_slice=43.55 budget=43.55
-2025-10-25 13:49:04 [INFO] Fallback started | phase=D board=18×18 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:49:04 [INFO] Fallback failed | phase=D board=18×18 elapsed=0.02 reason=Backtracking rescue failed (tile_area_exceeds_board)
-2025-10-25 13:49:04 [INFO] Solver detail | phase=D board=18×18 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
-2025-10-25 13:49:04 [INFO] Attempt finished | phase=D attempt=9.0 × 9.0 ft grid=9.0 × 9.0 ft duration=44.96s budget=43.55s slice=15/15 reason=phase_change
-2025-10-25 13:49:04 [INFO] Phase finished | phase=D duration=901.42s
-2025-10-25 13:49:04 [INFO] Phase started | phase=E
-2025-10-25 13:49:04 [INFO] Attempt started | phase=E attempt=10.5 × 10.5 ft grid=9.0 × 9.0 ft budget=75.00s slice=1/12
-2025-10-25 13:49:04 [INFO] Grid updated | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-25 13:49:04 [INFO] Attempt dispatched | phase=E board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
-2025-10-25 13:50:19 [INFO] Fallback started | phase=E board=21×21 reason=Subprocess ended early (pipe closed) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:55:52 [INFO] Fallback failed | phase=E board=21×21 elapsed=333.44 reason=Backtracking rescue failed (time_limit)
-2025-10-25 13:55:52 [INFO] Solver detail | phase=E board=21×21 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 13:55:52 [INFO] Retry limit reached | phase=E board=21×21 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 13:55:52 [INFO] Attempt finished | phase=E attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=408.26s budget=75.00s slice=1/12 reason=switch
-2025-10-25 13:55:52 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=44.70s slice=2/12
-2025-10-25 13:55:52 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-25 13:55:52 [INFO] Attempt dispatched | phase=E board=22×22 queue_size=10 remaining_round=491.74 adaptive_slice=44.7 budget=44.7
-2025-10-25 13:56:39 [INFO] Fallback started | phase=E board=22×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:57:23 [INFO] Fallback failed | phase=E board=22×22 elapsed=44.74 reason=Backtracking rescue failed (time_limit)
-2025-10-25 13:57:23 [INFO] Solver detail | phase=E board=22×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 13:57:23 [INFO] Retry limit reached | phase=E board=22×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 13:57:23 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=90.93s budget=44.70s slice=2/12 reason=switch
-2025-10-25 13:57:23 [INFO] Attempt started | phase=E attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=40.08s slice=3/12
-2025-10-25 13:57:23 [INFO] Grid updated | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
-2025-10-25 13:57:23 [INFO] Attempt dispatched | phase=E board=23×23 queue_size=9 remaining_round=400.82 adaptive_slice=40.08 budget=40.08
-2025-10-25 13:58:05 [INFO] Fallback started | phase=E board=23×23 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:58:45 [INFO] Fallback failed | phase=E board=23×23 elapsed=40.12 reason=Backtracking rescue failed (time_limit)
-2025-10-25 13:58:45 [INFO] Solver detail | phase=E board=23×23 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 13:58:45 [INFO] Retry limit reached | phase=E board=23×23 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 13:58:45 [INFO] Attempt finished | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=81.59s budget=40.08s slice=3/12 reason=switch
-2025-10-25 13:58:45 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=35.47s slice=4/12
-2025-10-25 13:58:45 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-25 13:58:45 [INFO] Attempt dispatched | phase=E board=24×24 queue_size=8 remaining_round=319.23 adaptive_slice=35.47 budget=35.47
-2025-10-25 13:59:22 [INFO] Fallback started | phase=E board=24×24 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 13:59:57 [INFO] Fallback failed | phase=E board=24×24 elapsed=35.51 reason=Backtracking rescue failed (time_limit)
-2025-10-25 13:59:57 [INFO] Solver detail | phase=E board=24×24 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 13:59:57 [INFO] Retry limit reached | phase=E board=24×24 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 13:59:57 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=72.37s budget=35.47s slice=4/12 reason=switch
-2025-10-25 13:59:57 [INFO] Attempt started | phase=E attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=30.86s slice=5/12
-2025-10-25 13:59:57 [INFO] Grid updated | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
-2025-10-25 13:59:57 [INFO] Attempt dispatched | phase=E board=25×25 queue_size=7 remaining_round=246.86 adaptive_slice=30.86 budget=30.86
-2025-10-25 14:00:30 [INFO] Fallback started | phase=E board=25×25 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:01:00 [INFO] Fallback failed | phase=E board=25×25 elapsed=30.9 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:01:00 [INFO] Solver detail | phase=E board=25×25 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 14:01:00 [INFO] Retry limit reached | phase=E board=25×25 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:01:00 [INFO] Attempt finished | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=63.14s budget=30.86s slice=5/12 reason=switch
-2025-10-25 14:01:00 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=26.25s slice=6/12
-2025-10-25 14:01:00 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-25 14:01:00 [INFO] Attempt dispatched | phase=E board=26×26 queue_size=6 remaining_round=183.72 adaptive_slice=26.25 budget=26.25
-2025-10-25 14:01:28 [INFO] Fallback started | phase=E board=26×26 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:01:54 [INFO] Fallback failed | phase=E board=26×26 elapsed=26.29 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:01:54 [INFO] Solver detail | phase=E board=26×26 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 14:01:54 [INFO] Retry limit reached | phase=E board=26×26 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:01:54 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=53.91s budget=26.25s slice=6/12 reason=switch
-2025-10-25 14:01:54 [INFO] Attempt started | phase=E attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=21.63s slice=7/12
-2025-10-25 14:01:54 [INFO] Grid updated | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
-2025-10-25 14:01:54 [INFO] Attempt dispatched | phase=E board=27×27 queue_size=5 remaining_round=129.8 adaptive_slice=21.63 budget=21.63
-2025-10-25 14:02:17 [INFO] Fallback started | phase=E board=27×27 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:02:39 [INFO] Fallback failed | phase=E board=27×27 elapsed=21.68 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:02:39 [INFO] Solver detail | phase=E board=27×27 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 14:02:39 [INFO] Retry limit reached | phase=E board=27×27 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:02:39 [INFO] Attempt finished | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=44.68s budget=21.63s slice=7/12 reason=switch
-2025-10-25 14:02:39 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=17.02s slice=8/12
-2025-10-25 14:02:39 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-25 14:02:39 [INFO] Attempt dispatched | phase=E board=28×28 queue_size=4 remaining_round=85.12 adaptive_slice=17.02 budget=17.02
-2025-10-25 14:14:15 [INFO] Fallback started | phase=E board=28×28 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:14:32 [INFO] Fallback failed | phase=E board=28×28 elapsed=17.1 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:14:32 [INFO] Solver detail | phase=E board=28×28 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
-2025-10-25 14:14:32 [INFO] Retry limit reached | phase=E board=28×28 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:14:32 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=712.82s budget=17.02s slice=8/12 reason=phase_change
-2025-10-25 14:14:32 [INFO] Phase finished | phase=E duration=1527.69s
-2025-10-25 14:14:32 [INFO] Phase started | phase=F
-2025-10-25 14:14:32 [INFO] Attempt started | phase=F attempt=10.5 × 10.5 ft grid=14.0 × 14.0 ft budget=75.00s slice=1/12
-2025-10-25 14:14:32 [INFO] Grid updated | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
-2025-10-25 14:14:32 [INFO] Attempt dispatched | phase=F board=21×21 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
-2025-10-25 14:15:48 [INFO] Fallback started | phase=F board=21×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:17:03 [INFO] Fallback failed | phase=F board=21×21 elapsed=75.07 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:17:03 [INFO] Solver detail | phase=F board=21×21 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:17:03 [INFO] Retry limit reached | phase=F board=21×21 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:17:03 [INFO] Attempt finished | phase=F attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=151.57s budget=75.00s slice=1/12 reason=switch
-2025-10-25 14:17:03 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=10.5 × 10.5 ft budget=68.04s slice=2/12
-2025-10-25 14:17:03 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
-2025-10-25 14:17:03 [INFO] Attempt dispatched | phase=F board=22×22 queue_size=10 remaining_round=748.42 adaptive_slice=68.04 budget=68.04
-2025-10-25 14:18:13 [INFO] Fallback started | phase=F board=22×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:23:27 [INFO] Fallback failed | phase=F board=22×22 elapsed=314.2 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:23:27 [INFO] Solver detail | phase=F board=22×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:23:27 [INFO] Retry limit reached | phase=F board=22×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:23:27 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=383.91s budget=68.04s slice=2/12 reason=switch
-2025-10-25 14:23:27 [INFO] Attempt started | phase=F attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=36.45s slice=3/12
-2025-10-25 14:23:27 [INFO] Grid updated | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
-2025-10-25 14:23:27 [INFO] Attempt dispatched | phase=F board=23×23 queue_size=9 remaining_round=364.51 adaptive_slice=36.45 budget=36.45
-2025-10-25 14:24:05 [INFO] Fallback started | phase=F board=23×23 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:24:42 [INFO] Fallback failed | phase=F board=23×23 elapsed=36.54 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:24:42 [INFO] Solver detail | phase=F board=23×23 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:24:42 [INFO] Retry limit reached | phase=F board=23×23 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:24:42 [INFO] Attempt finished | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=74.38s budget=36.45s slice=3/12 reason=switch
-2025-10-25 14:24:42 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=32.24s slice=4/12
-2025-10-25 14:24:42 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
-2025-10-25 14:24:42 [INFO] Attempt dispatched | phase=F board=24×24 queue_size=8 remaining_round=290.14 adaptive_slice=32.24 budget=32.24
-2025-10-25 14:25:15 [INFO] Fallback started | phase=F board=24×24 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:25:48 [INFO] Fallback failed | phase=F board=24×24 elapsed=32.32 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:25:48 [INFO] Solver detail | phase=F board=24×24 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:25:48 [INFO] Retry limit reached | phase=F board=24×24 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:25:48 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=65.93s budget=32.24s slice=4/12 reason=switch
-2025-10-25 14:25:48 [INFO] Attempt started | phase=F attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=28.03s slice=5/12
-2025-10-25 14:25:48 [INFO] Grid updated | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
-2025-10-25 14:25:48 [INFO] Attempt dispatched | phase=F board=25×25 queue_size=7 remaining_round=224.21 adaptive_slice=28.03 budget=28.03
-2025-10-25 14:26:17 [INFO] Fallback started | phase=F board=25×25 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:26:45 [INFO] Fallback failed | phase=F board=25×25 elapsed=28.12 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:26:45 [INFO] Solver detail | phase=F board=25×25 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:26:45 [INFO] Retry limit reached | phase=F board=25×25 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:26:45 [INFO] Attempt finished | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=57.48s budget=28.03s slice=5/12 reason=switch
-2025-10-25 14:26:45 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=23.82s slice=6/12
-2025-10-25 14:26:45 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
-2025-10-25 14:26:45 [INFO] Attempt dispatched | phase=F board=26×26 queue_size=6 remaining_round=166.73 adaptive_slice=23.82 budget=23.82
-2025-10-25 14:27:10 [INFO] Fallback started | phase=F board=26×26 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:27:34 [INFO] Fallback failed | phase=F board=26×26 elapsed=23.93 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:27:34 [INFO] Solver detail | phase=F board=26×26 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:27:34 [INFO] Retry limit reached | phase=F board=26×26 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:27:34 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=49.03s budget=23.82s slice=6/12 reason=switch
-2025-10-25 14:27:34 [INFO] Attempt started | phase=F attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=19.62s slice=7/12
-2025-10-25 14:27:34 [INFO] Grid updated | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
-2025-10-25 14:27:34 [INFO] Attempt dispatched | phase=F board=27×27 queue_size=5 remaining_round=117.7 adaptive_slice=19.62 budget=19.62
-2025-10-25 14:27:55 [INFO] Fallback started | phase=F board=27×27 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:28:15 [INFO] Fallback failed | phase=F board=27×27 elapsed=19.74 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:28:15 [INFO] Solver detail | phase=F board=27×27 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:28:15 [INFO] Retry limit reached | phase=F board=27×27 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:28:15 [INFO] Attempt finished | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=40.64s budget=19.62s slice=7/12 reason=switch
-2025-10-25 14:28:15 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=15.41s slice=8/12
-2025-10-25 14:28:15 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
-2025-10-25 14:28:15 [INFO] Attempt dispatched | phase=F board=28×28 queue_size=4 remaining_round=77.06 adaptive_slice=15.41 budget=15.41
-2025-10-25 14:28:31 [INFO] Fallback started | phase=F board=28×28 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:28:47 [INFO] Fallback failed | phase=F board=28×28 elapsed=15.56 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:28:47 [INFO] Solver detail | phase=F board=28×28 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:28:47 [INFO] Retry limit reached | phase=F board=28×28 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:28:47 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=32.25s budget=15.41s slice=8/12 reason=switch
-2025-10-25 14:28:47 [INFO] Attempt started | phase=F attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=11.20s slice=9/12
-2025-10-25 14:28:47 [INFO] Grid updated | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
-2025-10-25 14:28:47 [INFO] Attempt dispatched | phase=F board=29×29 queue_size=3 remaining_round=44.81 adaptive_slice=11.2 budget=11.2
-2025-10-25 14:28:59 [INFO] Fallback started | phase=F board=29×29 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:29:11 [INFO] Fallback failed | phase=F board=29×29 elapsed=11.35 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:29:11 [INFO] Solver detail | phase=F board=29×29 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:29:11 [INFO] Retry limit reached | phase=F board=29×29 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:29:11 [INFO] Attempt finished | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=23.82s budget=11.20s slice=9/12 reason=switch
-2025-10-25 14:29:11 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=7.00s slice=10/12
-2025-10-25 14:29:11 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
-2025-10-25 14:29:11 [INFO] Attempt dispatched | phase=F board=30×30 queue_size=2 remaining_round=20.99 adaptive_slice=7.0 budget=7.0
-2025-10-25 14:29:19 [INFO] Fallback started | phase=F board=30×30 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:29:26 [INFO] Fallback failed | phase=F board=30×30 elapsed=7.14 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:29:26 [INFO] Solver detail | phase=F board=30×30 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:29:26 [INFO] Retry limit reached | phase=F board=30×30 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:29:26 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=15.41s budget=7.00s slice=10/12 reason=switch
-2025-10-25 14:29:26 [INFO] Attempt started | phase=F attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=5.00s slice=11/12
-2025-10-25 14:29:26 [INFO] Grid updated | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
-2025-10-25 14:29:26 [INFO] Attempt dispatched | phase=F board=31×31 queue_size=1 remaining_round=5.57 adaptive_slice=2.79 budget=5.0
-2025-10-25 14:29:33 [INFO] Fallback started | phase=F board=31×31 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
-2025-10-25 14:29:38 [INFO] Fallback failed | phase=F board=31×31 elapsed=5.17 reason=Backtracking rescue failed (time_limit)
-2025-10-25 14:29:38 [INFO] Solver detail | phase=F board=31×31 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
-2025-10-25 14:29:38 [INFO] Retry limit reached | phase=F board=31×31 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
-2025-10-25 14:29:38 [INFO] Attempt finished | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=11.45s budget=5.00s slice=11/12 reason=run_complete
-2025-10-25 14:29:38 [INFO] Run finished | status=Error ok=False duration=4235.02s best_used=0 coverage=0.00% message=Backtracking rescue failed (time_limit)
+2025-10-26 10:21:49 [INFO] Run timer started
+2025-10-26 10:22:07 [INFO] Progress reset
+2025-10-26 10:22:07 [INFO] Run timer started
+2025-10-26 10:22:07 [INFO] Phase started | phase=1
+2025-10-26 10:22:07 [INFO] Guard configuration | TS_TEST_MODE=0 TS_MAX_EDGE_FT=6.0 TS_NO_PLUS=0 TS_SAME_SHAPE_LIMIT=1
+2025-10-26 10:22:07 [INFO] Run setup | demand_count=47 area_sqft=109.75 grid_step=1 max_tile_side=6 base_side_cells=21 sqrt_cells=21
+2025-10-26 10:22:07 [INFO] Phase finished | phase=1 duration=0.01s
+2025-10-26 10:22:07 [INFO] Phase started | phase=S0
+2025-10-26 10:22:07 [INFO] Attempt started | phase=S0 attempt=Computing demand grid=Computing demand
+2025-10-26 10:22:07 [INFO] Grid updated | phase=S0 attempt=Computing demand grid=—
+2025-10-26 10:22:07 [INFO] Attempt finished | phase=S0 attempt=Computing demand grid=— duration=0.01s reason=phase_change
+2025-10-26 10:22:07 [INFO] Phase finished | phase=S0 duration=0.01s
+2025-10-26 10:22:07 [INFO] Phase started | phase=C
+2025-10-26 10:22:07 [INFO] Attempt started | phase=C attempt=10.0 × 10.0 ft grid=— budget=900.00s slice=1/1
+2025-10-26 10:22:07 [INFO] Grid updated | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-26 10:22:07 [INFO] Attempt dispatched | phase=C board=20×20 queue_size=0 remaining_round=900.0 adaptive_slice=900.0 budget=900.0
+2025-10-26 10:23:21 [INFO] Fallback started | phase=C board=20×20 reason=Subprocess ended early (pipe closed) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:23:21 [INFO] Fallback failed | phase=C board=20×20 elapsed=0.06 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:23:21 [INFO] Solver detail | phase=C board=20×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=False placements=0
+2025-10-26 10:37:07 [INFO] Attempt finished | phase=C attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=900.00s budget=900.00s slice=1/1 reason=phase_change
+2025-10-26 10:37:07 [INFO] Phase finished | phase=C duration=900.01s
+2025-10-26 10:37:07 [INFO] Phase started | phase=D
+2025-10-26 10:37:07 [INFO] Attempt started | phase=D attempt=11.0 × 11.0 ft grid=10.0 × 10.0 ft budget=60.00s slice=1/15
+2025-10-26 10:37:07 [INFO] Grid updated | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-26 10:37:07 [INFO] Attempt dispatched | phase=D board=22×22 queue_size=14 remaining_round=900.0 adaptive_slice=60.0 budget=60.0
+2025-10-26 10:38:08 [INFO] Fallback started | phase=D board=22×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:39:08 [INFO] Fallback failed | phase=D board=22×22 elapsed=60.12 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:39:08 [INFO] Solver detail | phase=D board=22×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:39:08 [INFO] Retry limit reached | phase=D board=22×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:39:08 [INFO] Attempt finished | phase=D attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=121.57s budget=60.00s slice=1/15 reason=switch
+2025-10-26 10:39:08 [INFO] Attempt started | phase=D attempt=10.5 × 11.0 ft grid=11.0 × 11.0 ft budget=55.60s slice=2/15
+2025-10-26 10:39:08 [INFO] Grid updated | phase=D attempt=10.5 × 11.0 ft grid=10.5 × 11.0 ft
+2025-10-26 10:39:08 [INFO] Attempt dispatched | phase=D board=21×22 queue_size=13 remaining_round=778.43 adaptive_slice=55.6 budget=55.6
+2025-10-26 10:40:05 [INFO] Fallback started | phase=D board=21×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:41:57 [INFO] Fallback failed | phase=D board=21×22 elapsed=111.31 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:41:57 [INFO] Solver detail | phase=D board=21×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:41:57 [INFO] Retry limit reached | phase=D board=21×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:41:57 [INFO] Attempt finished | phase=D attempt=10.5 × 11.0 ft grid=10.5 × 11.0 ft duration=168.34s budget=55.60s slice=2/15 reason=switch
+2025-10-26 10:41:57 [INFO] Attempt started | phase=D attempt=11.0 × 10.5 ft grid=10.5 × 11.0 ft budget=46.93s slice=3/15
+2025-10-26 10:41:57 [INFO] Grid updated | phase=D attempt=11.0 × 10.5 ft grid=11.0 × 10.5 ft
+2025-10-26 10:41:57 [INFO] Attempt dispatched | phase=D board=22×21 queue_size=12 remaining_round=610.09 adaptive_slice=46.93 budget=46.93
+2025-10-26 10:42:45 [INFO] Fallback started | phase=D board=22×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:44:19 [INFO] Fallback failed | phase=D board=22×21 elapsed=93.98 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:44:19 [INFO] Solver detail | phase=D board=22×21 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:44:19 [INFO] Retry limit reached | phase=D board=22×21 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:44:19 [INFO] Attempt finished | phase=D attempt=11.0 × 10.5 ft grid=11.0 × 10.5 ft duration=142.31s budget=46.93s slice=3/15 reason=switch
+2025-10-26 10:44:19 [INFO] Attempt started | phase=D attempt=10.5 × 10.5 ft grid=11.0 × 10.5 ft budget=38.98s slice=4/15
+2025-10-26 10:44:19 [INFO] Grid updated | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft
+2025-10-26 10:44:19 [INFO] Attempt dispatched | phase=D board=21×21 queue_size=11 remaining_round=467.78 adaptive_slice=38.98 budget=38.98
+2025-10-26 10:44:59 [INFO] Fallback started | phase=D board=21×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:46:17 [INFO] Fallback failed | phase=D board=21×21 elapsed=78.07 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:46:17 [INFO] Solver detail | phase=D board=21×21 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:46:17 [INFO] Retry limit reached | phase=D board=21×21 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:46:17 [INFO] Attempt finished | phase=D attempt=10.5 × 10.5 ft grid=10.5 × 10.5 ft duration=118.43s budget=38.98s slice=4/15 reason=switch
+2025-10-26 10:46:17 [INFO] Attempt started | phase=D attempt=10.0 × 11.0 ft grid=10.5 × 10.5 ft budget=31.76s slice=5/15
+2025-10-26 10:46:17 [INFO] Grid updated | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft
+2025-10-26 10:46:17 [INFO] Attempt dispatched | phase=D board=20×22 queue_size=10 remaining_round=349.36 adaptive_slice=31.76 budget=31.76
+2025-10-26 10:46:50 [INFO] Fallback started | phase=D board=20×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:47:54 [INFO] Fallback failed | phase=D board=20×22 elapsed=63.63 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:47:54 [INFO] Solver detail | phase=D board=20×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:47:54 [INFO] Retry limit reached | phase=D board=20×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:47:54 [INFO] Attempt finished | phase=D attempt=10.0 × 11.0 ft grid=10.0 × 11.0 ft duration=96.76s budget=31.76s slice=5/15 reason=switch
+2025-10-26 10:47:54 [INFO] Attempt started | phase=D attempt=11.0 × 10.0 ft grid=10.0 × 11.0 ft budget=25.26s slice=6/15
+2025-10-26 10:47:54 [INFO] Grid updated | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft
+2025-10-26 10:47:54 [INFO] Attempt dispatched | phase=D board=22×20 queue_size=9 remaining_round=252.6 adaptive_slice=25.26 budget=25.26
+2025-10-26 10:48:21 [INFO] Fallback started | phase=D board=22×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:49:11 [INFO] Fallback failed | phase=D board=22×20 elapsed=50.62 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:49:11 [INFO] Solver detail | phase=D board=22×20 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 10:49:11 [INFO] Retry limit reached | phase=D board=22×20 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:49:11 [INFO] Attempt finished | phase=D attempt=11.0 × 10.0 ft grid=11.0 × 10.0 ft duration=77.23s budget=25.26s slice=6/15 reason=switch
+2025-10-26 10:49:11 [INFO] Attempt started | phase=D attempt=9.5 × 11.5 ft grid=11.0 × 10.0 ft budget=19.49s slice=7/15
+2025-10-26 10:49:11 [INFO] Grid updated | phase=D attempt=9.5 × 11.5 ft grid=9.5 × 11.5 ft
+2025-10-26 10:49:11 [INFO] Attempt dispatched | phase=D board=19×23 queue_size=8 remaining_round=175.37 adaptive_slice=19.49 budget=19.49
+2025-10-26 10:49:32 [INFO] Fallback started | phase=D board=19×23 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:49:32 [INFO] Fallback failed | phase=D board=19×23 elapsed=0.07 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:49:32 [INFO] Solver detail | phase=D board=19×23 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:49:32 [INFO] Attempt finished | phase=D attempt=9.5 × 11.5 ft grid=9.5 × 11.5 ft duration=20.88s budget=19.49s slice=7/15 reason=switch
+2025-10-26 10:49:32 [INFO] Attempt started | phase=D attempt=10.0 × 10.5 ft grid=9.5 × 11.5 ft budget=19.31s slice=8/15
+2025-10-26 10:49:32 [INFO] Grid updated | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft
+2025-10-26 10:49:32 [INFO] Attempt dispatched | phase=D board=20×21 queue_size=7 remaining_round=154.49 adaptive_slice=19.31 budget=19.31
+2025-10-26 10:49:53 [INFO] Fallback started | phase=D board=20×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:49:53 [INFO] Fallback failed | phase=D board=20×21 elapsed=0.09 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:49:53 [INFO] Solver detail | phase=D board=20×21 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:49:53 [INFO] Attempt finished | phase=D attempt=10.0 × 10.5 ft grid=10.0 × 10.5 ft duration=20.73s budget=19.31s slice=8/15 reason=switch
+2025-10-26 10:49:53 [INFO] Attempt started | phase=D attempt=10.5 × 10.0 ft grid=10.0 × 10.5 ft budget=19.11s slice=9/15
+2025-10-26 10:49:53 [INFO] Grid updated | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft
+2025-10-26 10:49:53 [INFO] Attempt dispatched | phase=D board=21×20 queue_size=6 remaining_round=133.75 adaptive_slice=19.11 budget=19.11
+2025-10-26 10:50:13 [INFO] Fallback started | phase=D board=21×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:50:13 [INFO] Fallback failed | phase=D board=21×20 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:50:13 [INFO] Solver detail | phase=D board=21×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:50:13 [INFO] Attempt finished | phase=D attempt=10.5 × 10.0 ft grid=10.5 × 10.0 ft duration=20.48s budget=19.11s slice=9/15 reason=switch
+2025-10-26 10:50:13 [INFO] Attempt started | phase=D attempt=9.5 × 11.0 ft grid=10.5 × 10.0 ft budget=18.88s slice=10/15
+2025-10-26 10:50:13 [INFO] Grid updated | phase=D attempt=9.5 × 11.0 ft grid=9.5 × 11.0 ft
+2025-10-26 10:50:13 [INFO] Attempt dispatched | phase=D board=19×22 queue_size=5 remaining_round=113.27 adaptive_slice=18.88 budget=18.88
+2025-10-26 10:50:34 [INFO] Fallback started | phase=D board=19×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:50:34 [INFO] Fallback failed | phase=D board=19×22 elapsed=0.06 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:50:34 [INFO] Solver detail | phase=D board=19×22 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:50:34 [INFO] Attempt finished | phase=D attempt=9.5 × 11.0 ft grid=9.5 × 11.0 ft duration=20.26s budget=18.88s slice=10/15 reason=switch
+2025-10-26 10:50:34 [INFO] Attempt started | phase=D attempt=10.0 × 10.0 ft grid=9.5 × 11.0 ft budget=18.60s slice=11/15
+2025-10-26 10:50:34 [INFO] Grid updated | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft
+2025-10-26 10:50:34 [INFO] Attempt dispatched | phase=D board=20×20 queue_size=4 remaining_round=93.01 adaptive_slice=18.6 budget=18.6
+2025-10-26 10:50:54 [INFO] Fallback started | phase=D board=20×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:50:54 [INFO] Fallback failed | phase=D board=20×20 elapsed=0.06 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:50:54 [INFO] Solver detail | phase=D board=20×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:50:54 [INFO] Attempt finished | phase=D attempt=10.0 × 10.0 ft grid=10.0 × 10.0 ft duration=19.97s budget=18.60s slice=11/15 reason=switch
+2025-10-26 10:50:54 [INFO] Attempt started | phase=D attempt=9.5 × 10.5 ft grid=10.0 × 10.0 ft budget=18.26s slice=12/15
+2025-10-26 10:50:54 [INFO] Grid updated | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft
+2025-10-26 10:50:54 [INFO] Attempt dispatched | phase=D board=19×21 queue_size=3 remaining_round=73.04 adaptive_slice=18.26 budget=18.26
+2025-10-26 10:51:13 [INFO] Fallback started | phase=D board=19×21 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:51:13 [INFO] Fallback failed | phase=D board=19×21 elapsed=0.06 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:51:13 [INFO] Solver detail | phase=D board=19×21 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:51:13 [INFO] Attempt finished | phase=D attempt=9.5 × 10.5 ft grid=9.5 × 10.5 ft duration=19.63s budget=18.26s slice=12/15 reason=switch
+2025-10-26 10:51:13 [INFO] Attempt started | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.5 ft budget=17.80s slice=13/15
+2025-10-26 10:51:13 [INFO] Grid updated | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft
+2025-10-26 10:51:13 [INFO] Attempt dispatched | phase=D board=19×20 queue_size=2 remaining_round=53.41 adaptive_slice=17.8 budget=17.8
+2025-10-26 10:51:32 [INFO] Fallback started | phase=D board=19×20 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:51:32 [INFO] Fallback failed | phase=D board=19×20 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:51:32 [INFO] Solver detail | phase=D board=19×20 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:51:32 [INFO] Attempt finished | phase=D attempt=9.5 × 10.0 ft grid=9.5 × 10.0 ft duration=19.16s budget=17.80s slice=13/15 reason=switch
+2025-10-26 10:51:32 [INFO] Attempt started | phase=D attempt=10.0 × 9.5 ft grid=9.5 × 10.0 ft budget=17.13s slice=14/15
+2025-10-26 10:51:32 [INFO] Grid updated | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft
+2025-10-26 10:51:32 [INFO] Attempt dispatched | phase=D board=20×19 queue_size=1 remaining_round=34.25 adaptive_slice=17.13 budget=17.13
+2025-10-26 10:51:51 [INFO] Fallback started | phase=D board=20×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:51:51 [INFO] Fallback failed | phase=D board=20×19 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:51:51 [INFO] Solver detail | phase=D board=20×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:51:51 [INFO] Attempt finished | phase=D attempt=10.0 × 9.5 ft grid=10.0 × 9.5 ft duration=18.50s budget=17.13s slice=14/15 reason=switch
+2025-10-26 10:51:51 [INFO] Attempt started | phase=D attempt=9.5 × 9.5 ft grid=10.0 × 9.5 ft budget=15.75s slice=15/15
+2025-10-26 10:51:51 [INFO] Grid updated | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft
+2025-10-26 10:51:51 [INFO] Attempt dispatched | phase=D board=19×19 queue_size=0 remaining_round=15.75 adaptive_slice=15.75 budget=15.75
+2025-10-26 10:52:08 [INFO] Fallback started | phase=D board=19×19 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:52:08 [INFO] Fallback failed | phase=D board=19×19 elapsed=0.05 reason=Backtracking rescue failed (tile_area_exceeds_board)
+2025-10-26 10:52:08 [INFO] Solver detail | phase=D board=19×19 ok=False reason=Backtracking rescue failed (tile_area_exceeds_board) allow_discard=True placements=0
+2025-10-26 10:52:08 [INFO] Attempt finished | phase=D attempt=9.5 × 9.5 ft grid=9.5 × 9.5 ft duration=17.11s budget=15.75s slice=15/15 reason=phase_change
+2025-10-26 10:52:08 [INFO] Phase finished | phase=D duration=901.36s
+2025-10-26 10:52:08 [INFO] Phase started | phase=E
+2025-10-26 10:52:08 [INFO] Attempt started | phase=E attempt=11.0 × 11.0 ft grid=9.5 × 9.5 ft budget=75.00s slice=1/12
+2025-10-26 10:52:08 [INFO] Grid updated | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-26 10:52:08 [INFO] Attempt dispatched | phase=E board=22×22 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
+2025-10-26 10:53:25 [INFO] Fallback started | phase=E board=22×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:54:40 [INFO] Fallback failed | phase=E board=22×22 elapsed=75.12 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:54:40 [INFO] Solver detail | phase=E board=22×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 10:54:40 [INFO] Retry limit reached | phase=E board=22×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:54:40 [INFO] Attempt finished | phase=E attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=151.62s budget=75.00s slice=1/12 reason=switch
+2025-10-26 10:54:40 [INFO] Attempt started | phase=E attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=68.03s slice=2/12
+2025-10-26 10:54:40 [INFO] Grid updated | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
+2025-10-26 10:54:40 [INFO] Attempt dispatched | phase=E board=23×23 queue_size=10 remaining_round=748.38 adaptive_slice=68.03 budget=68.03
+2025-10-26 10:55:49 [INFO] Fallback started | phase=E board=23×23 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:56:57 [INFO] Fallback failed | phase=E board=23×23 elapsed=68.17 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:56:57 [INFO] Solver detail | phase=E board=23×23 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 10:56:57 [INFO] Retry limit reached | phase=E board=23×23 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:56:57 [INFO] Attempt finished | phase=E attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=137.69s budget=68.03s slice=2/12 reason=switch
+2025-10-26 10:56:57 [INFO] Attempt started | phase=E attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=61.07s slice=3/12
+2025-10-26 10:56:57 [INFO] Grid updated | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-26 10:56:57 [INFO] Attempt dispatched | phase=E board=24×24 queue_size=9 remaining_round=610.69 adaptive_slice=61.07 budget=61.07
+2025-10-26 10:58:00 [INFO] Fallback started | phase=E board=24×24 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 10:59:01 [INFO] Fallback failed | phase=E board=24×24 elapsed=61.21 reason=Backtracking rescue failed (time_limit)
+2025-10-26 10:59:01 [INFO] Solver detail | phase=E board=24×24 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 10:59:01 [INFO] Retry limit reached | phase=E board=24×24 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 10:59:01 [INFO] Attempt finished | phase=E attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=123.74s budget=61.07s slice=3/12 reason=switch
+2025-10-26 10:59:01 [INFO] Attempt started | phase=E attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=54.11s slice=4/12
+2025-10-26 10:59:01 [INFO] Grid updated | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
+2025-10-26 10:59:01 [INFO] Attempt dispatched | phase=E board=25×25 queue_size=8 remaining_round=486.95 adaptive_slice=54.11 budget=54.11
+2025-10-26 10:59:57 [INFO] Fallback started | phase=E board=25×25 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:00:51 [INFO] Fallback failed | phase=E board=25×25 elapsed=54.26 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:00:51 [INFO] Solver detail | phase=E board=25×25 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:00:51 [INFO] Retry limit reached | phase=E board=25×25 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:00:51 [INFO] Attempt finished | phase=E attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=109.81s budget=54.11s slice=4/12 reason=switch
+2025-10-26 11:00:51 [INFO] Attempt started | phase=E attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=47.14s slice=5/12
+2025-10-26 11:00:51 [INFO] Grid updated | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-26 11:00:51 [INFO] Attempt dispatched | phase=E board=26×26 queue_size=7 remaining_round=377.14 adaptive_slice=47.14 budget=47.14
+2025-10-26 11:01:39 [INFO] Fallback started | phase=E board=26×26 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:02:27 [INFO] Fallback failed | phase=E board=26×26 elapsed=47.32 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:02:27 [INFO] Solver detail | phase=E board=26×26 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:02:27 [INFO] Retry limit reached | phase=E board=26×26 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:02:27 [INFO] Attempt finished | phase=E attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=95.90s budget=47.14s slice=5/12 reason=switch
+2025-10-26 11:02:27 [INFO] Attempt started | phase=E attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=40.18s slice=6/12
+2025-10-26 11:02:27 [INFO] Grid updated | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
+2025-10-26 11:02:27 [INFO] Attempt dispatched | phase=E board=27×27 queue_size=6 remaining_round=281.25 adaptive_slice=40.18 budget=40.18
+2025-10-26 11:03:08 [INFO] Fallback started | phase=E board=27×27 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:03:49 [INFO] Fallback failed | phase=E board=27×27 elapsed=40.44 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:03:49 [INFO] Solver detail | phase=E board=27×27 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:03:49 [INFO] Retry limit reached | phase=E board=27×27 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:03:49 [INFO] Attempt finished | phase=E attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=82.07s budget=40.18s slice=6/12 reason=switch
+2025-10-26 11:03:49 [INFO] Attempt started | phase=E attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=33.20s slice=7/12
+2025-10-26 11:03:49 [INFO] Grid updated | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-26 11:03:49 [INFO] Attempt dispatched | phase=E board=28×28 queue_size=5 remaining_round=199.18 adaptive_slice=33.2 budget=33.2
+2025-10-26 11:04:23 [INFO] Fallback started | phase=E board=28×28 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:04:57 [INFO] Fallback failed | phase=E board=28×28 elapsed=33.46 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:04:57 [INFO] Solver detail | phase=E board=28×28 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:04:57 [INFO] Retry limit reached | phase=E board=28×28 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:04:57 [INFO] Attempt finished | phase=E attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=68.03s budget=33.20s slice=7/12 reason=switch
+2025-10-26 11:04:57 [INFO] Attempt started | phase=E attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=26.23s slice=8/12
+2025-10-26 11:04:57 [INFO] Grid updated | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
+2025-10-26 11:04:57 [INFO] Attempt dispatched | phase=E board=29×29 queue_size=4 remaining_round=131.15 adaptive_slice=26.23 budget=26.23
+2025-10-26 11:05:24 [INFO] Fallback started | phase=E board=29×29 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:05:51 [INFO] Fallback failed | phase=E board=29×29 elapsed=26.46 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:05:51 [INFO] Solver detail | phase=E board=29×29 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:05:51 [INFO] Retry limit reached | phase=E board=29×29 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:05:51 [INFO] Attempt finished | phase=E attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=54.02s budget=26.23s slice=8/12 reason=switch
+2025-10-26 11:05:51 [INFO] Attempt started | phase=E attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=19.28s slice=9/12
+2025-10-26 11:05:51 [INFO] Grid updated | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-26 11:05:51 [INFO] Attempt dispatched | phase=E board=30×30 queue_size=3 remaining_round=77.13 adaptive_slice=19.28 budget=19.28
+2025-10-26 11:06:11 [INFO] Fallback started | phase=E board=30×30 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:06:31 [INFO] Fallback failed | phase=E board=30×30 elapsed=19.54 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:06:31 [INFO] Solver detail | phase=E board=30×30 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:06:31 [INFO] Retry limit reached | phase=E board=30×30 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:06:31 [INFO] Attempt finished | phase=E attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=40.12s budget=19.28s slice=9/12 reason=switch
+2025-10-26 11:06:31 [INFO] Attempt started | phase=E attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=12.34s slice=10/12
+2025-10-26 11:06:31 [INFO] Grid updated | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
+2025-10-26 11:06:31 [INFO] Attempt dispatched | phase=E board=31×31 queue_size=2 remaining_round=37.01 adaptive_slice=12.34 budget=12.34
+2025-10-26 11:06:45 [INFO] Fallback started | phase=E board=31×31 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:06:57 [INFO] Fallback failed | phase=E board=31×31 elapsed=12.6 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:06:57 [INFO] Solver detail | phase=E board=31×31 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:06:57 [INFO] Retry limit reached | phase=E board=31×31 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:06:57 [INFO] Attempt finished | phase=E attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=26.21s budget=12.34s slice=10/12 reason=switch
+2025-10-26 11:06:57 [INFO] Attempt started | phase=E attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.40s slice=11/12
+2025-10-26 11:06:57 [INFO] Grid updated | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-26 11:06:57 [INFO] Attempt dispatched | phase=E board=32×32 queue_size=1 remaining_round=10.8 adaptive_slice=5.4 budget=5.4
+2025-10-26 11:07:04 [INFO] Fallback started | phase=E board=32×32 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:07:10 [INFO] Fallback failed | phase=E board=32×32 elapsed=5.67 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:07:10 [INFO] Solver detail | phase=E board=32×32 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=False placements=0
+2025-10-26 11:07:10 [INFO] Retry limit reached | phase=E board=32×32 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:07:10 [INFO] Attempt finished | phase=E attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=12.32s budget=5.40s slice=11/12 reason=phase_change
+2025-10-26 11:07:10 [INFO] Phase finished | phase=E duration=901.52s
+2025-10-26 11:07:10 [INFO] Phase started | phase=F
+2025-10-26 11:07:10 [INFO] Attempt started | phase=F attempt=11.0 × 11.0 ft grid=16.0 × 16.0 ft budget=75.00s slice=1/12
+2025-10-26 11:07:10 [INFO] Grid updated | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft
+2025-10-26 11:07:10 [INFO] Attempt dispatched | phase=F board=22×22 queue_size=11 remaining_round=900.0 adaptive_slice=75.0 budget=75.0
+2025-10-26 11:08:26 [INFO] Fallback started | phase=F board=22×22 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:09:41 [INFO] Fallback failed | phase=F board=22×22 elapsed=75.12 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:09:41 [INFO] Solver detail | phase=F board=22×22 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:09:41 [INFO] Retry limit reached | phase=F board=22×22 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:09:41 [INFO] Attempt finished | phase=F attempt=11.0 × 11.0 ft grid=11.0 × 11.0 ft duration=151.63s budget=75.00s slice=1/12 reason=switch
+2025-10-26 11:09:41 [INFO] Attempt started | phase=F attempt=11.5 × 11.5 ft grid=11.0 × 11.0 ft budget=68.03s slice=2/12
+2025-10-26 11:09:41 [INFO] Grid updated | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft
+2025-10-26 11:09:41 [INFO] Attempt dispatched | phase=F board=23×23 queue_size=10 remaining_round=748.37 adaptive_slice=68.03 budget=68.03
+2025-10-26 11:10:51 [INFO] Fallback started | phase=F board=23×23 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:11:59 [INFO] Fallback failed | phase=F board=23×23 elapsed=68.17 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:11:59 [INFO] Solver detail | phase=F board=23×23 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:11:59 [INFO] Retry limit reached | phase=F board=23×23 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:11:59 [INFO] Attempt finished | phase=F attempt=11.5 × 11.5 ft grid=11.5 × 11.5 ft duration=137.70s budget=68.03s slice=2/12 reason=switch
+2025-10-26 11:11:59 [INFO] Attempt started | phase=F attempt=12.0 × 12.0 ft grid=11.5 × 11.5 ft budget=61.07s slice=3/12
+2025-10-26 11:11:59 [INFO] Grid updated | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft
+2025-10-26 11:11:59 [INFO] Attempt dispatched | phase=F board=24×24 queue_size=9 remaining_round=610.67 adaptive_slice=61.07 budget=61.07
+2025-10-26 11:13:01 [INFO] Fallback started | phase=F board=24×24 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:14:03 [INFO] Fallback failed | phase=F board=24×24 elapsed=61.27 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:14:03 [INFO] Solver detail | phase=F board=24×24 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:14:03 [INFO] Retry limit reached | phase=F board=24×24 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:14:03 [INFO] Attempt finished | phase=F attempt=12.0 × 12.0 ft grid=12.0 × 12.0 ft duration=123.80s budget=61.07s slice=3/12 reason=switch
+2025-10-26 11:14:03 [INFO] Attempt started | phase=F attempt=12.5 × 12.5 ft grid=12.0 × 12.0 ft budget=54.10s slice=4/12
+2025-10-26 11:14:03 [INFO] Grid updated | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft
+2025-10-26 11:14:03 [INFO] Attempt dispatched | phase=F board=25×25 queue_size=8 remaining_round=486.86 adaptive_slice=54.1 budget=54.1
+2025-10-26 11:14:58 [INFO] Fallback started | phase=F board=25×25 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:15:52 [INFO] Fallback failed | phase=F board=25×25 elapsed=54.25 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:15:52 [INFO] Solver detail | phase=F board=25×25 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:15:52 [INFO] Retry limit reached | phase=F board=25×25 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:15:52 [INFO] Attempt finished | phase=F attempt=12.5 × 12.5 ft grid=12.5 × 12.5 ft duration=109.79s budget=54.10s slice=4/12 reason=switch
+2025-10-26 11:15:52 [INFO] Attempt started | phase=F attempt=13.0 × 13.0 ft grid=12.5 × 12.5 ft budget=47.13s slice=5/12
+2025-10-26 11:15:52 [INFO] Grid updated | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft
+2025-10-26 11:15:52 [INFO] Attempt dispatched | phase=F board=26×26 queue_size=7 remaining_round=377.08 adaptive_slice=47.13 budget=47.13
+2025-10-26 11:16:41 [INFO] Fallback started | phase=F board=26×26 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:17:28 [INFO] Fallback failed | phase=F board=26×26 elapsed=47.31 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:17:28 [INFO] Solver detail | phase=F board=26×26 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:17:28 [INFO] Retry limit reached | phase=F board=26×26 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:17:28 [INFO] Attempt finished | phase=F attempt=13.0 × 13.0 ft grid=13.0 × 13.0 ft duration=95.86s budget=47.13s slice=5/12 reason=switch
+2025-10-26 11:17:28 [INFO] Attempt started | phase=F attempt=13.5 × 13.5 ft grid=13.0 × 13.0 ft budget=40.17s slice=6/12
+2025-10-26 11:17:28 [INFO] Grid updated | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft
+2025-10-26 11:17:28 [INFO] Attempt dispatched | phase=F board=27×27 queue_size=6 remaining_round=281.22 adaptive_slice=40.17 budget=40.17
+2025-10-26 11:18:10 [INFO] Fallback started | phase=F board=27×27 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:18:50 [INFO] Fallback failed | phase=F board=27×27 elapsed=40.42 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:18:50 [INFO] Solver detail | phase=F board=27×27 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:18:50 [INFO] Retry limit reached | phase=F board=27×27 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:18:50 [INFO] Attempt finished | phase=F attempt=13.5 × 13.5 ft grid=13.5 × 13.5 ft duration=81.99s budget=40.17s slice=6/12 reason=switch
+2025-10-26 11:18:50 [INFO] Attempt started | phase=F attempt=14.0 × 14.0 ft grid=13.5 × 13.5 ft budget=33.20s slice=7/12
+2025-10-26 11:18:50 [INFO] Grid updated | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft
+2025-10-26 11:18:50 [INFO] Attempt dispatched | phase=F board=28×28 queue_size=5 remaining_round=199.23 adaptive_slice=33.2 budget=33.2
+2025-10-26 11:19:25 [INFO] Fallback started | phase=F board=28×28 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:19:58 [INFO] Fallback failed | phase=F board=28×28 elapsed=33.42 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:19:58 [INFO] Solver detail | phase=F board=28×28 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:19:58 [INFO] Retry limit reached | phase=F board=28×28 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:19:58 [INFO] Attempt finished | phase=F attempt=14.0 × 14.0 ft grid=14.0 × 14.0 ft duration=67.99s budget=33.20s slice=7/12 reason=switch
+2025-10-26 11:19:58 [INFO] Attempt started | phase=F attempt=14.5 × 14.5 ft grid=14.0 × 14.0 ft budget=26.25s slice=8/12
+2025-10-26 11:19:58 [INFO] Grid updated | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft
+2025-10-26 11:19:58 [INFO] Attempt dispatched | phase=F board=29×29 queue_size=4 remaining_round=131.23 adaptive_slice=26.25 budget=26.25
+2025-10-26 11:20:26 [INFO] Fallback started | phase=F board=29×29 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:20:52 [INFO] Fallback failed | phase=F board=29×29 elapsed=26.47 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:20:52 [INFO] Solver detail | phase=F board=29×29 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:20:52 [INFO] Retry limit reached | phase=F board=29×29 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:20:52 [INFO] Attempt finished | phase=F attempt=14.5 × 14.5 ft grid=14.5 × 14.5 ft duration=54.07s budget=26.25s slice=8/12 reason=switch
+2025-10-26 11:20:52 [INFO] Attempt started | phase=F attempt=15.0 × 15.0 ft grid=14.5 × 14.5 ft budget=19.29s slice=9/12
+2025-10-26 11:20:52 [INFO] Grid updated | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft
+2025-10-26 11:20:52 [INFO] Attempt dispatched | phase=F board=30×30 queue_size=3 remaining_round=77.16 adaptive_slice=19.29 budget=19.29
+2025-10-26 11:21:13 [INFO] Fallback started | phase=F board=30×30 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:21:32 [INFO] Fallback failed | phase=F board=30×30 elapsed=19.52 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:21:32 [INFO] Solver detail | phase=F board=30×30 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:21:32 [INFO] Retry limit reached | phase=F board=30×30 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:21:32 [INFO] Attempt finished | phase=F attempt=15.0 × 15.0 ft grid=15.0 × 15.0 ft duration=40.13s budget=19.29s slice=9/12 reason=switch
+2025-10-26 11:21:32 [INFO] Attempt started | phase=F attempt=15.5 × 15.5 ft grid=15.0 × 15.0 ft budget=12.34s slice=10/12
+2025-10-26 11:21:32 [INFO] Grid updated | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft
+2025-10-26 11:21:33 [INFO] Attempt dispatched | phase=F board=31×31 queue_size=2 remaining_round=37.03 adaptive_slice=12.34 budget=12.34
+2025-10-26 11:21:46 [INFO] Fallback started | phase=F board=31×31 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:21:59 [INFO] Fallback failed | phase=F board=31×31 elapsed=12.6 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:21:59 [INFO] Solver detail | phase=F board=31×31 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:21:59 [INFO] Retry limit reached | phase=F board=31×31 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:21:59 [INFO] Attempt finished | phase=F attempt=15.5 × 15.5 ft grid=15.5 × 15.5 ft duration=26.21s budget=12.34s slice=10/12 reason=switch
+2025-10-26 11:21:59 [INFO] Attempt started | phase=F attempt=16.0 × 16.0 ft grid=15.5 × 15.5 ft budget=5.41s slice=11/12
+2025-10-26 11:21:59 [INFO] Grid updated | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft
+2025-10-26 11:21:59 [INFO] Attempt dispatched | phase=F board=32×32 queue_size=1 remaining_round=10.82 adaptive_slice=5.41 budget=5.41
+2025-10-26 11:22:05 [INFO] Fallback started | phase=F board=32×32 reason=Stopped before solution (timebox / crash?) retries=0 max_retries=3 trigger=crash
+2025-10-26 11:22:11 [INFO] Fallback failed | phase=F board=32×32 elapsed=5.71 reason=Backtracking rescue failed (time_limit)
+2025-10-26 11:22:11 [INFO] Solver detail | phase=F board=32×32 ok=False reason=Backtracking rescue failed (time_limit) allow_discard=True placements=0
+2025-10-26 11:22:11 [INFO] Retry limit reached | phase=F board=32×32 reason=Backtracking rescue failed (time_limit) retries=3 max_retries=3
+2025-10-26 11:22:11 [INFO] Attempt finished | phase=F attempt=16.0 × 16.0 ft grid=16.0 × 16.0 ft duration=12.38s budget=5.41s slice=11/12 reason=run_complete
+2025-10-26 11:22:11 [INFO] Run finished | status=Error ok=False duration=3604.47s best_used=0 coverage=0.00% message=Backtracking rescue failed (time_limit)
