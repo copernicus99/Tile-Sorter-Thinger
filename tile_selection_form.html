@@ -113,6 +113,8 @@
         <div class="rc-stat"><b>Phase total</b><span id="rc-phase-total">—</span></div>
         <div class="rc-stat"><b>Attempt</b><span id="rc-attempt">—</span></div>
         <div class="rc-stat"><b>Grid</b><span id="rc-grid">—</span></div>
+        <div class="rc-stat"><b>Tiles placed</b><span id="rc-best-used">—</span></div>
+        <div class="rc-stat"><b>Coverage</b><span id="rc-coverage">—</span></div>
         <div class="rc-row-span"><div class="rc-stat"><b>Elapsed</b><span id="rc-elapsed">0s</span></div></div>
         <div class="rc-row-span rc-divider"></div>
         <div class="rc-row-span"><div class="rc-stat"><b>Phase</b><span id="rc-phase">—</span></div></div>
@@ -187,7 +189,8 @@
   const S = {
     status: $('rc-status'), strategy: $('rc-strategy'), attempt: $('rc-attempt'),
     grid: $('rc-grid'), elapsed: $('rc-elapsed'),
-    phaseTotal: $('rc-phase-total'), phase: $('rc-phase'), barPhase: $('rc-bar-phase')
+    phaseTotal: $('rc-phase-total'), phase: $('rc-phase'), barPhase: $('rc-bar-phase'),
+    bestUsed: $('rc-best-used'), coverage: $('rc-coverage')
   };
   let lastRunId = null;
   let previousRunId = null;
@@ -246,6 +249,28 @@
     const val = Math.max(0, Math.min(100, parseFloat(String(rawPhase || 0).toString().replace('%',''))));
     S.phase.textContent = `${val.toFixed(1)}%`;
     S.barPhase.setAttribute('width', String(val));
+
+    let bestText = '—';
+    const bestUsed = Number(p.best_used);
+    const demandTotal = Number(p.demand_count);
+    if (Number.isFinite(bestUsed) && bestUsed >= 0) {
+      if (Number.isFinite(demandTotal) && demandTotal > 0) {
+        bestText = `${bestUsed}/${demandTotal}`;
+      } else {
+        bestText = String(bestUsed);
+      }
+    }
+    S.bestUsed.textContent = bestText;
+
+    let coverageText = '—';
+    const coverageRaw = p.coverage_pct;
+    if (coverageRaw !== undefined && coverageRaw !== null && coverageRaw !== '') {
+      const coverageNum = Number(coverageRaw);
+      if (Number.isFinite(coverageNum)) {
+        coverageText = `${coverageNum.toFixed(1)}%`;
+      }
+    }
+    S.coverage.textContent = coverageText;
   }
 
   async function poll(token){
