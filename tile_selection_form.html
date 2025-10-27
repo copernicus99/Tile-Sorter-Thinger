@@ -186,6 +186,7 @@
   const ov = document.getElementById('runOverlay');
   const $ = (id) => document.getElementById(id);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const PLACEHOLDER = '—';
   const S = {
     status: $('rc-status'), strategy: $('rc-strategy'), attempt: $('rc-attempt'),
     grid: $('rc-grid'), elapsed: $('rc-elapsed'),
@@ -196,21 +197,34 @@
   let previousRunId = null;
   let awaitingNewRun = false;
   let currentPollToken = 0;
-  function show(){ ov.classList.remove('hidden'); }
+  function resetCard(){
+    S.status.textContent = 'Solving';
+    S.strategy.textContent = PLACEHOLDER;
+    S.attempt.textContent = PLACEHOLDER;
+    S.grid.textContent = PLACEHOLDER;
+    S.elapsed.textContent = '0s';
+    S.phaseTotal.textContent = PLACEHOLDER;
+    S.phase.textContent = '0.0%';
+    S.barPhase.setAttribute('width', '0');
+    S.bestUsed.textContent = PLACEHOLDER;
+    S.coverage.textContent = PLACEHOLDER;
+  }
+  function show(){
+    resetCard();
+    ov.classList.remove('hidden');
+  }
   function hide(){ ov.classList.add('hidden'); }
   function fmtElapsed(sec){ sec=Math.max(0,Math.floor(sec||0)); const m=Math.floor(sec/60), s=sec%60; return (m?m+'m ':'')+s+'s'; }
   function normalize(s){ return s ? String(s).replace(/x/g,' × ') : s; }
 
   function updateCard(p){
-    const label = "Solving";
-    const api = (p.status || "").trim();
-    const showExtra = api && api.toLowerCase() !== label.toLowerCase();
-    S.status.textContent = showExtra ? `${label} (${api})` : label;
+    const statusText = (p.status ?? '').toString().trim();
+    S.status.textContent = statusText || 'Solving';
 
     const phaseLabel = (p.phase ?? p.strategy);
     S.strategy.textContent = (phaseLabel !== undefined && phaseLabel !== null && phaseLabel !== '')
       ? String(phaseLabel)
-      : '—';
+      : PLACEHOLDER;
     let attemptText = normalize(p.attempt);
     if (attemptText && attemptText.trim() !== '') {
       const extras = [];
@@ -228,21 +242,46 @@
         attemptText = `${attemptText} (${extras.join(', ')})`;
       }
     } else {
-      attemptText = '—';
+      attemptText = PLACEHOLDER;
     }
     S.attempt.textContent  = attemptText;
 
     // Grid fallback: grid → grid_ft → attempt
-    const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? '—';
+    const gridText = normalize(p.grid) ?? normalize(p.grid_ft) ?? normalize(p.attempt) ?? PLACEHOLDER;
     S.grid.textContent = gridText;
 
     const elapsedSec = p.elapsed ?? p.overall_elapsed ?? 0;
     S.elapsed.textContent = fmtElapsed(elapsedSec);
 
     const phaseTotal = p.phase_total ?? p.time_limit;
-    S.phaseTotal.textContent = (phaseTotal !== undefined && phaseTotal !== null && phaseTotal !== '')
-      ? String(phaseTotal)
-      : '—';
+    if (phaseTotal !== undefined && phaseTotal !== null && phaseTotal !== '') {
+      const phaseTotalNum = Number(phaseTotal);
+      if (Number.isFinite(phaseTotalNum) && phaseTotalNum >= 0) {
+        if (phaseTotalNum >= 3600) {
+          const hours = Math.floor(phaseTotalNum / 3600);
+          const mins = Math.floor((phaseTotalNum % 3600) / 60);
+          const secs = Math.floor(phaseTotalNum % 60);
+          const parts = [`${hours}h`];
+          if (mins) parts.push(`${mins}m`);
+          if (secs) parts.push(`${secs}s`);
+          S.phaseTotal.textContent = parts.join(' ');
+        } else if (phaseTotalNum >= 60) {
+          const mins = Math.floor(phaseTotalNum / 60);
+          const secs = Math.floor(phaseTotalNum % 60);
+          S.phaseTotal.textContent = secs ? `${mins}m ${secs}s` : `${mins}m`;
+        } else if (phaseTotalNum >= 10) {
+          S.phaseTotal.textContent = `${Math.round(phaseTotalNum)}s`;
+        } else if (phaseTotalNum > 0) {
+          S.phaseTotal.textContent = `${phaseTotalNum.toFixed(1)}s`;
+        } else {
+          S.phaseTotal.textContent = PLACEHOLDER;
+        }
+      } else {
+        S.phaseTotal.textContent = String(phaseTotal);
+      }
+    } else {
+      S.phaseTotal.textContent = PLACEHOLDER;
+    }
 
     let rawPhase = p.percent ?? p.step_pct;
     if (rawPhase == null && p.time_limit) rawPhase = (p.step_elapsed / p.time_limit) * 100;
@@ -250,7 +289,7 @@
     S.phase.textContent = `${val.toFixed(1)}%`;
     S.barPhase.setAttribute('width', String(val));
 
-    let bestText = '—';
+    let bestText = PLACEHOLDER;
     const bestUsed = Number(p.best_used);
     const demandTotal = Number(p.demand_count);
     if (Number.isFinite(bestUsed) && bestUsed >= 0) {
@@ -262,7 +301,7 @@
     }
     S.bestUsed.textContent = bestText;
 
-    let coverageText = '—';
+    let coverageText = PLACEHOLDER;
     const coverageRaw = p.coverage_pct;
     if (coverageRaw !== undefined && coverageRaw !== null && coverageRaw !== '') {
       const coverageNum = Number(coverageRaw);
