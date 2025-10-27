@@ -733,6 +733,15 @@ def solve_orchestrator(*args, **kwargs):
             sqrt_cells=sqrt_cells,
         )
 
+        set_status("Solving")
+        set_phase("S0")
+        set_phase_total(1)
+        set_attempt("Computing demand")
+        set_grid("—")
+        set_progress_pct(0.0)
+        set_best_used(0)
+        set_coverage_pct(0.0)
+
         guard_block_reason = "Proven infeasible under current constraints"
         guard_failure_reason: Optional[str] = None
 
@@ -764,15 +773,6 @@ def solve_orchestrator(*args, **kwargs):
             except Exception:
                 pass
             pass
-
-        set_status("Solving")
-        set_phase("S0")
-        set_phase_total(1)
-        set_attempt("Computing demand")
-        set_grid("—")
-        set_progress_pct(0.0)
-        set_best_used(0)
-        set_coverage_pct(0.0)
 
         best_used_tiles = 0
         best_cover_pct = 0.0
