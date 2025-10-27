@@ -293,43 +293,71 @@ def _start_overlay_spinner(t0: float) -> threading.Event:
             "phase_total": normalize(snap.get("phase_total")),
             "attempt": normalize(snap.get("attempt")),
             "grid": normalize(snap.get("grid")),
+            "percent": normalize(snap.get("percent")),
         }
 
     baseline: Optional[Dict[str, str]] = None
 
-    def _solver_started(current: Dict[str, str]) -> bool:
-        if not baseline:
-            return False
-        # Any change away from the placeholder bootstrap values means the
-        # orchestrator has started publishing real progress.
-        if current.get("phase") and current.get("phase") != baseline.get("phase"):
-            return True
-        if current.get("phase_total") and current.get("phase_total") != baseline.get("phase_total"):
-            return True
-        if current.get("attempt") and current.get("attempt") != baseline.get("attempt"):
-            return True
-        grid = current.get("grid")
-        if grid and grid not in {baseline.get("grid"), "—"}:
-            return True
-        return False
-
     def _run():
         nonlocal baseline
         max_pct = 0.0
+
+        def _parse_pct(value: Optional[str]) -> Optional[float]:
+            if value is None:
+                return None
+            text = value.strip()
+            if not text:
+                return None
+            try:
+                return float(text.rstrip("%"))
+            except Exception:
+                return None
+
+        def _solver_started(current: Dict[str, str]) -> bool:
+            if not baseline:
+                return False
+            # Any change away from the placeholder bootstrap values means the
+            # orchestrator has started publishing real progress.
+            if current.get("phase") and current.get("phase") != baseline.get("phase"):
+                return True
+            if current.get("phase_total") and current.get("phase_total") != baseline.get("phase_total"):
+                return True
+            if current.get("attempt") and current.get("attempt") != baseline.get("attempt"):
+                return True
+            grid = current.get("grid")
+            if grid and grid not in {baseline.get("grid"), "—"}:
+                return True
+
+            pct_now = _parse_pct(current.get("percent"))
+            if pct_now is None:
+                return False
+
+            pct_prev = _parse_pct(baseline.get("percent"))
+            if pct_prev is not None and abs(pct_now - pct_prev) > 0.5:
+                return True
+            if abs(pct_now - max_pct) > 0.5:
+                return True
+            return False
+
         while not stop_evt.is_set():
             if stop_evt.wait(0.5):
                 break
             fields = _snapshot_fields()
-            if not baseline and fields:
-                baseline = fields
-            elif fields and _solver_started(fields):
-                break
+            if fields:
+                if baseline is None:
+                    baseline = fields
+                elif _solver_started(fields):
+                    break
+                else:
+                    baseline = fields
             try:
                 dt = time.time() - t0
                 pct = max(5.0, min(35.0, (dt / 45.0) * 60.0))
                 if pct > max_pct:
                     max_pct = pct
                 set_progress_pct(max_pct)
+                if baseline is not None:
+                    baseline["percent"] = f"{max_pct:.1f}"
             except Exception:
                 continue
         stop_evt.set()
